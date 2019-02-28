@@ -28,7 +28,7 @@ GerbMerge currently works with:
   * Artwork in Gerber RS274-X format</LI>
   * Drill files in Excellon format</LI>
 
-Here is [one sample](.\doc\sample.jpg) and [another sample](.\doc\sample2.jpg) of the program's output. These samples demonstrate panelizing multiple, different jobs, and also demonstrate board rotation.
+Here is [one sample](./doc/sample.jpg) and [another sample](./doc/sample2.jpg) of the program's output. These samples demonstrate panelizing multiple, different jobs, and also demonstrate board rotation.
 
 ## Requirements
 GerbMerge is written in pure Python. It depends upon the following packages for operation:
@@ -111,7 +111,7 @@ For the manual relative placement approach, GerbMerge needs two input text files
 The names of these files are the two required parameters to GerbMerge:
 `gerbmerge file.cfg file.def`
 
-The following links describe the contents of the [configuration file](.\doc\cfgfile.md) and [layout file](.\doc\layoutfile.md).
+The following links describe the contents of the [configuration file](./doc/cfgfile.md) and [layout file](./doc/layoutfile.md).
 
 #### Manual Absolute Placement
 For the manual absolute placement approach, GerbMerge also needs the configuration file as well as another text file that specifies where each job is located on the panel and whether or not it is rotated:
@@ -124,14 +124,14 @@ cpu 0.756 0.100
 cpu*rotated 1.35 1.50
 ```
 
-This method of placement is not meant for normal use. It can be used to recreate a previous invocation of GerbMerge, since GerbMerge saves its results in a text file (whose name is set in the [MergeOutputFiles](.\doc\cfgfile.md#MergeOutputFiles) section of the configuration file) after every run. Thus, you can experiment with different parameters, save a placement you like, do some more experimentation, then return to the saved placement if necessary.
+This method of placement is not meant for normal use. It can be used to recreate a previous invocation of GerbMerge, since GerbMerge saves its results in a text file (whose name is set in the [MergeOutputFiles](./doc/cfgfile.md#MergeOutputFiles) section of the configuration file) after every run. Thus, you can experiment with different parameters, save a placement you like, do some more experimentation, then return to the saved placement if necessary.
 
 Alternatively, this method of placement can be used with third-party back ends that implement intelligent auto-placement algorithms, using GerbMerge only for doing the actual panelization.
 
 #### Automatic Placement
-For the [automatic placement](.\doc\autosearch.html) approach, GerbMerge only needs the configuration file:
+For the [automatic placement](./doc/autosearch.md) approach, GerbMerge only needs the configuration file:
 `gerbmerge file.cfg`
-Command-line options can be used to modify the search algorithm. See the [Automatic Placement](.\doc\autosearch.html) page for more information.
+Command-line options can be used to modify the search algorithm. See the [Automatic Placement](./doc/autosearch.md) page for more information.
 
 ### Input File Requirements
 GerbMerge requires the following input CAM files:
@@ -187,14 +187,14 @@ I recommend the following programs for viewing the final output data. Take the t
   <dd>The `--octagons=normal` option is the default (22.5 degrees) and need not be specified. A rotation of 0.0 degrees can be achieved by specifying `--octagons=rotate`.</DD>
 
   <dt>--random-search</dt>
-  <dd>This option is the default when only a configuration file is specified (see the documentation on [Automatic Placement](doc\autosearch.md) for more information). It indicates that a randomized search of possible job tilings is to be performed. This option does not make sense when a layout file is specified.</dd>
+  <dd>This option is the default when only a configuration file is specified (see the documentation on [Automatic Placement](./doc/autosearch.md) for more information). It indicates that a randomized search of possible job tilings is to be performed. This option does not make sense when a layout file is specified.</dd>
 
 
   <dt>--full-search</dt>
-  <dd>This option may be specified to indicate that all possible job tilings are to be searched (see the documentation on [Automatic Placement](doc\autosearch.md) for more information). This option does not make sense when a layout file is specified.</dd>
+  <dd>This option may be specified to indicate that all possible job tilings are to be searched (see the documentation on [Automatic Placement](./doc/autosearch.md) for more information). This option does not make sense when a layout file is specified.</dd>
 
   <dt>--rs-fsjobs=N</dt>
-  <dd>This option is used with randomized search to indicate how many jobs are to undergo full search for each tiling. See the documentation on [Automatic Placement](doc\autosearch.md) for more information.</dd>
+  <dd>This option is used with randomized search to indicate how many jobs are to undergo full search for each tiling. See the documentation on [Automatic Placement](./doc/autosearch.md) for more information.</dd>
 
   <dt>--place-file=filename</dt>
   <dd>This option performs a panel layout based upon absolute job positions in the given text file, rather than by random/full search or by a layout file. The placement file created by GerbMerge can be used as an input file to this option in order to recreate a previous layout.</dd>
