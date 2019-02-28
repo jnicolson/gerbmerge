@@ -191,36 +191,35 @@ I recommend the following programs for viewing the final output data. Take the t
   <dt>--octagons=rotate</dt>
   <dd>The `--octagons` option affects how the octagon aperture is defined in the output files. The parameter to this option must either be `rotate` or `normal`. Normally, octagons begin at an angle of 22.5 degrees, but some Gerber viewers have a problem with that (notably CircuitMaker from LPKF). These programs expect octagons to begin at 0.0 degrees.</dd>
   <dd>The `--octagons=normal` option is the default (22.5 degrees) and need not be specified. A rotation of 0.0 degrees can be achieved by specifying `--octagons=rotate`.</DD>
+
+  <dt>--random-search</dt>
+  <dd>This option is the default when only a configuration file is specified (see the documentation on <A HREF="autosearch.html">Automatic Placement</A> for more information). It indicates that a randomized search of possible job tilings is to be performed. This option does not make sense when a layout file is specified.</dd>
+
+
+  <dt>--full-search</dt>
+  <dd>This option may be specified to indicate that all possible job tilings are to be searched (see the documentation on <A HREF="autosearch.html">Automatic Placement</A> for more information). This option does not make sense when a layout file is specified.</dd>
+
+  <dt>--rs-fsjobs=N</dt>
+  <dd>This option is used with randomized search to indicate how many jobs are to undergo full search for each tiling. See the documentation on <A HREF="autosearch.html">Automatic Placement</A> for more information.</dd>
+
+  <dt>--place-file=filename</dt>
+  <dd>This option performs a panel layout based upon absolute job positions in the given text file, rather than by random/full search or by a layout file. The placement file created by GerbMerge can be used as an input file to this option in order to recreate a previous layout.</dd>
+
+  <dt>--no-trim-gerber</dt>
+  <dd>This option prevents GerbMerge from trying to trim all Gerber data to lie within the extents of a given job's board outline. Normally, GerbMerge will try to do so to prevent one job's Gerber data (most notably, silkscreen lines for connectors that protrude from the board) from interfering with a neighboring job on the final panel. Specify this command-line option if you do not want this trimming to occur.</DD>
+
+  <dt>--no-trim-excellon</dt>
+  <dd>This option prevents GerbMerge from trying to trim all Excellon data to lie within the extents of a given job's board outline. Normally, GerbMerge will try to do so to prevent one job's drill holes from landing in the middle of a neighboring job on the final panel. Specify this command-line option if you do not want this trimming to occur.</DD>
+
+  <dt>--search-timeout=seconds</dt>
+  <dd>When random placements are used, this option can be used to automatically terminate the search process after the specified number of seconds. If the number of seconds is 0 or this option is not specified, then random placements are tried forever, until Ctrl-C is pressed to stop the process and keep the best placement so far.</DD>
+
+  <dt>-h, --help</dt>
+  <dd>The '`-h`' or '`--help`' option prints a brief summary of available options.</dd>
+
+  <dt>-v, --version</dt>
+  <dd>The '`-v`' or '`--version`' option prints the current program version and author contact information.</dd>
 </dl>
-
-
-
---random-search
-: This option is the default when only a configuration file is specified (see the documentation on <A HREF="autosearch.html">Automatic Placement</A> for more information). It indicates that a randomized search of possible job tilings is to be performed. This option does not make sense when a layout file is specified.
-
---full-search
-:This option may be specified to indicate that all possible job tilings are to be searched (see the documentation on <A HREF="autosearch.html">Automatic Placement</A> for more information). This option does not make sense when a layout file is specified.
-
---rs-fsjobs=N
-: This option is used with randomized search to indicate how many jobs are to undergo full search for each tiling. See the documentation on <A HREF="autosearch.html">Automatic Placement</A> for more information.
-
---place-file=filename
-: This option performs a panel layout based upon absolute job positions in the given text file, rather than by random/full search or by a layout file. The placement file created by GerbMerge can be used as an input file to this option in order to recreate a previous layout.
-
---no-trim-gerber
-:This option prevents GerbMerge from trying to trim all Gerber data to lie within the extents of a given job's board outline. Normally, GerbMerge will try to do so to prevent one job's Gerber data (most notably, silkscreen lines for connectors that protrude from the board) from interfering with a neighboring job on the final panel. Specify this command-line option if you do not want this trimming to occur.</DD>
-
---no-trim-excellon
-: This option prevents GerbMerge from trying to trim all Excellon data to lie within the extents of a given job's board outline. Normally, GerbMerge will try to do so to prevent one job's drill holes from landing in the middle of a neighboring job on the final panel. Specify this command-line option if you do not want this trimming to occur.</DD>
-
---search-timeout=seconds
-: When random placements are used, this option can be used to automatically terminate the search process after the specified number of seconds. If the number of seconds is 0 or this option is not specified, then random placements are tried forever, until Ctrl-C is pressed to stop the process and keep the best placement so far.</DD>
-
--h, --help
-:The '`-h`' or '`--help`' option prints a brief summary of available options.
-
--v, --version
-: The '`-v`' or '`--version`' option prints the current program version and author contact information.
 
 ## Copyright &amp; License
 Copyright &copy; 2013 <a href="http://provideyourown.com">ProvideYourOwn.com</a>. All Rights Reserved.
