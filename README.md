@@ -45,10 +45,10 @@ First, install all of the packages listed above in the Requirements section.
 Run the `gerbmerge1.8.exe` installation program. I will assume
 you choose all of the default installation options. The installer
 will create and populate the following directories:
-<PRE>
+
 c:\Python24\lib\site-packages\gerbmerge
 c:\Python24\gerbmerge
-</PRE>
+
 The above assumes you have Python installed in `C:\Python24`. The
 first directory is where the actual program resides. The second directory
 contains the documentation, example files, etc. In the `C:\Python24`
@@ -61,11 +61,12 @@ Extract the `gerbmerge1.8.tar.gz` file then install as follows:
 `python setup.py install`&nbsp;&nbsp;&nbsp;(You may need to be root to install to system directories)
 
 The installer will create and populate the following directories/files:
-<PRE>
+
+```
 /usr/local/lib/python2.4/site-packages/gerbmerge
 /usr/local/lib/python2.4/gerbmerge
 /usr/local/bin/gerbmerge
-</PRE>
+```
 
 The above assumes your Python library directory is as indicated (it may be
 elsewhere but the installer should be able to find it, so don't worry about
@@ -78,15 +79,15 @@ Not all Linux distributions are the same, however. If you have trouble, there is
 
 ## Running GerbMerge
 ### Windows
-<Open a DOS box and invoke the Python interpreter on the `gerbmerge.py` file.
+Open a DOS box and invoke the Python interpreter on the `gerbmerge.py` file.
 Have a look at GERBMERGE.BAT (and put this on your Path somewhere) for an example.
-<PRE><CENTER>c:\python24\python c:\python24\lib\site-packages\gerbmerge\gerbmerge.py</CENTER></PRE>
+c:\python24\python c:\python24\lib\site-packages\gerbmerge\gerbmerge.py
 
 ### Unix / Mac OS X
 You run GerbMerge by invoking the Python interpreter on the `gerbmerge.py`
 file of the `gerbmerge` package. For example:
 
-<PRE><CENTER>python /usr/local/lib/python2.4/site-packages/gerbmerge/gerbmerge.py</CENTER></PRE>
+```python /usr/local/lib/python2.4/site-packages/gerbmerge/gerbmerge.py```
 
 The `gerbmerge` shell script that comes with this software contains an
 example for running GerbMerge, modelled on the above. By default, this shell
@@ -106,30 +107,30 @@ For the manual relative placement approach, GerbMerge needs two input text files
   * The _layout file_ specifies how the jobs are to be laid out.
 
 The names of these files are the two required parameters to GerbMerge:
-<PRE><CENTER>gerbmerge file.cfg file.def</CENTER></PRE>
+`gerbmerge file.cfg file.def`
 
-The following links describe the contents of the <A HREF="cfgfile.html">configuration
-file</A> and <A HREF="layoutfile.html">layout file</A>.
+The following links describe the contents of the [configuration
+file](docs/cfgfile.md) and [layout file](docs/layoutfile.md).
 
 #### Manual Absolute Placement
 For the manual absolute placement approach, GerbMerge also needs the configuration file
 as well as another text file that specifies where each job is located on the panel and
 whether or not it is rotated:
-<PRE><CENTER>gerbmerge --place-file=place.txt file.cfg</CENTER></PRE>
+`gerbmerge --place-file=place.txt file.cfg`
 
 The `place.txt` file looks something like:
-<PRE>job1 0.100 0.100
+```job1 0.100 0.100
 cpu 0.756 0.100
 cpu*rotated 1.35 1.50
-</PRE>
+```
 
-This method of placement is not meant for normal use. It can be used to recreate a previous invocation of GerbMerge, since GerbMerge saves its results in a text file (whose name is set in the <A HREF="cfgfile.html#MergeOutputFiles">`[MergeOutputFiles]`</A> section of the configuration file) after every run. Thus, you can experiment with different parameters, save a placement you like, do some more experimentation, then return to the saved placement if necessary.
+This method of placement is not meant for normal use. It can be used to recreate a previous invocation of GerbMerge, since GerbMerge saves its results in a text file (whose name is set in the `[MergeOutputFiles]`(docs/cfgfile.md#MergeOutputFiles) section of the configuration file) after every run. Thus, you can experiment with different parameters, save a placement you like, do some more experimentation, then return to the saved placement if necessary.
 
 Alternatively, this method of placement can be used with third-party back ends that implement intelligent auto-placement algorithms, using GerbMerge only for doing the actual panelization.
 
 #### Automatic Placement
 For the <A HREF="autosearch.html">automatic placement</A> approach, GerbMerge only needs the configuration file:
-<PRE><CENTER>gerbmerge file.cfg</CENTER></PRE>
+`gerbmerge file.cfg`
 Command-line options can be used to modify the search algorithm. See the
 <A HREF="autosearch.html">Automatic Placement</A> page for more information.
 
@@ -142,11 +143,11 @@ GerbMerge requires the following input CAM files:
   * All files must have the same offset and must be shown looking from the top of the board, i.e., not mirrored.
   * Each job may have an optional tool list file indicating the tool names used in the Excellon file and the diameter of each tool. This file is not necessary if tool sizes are embedded in the Excellon file. A typical tool list file looks like:
 
-<PRE>
-          T01 0.025in
-          T02 0.032in
-          T03 0.045in
-</PRE>
+```
+T01 0.025in
+T02 0.032in
+T03 0.045in
+```
 
 ## Verifying the Output
 
@@ -169,12 +170,7 @@ I recommend the following programs for viewing the final output data. Take the t
 
   * This program has mainly been tested with output from the Eagle CAD program. Limited testing has been performed with Orcad, Protel, and PCB. Other CAD programs will NOT WORK with a very high probability, as the input parser is quite primitive.
 
-  If you have the need/motivation to adapt GerbMerge to other CAD programs,
-  have a look at the `gerber2pdf` program. It is written in Python and
-  implements a much more complete RS274-X input file parser. Combining GerbMerge
-  with `gerber2pdf` should be a fairly simple exercise. Also, feel free to
-  send us samples of Gerber/Excellon output of your CAD tool and we'll see if we can
-  add support for it.
+  If you have the need/motivation to adapt GerbMerge to other CAD programs, have a look at the `gerber2pdf` program. It is written in Python and implements a much more complete RS274-X input file parser. Combining GerbMerge with `gerber2pdf` should be a fairly simple exercise. Also, feel free to send us samples of Gerber/Excellon output of your CAD tool and we'll see if we can add support for it.
 
   * This program handles apertures that are rectangles, ovals, circles, macros without parameters or operators, and Eagle octagons (which are defined using a macro with a single parameter, hence currently handled as a special case).
 
@@ -224,39 +220,23 @@ I recommend the following programs for viewing the final output data. Take the t
 ## Copyright &amp; License
 Copyright &copy; 2013 <a href="http://provideyourown.com">ProvideYourOwn.com</a>. All Rights Reserved.
 
-This repo is a fork of gerbmerge, version 1.8 from Rugged Circuits LLC: </p>
+This repo is a fork of gerbmerge, version 1.8 from Rugged Circuits LLC:
 
 Copyright &copy; 2011 <A HREF="http://ruggedcircuits.com">Rugged Circuits LLC</A>. All Rights Reserved.
   mailto: <A HREF="mailto:support@ruggedcircuits.com?subject=GerbMerge">support@ruggedcircuits.com</A>
 
-GerbMerge comes with ABSOLUTELY NO WARRANTY. This
-  is free software licensed under the terms of the <A HREF="gpl.html">GNU General
-  Public License</A> Version 3. You are welcome to copy, modify and redistribute this software
-  under certain conditions. For more details, see the LICENSE file or
-  visit <A HREF="http://www.fsf.org">The Free Software Foundation</A>.
+GerbMerge comes with ABSOLUTELY NO WARRANTY. This is free software licensed under the terms of the GNU General Public License Version 3. You are welcome to copy, modify and redistribute this software under certain conditions. For more details, see the LICENSE file or visit <A HREF="http://www.fsf.org">The Free Software Foundation</A>.
 
 ## To Do
-
-  <OL>
-    * Accept outputs from more CAD programs
-    * A graphical interface for interactive placement
-    * Better reporting of parse errors in the layout and configuration files
-    * Implement simple primitive for panelizing a single job in an array
-    * More intelligent placement algorithms, possibly based on the fabric cutting problem.
-    <LI>Accept aperture macro parameters and operators
-  </OL>
+  1. Accept outputs from more CAD programs
+  2. A graphical interface for interactive placement
+  3. Better reporting of parse errors in the layout and configuration files
+  4. Implement simple primitive for panelizing a single job in an array
+  5. More intelligent placement algorithms, possibly based on the fabric cutting problem.
+  6. Accept aperture macro parameters and operators
 
 ## Credits
-Thanks to Jace Browning for major contributions to this code. This help file is based on a template for the help file for mxTools by <A HREF="http://starship.python.net/crew/lemburg">M.A. Lemburg</A>. This software was created with <A HREF="http://www.vim.org/">VIM</A>;
-  thanks to the authors of this program and special thanks for
-  the Python syntax support. Thanks to M.A. Lemburg for his
-  <A HREF="http://www.egenix.com/files/python/eGenix-mx-Extensions.html">mxBase</A>
-  package, Mike Fletcher for his
-  <A HREF="http://simpleparse.sourceforge.net">SimpleParse</A> package, and
-  the authors of <A HREF="http://gerbv.sourceforge.net">gerbv</A>, a great
-  Gerber file viewer for Linux/Mac OS X, and, of course, to the
-  <A HREF="http://www.python.org">Python</A> developers and
-  support community.
+Thanks to Jace Browning for major contributions to this code. This help file is based on a template for the help file for mxTools by <A HREF="http://starship.python.net/crew/lemburg">M.A. Lemburg</A>. This software was created with <A HREF="http://www.vim.org/">VIM</A>; thanks to the authors of this program and special thanks for the Python syntax support. Thanks to M.A. Lemburg for his <A HREF="http://www.egenix.com/files/python/eGenix-mx-Extensions.html">mxBase</A> package, Mike Fletcher for his <A HREF="http://simpleparse.sourceforge.net">SimpleParse</A> package, and the authors of <A HREF="http://gerbv.sourceforge.net">gerbv</A>, a great Gerber file viewer for Linux/Mac OS X, and, of course, to the <A HREF="http://www.python.org">Python</A> developers and support community.
 
 Thanks to Joe Pighetti for making me start writing this program, and to the Grand Valley State University Firefighting Robot Team for making me finish it.
 
@@ -264,6 +244,6 @@ Thanks to Matt Kavalauskas for identifying Eagle's annulus and thermal macros an
 
 Thanks to Bohdan Zograf for the <A HREF="http://webhostingrating.com/libs/gerbmerge-be">Belorussian translation</A> of this documentation.
 
+Copyright &copy; 2013 <a href="http://provideyourown.com">ProvideYourOwn.com</a>. All Rights Reserved.
 
-<p>Copyright &copy; 2013 <a href="http://provideyourown.com">ProvideYourOwn.com</a>. All Rights Reserved.</p>
-<p><center><font size="-1">Portions (version 1.8 & prior): Copyright &copy; 2003-2011, Copyright by <A HREF="http://ruggedcircuits.com">Rugged Circuits LLC</A>; All Rights Reserved. mailto: <A HREF="mailto:support@ruggedcircuits.com?subject=GerbMerge">support@ruggedcircuits.com</A></p></font></center>
+Portions (version 1.8 & prior): Copyright &copy; 2003-2011, Copyright by <A HREF="http://ruggedcircuits.com">Rugged Circuits LLC</A>; All Rights Reserved. mailto: <A HREF="mailto:support@ruggedcircuits.com?subject=GerbMerge">support@ruggedcircuits.com</A>
