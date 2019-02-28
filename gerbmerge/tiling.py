@@ -39,7 +39,7 @@ def above(p1,p2):
 def below(p1,p2):
   return p1[1]<p2[1] and p1[0]==p2[0]
 
-class Tiling:
+class Tiling(object):
   def __init__(self, Xmax, Ymax):
     # Make maximum dimensions bigger by inter-job spacing so that
     # we allow jobs (which are seated at the lower left of their cells)

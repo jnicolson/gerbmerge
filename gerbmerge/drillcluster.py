@@ -147,9 +147,9 @@ def debug_print(text, status = False, newLine = True):
     
     if _DEBUG or (status and _STATUS):
         if newLine:
-            print " ", text
+            print(" ", text)
         else:
-            print " ", text,
+            print(" ", text, "\n")
             
 def str_d(drills):
     """
@@ -194,7 +194,7 @@ def drillsToString(drills):
 if __name__=="__main__":
   import random
   
-  print "  Clustering random drills..."
+  print("  Clustering random drills...")
 
   old = {}
   tool_num = 0

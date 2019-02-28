@@ -291,7 +291,7 @@ def writeScoring(fid, Place, OriginX, OriginY, MaxXExtent, MaxYExtent):
   Lines = mergeLines(Lines)
 
   #for line in Lines:
-  #  print [round(x,3) for x in line]
+  #  print([round(x,3) for x in line])
 
   # Write 'em out
   for line in Lines:

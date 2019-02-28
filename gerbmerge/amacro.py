@@ -83,7 +83,7 @@ def rotatethelem(L, ix):
   # Increase angle th by +90 degrees for a list element
   L[ix] = rotatetheta(L[ix])
 
-class ApertureMacroPrimitive:
+class ApertureMacroPrimitive(object):
   def __init__(self, code=-1, fields=None):
     self.code = code
     self.parms = []
@@ -158,9 +158,9 @@ class ApertureMacroPrimitive:
         raise RuntimeError, 'Illegal aperture macro primitive code "%s"' % fields[0]
       self.setFromFields(code, fields[1:])
     except:
-      print '='*20
-      print "==> ", line
-      print '='*20
+      print('='*20)
+      print("==> ", line)
+      print('='*20)
       raise
 
   def rotate(self):

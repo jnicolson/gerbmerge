@@ -118,12 +118,12 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
     remaining_jobs = Jobs[:job_ix]+Jobs[job_ix+1:]
 
     if 0:
-      print "Level %d (%s)" % (level, job.name)
+      print("Level %d (%s)" % (level, job.name))
       TSoFar.joblist()
       for J in remaining_jobs:
-          print J[2].name, ", ",
-      print
-      print '-'*75
+          print(J[2].name, ", ", "\n")
+      print("\n")
+      print('-'*75)
 
     # Construct add-points for the non-rotated and rotated job.
     # As an optimization, do not construct add-points for the rotated
@@ -216,23 +216,23 @@ def tile_search1(Jobs, X, Y):
   # square). Practically, these assumptions make no difference because the software
   # currently doesn't optimize for cases of repeated jobs.
   _PossiblePermutations = (2L**len(Jobs))*factorial(len(Jobs))
-  #print "Possible permutations:", _PossiblePermutations
+  #print("Possible permutations:", _PossiblePermutations)
 
-  print '='*70
-  print "Starting placement using exhaustive search."
-  print "There are %ld possible permutations..." % _PossiblePermutations,
+  print('='*70)
+  print("Starting placement using exhaustive search.")
+  print("There are %ld possible permutations..." % _PossiblePermutations,"\n")
   if _PossiblePermutations < 1e4:
-    print "this'll take no time at all."
+    print("this'll take no time at all.")
   elif _PossiblePermutations < 1e5:
-    print "surf the web for a few minutes."
+    print("surf the web for a few minutes.")
   elif _PossiblePermutations < 1e6:
-    print "take a long lunch."
+    print("take a long lunch.")
   elif _PossiblePermutations < 1e7:
-    print "come back tomorrow."
+    print("come back tomorrow.")
   else:
-    print "don't hold your breath."
-  print "Press Ctrl-C to stop and use the best placement so far."
-  print "Estimated maximum possible utilization is %.1f%%." % (tiling.maxUtilization(Jobs)*100)
+    print("don't hold your breath.")
+  print("Press Ctrl-C to stop and use the best placement so far.")
+  print("Estimated maximum possible utilization is %.1f%%." % (tiling.maxUtilization(Jobs)*100))
 
   try:
     _tile_search1(Jobs, tiling.Tiling(X,Y), 1)
@@ -244,7 +244,7 @@ def tile_search1(Jobs, X, Y):
     print "Interrupted."
 
   computeTime = time.time() - _StartTime
-  print "Computed %ld placements in %d seconds / %.1f placements/second" % (_Placements, computeTime, _Placements/computeTime)
-  print '='*70
+  print("Computed %ld placements in %d seconds / %.1f placements/second" % (_Placements, computeTime, _Placements/computeTime))
+  print('='*70)
 
   return _TBestTiling

@@ -104,7 +104,7 @@ XIgnoreList = ( \
 # The board outline and Excellon filenames must be given separately.
 # The board outline file determines the extents of the job.
 
-class Job:
+class Job(object):
   def __init__(self, name):
     self.name = name
 
@@ -266,7 +266,7 @@ class Job:
     RevGAT = config.buildRevDict(GAT)     # RevGAT[hash] = aperturename
     RevGAMT = config.buildRevDict(GAMT)   # RevGAMT[hash] = aperturemacroname
 
-    #print 'Reading data from %s ...' % fullname
+    #print('Reading data from %s ...' % fullname)
 
     fid = file(fullname, 'rt')
     currtool = None
@@ -338,9 +338,9 @@ class Job:
 
         hash = A.hash()
         if not RevGAT.has_key(hash):
-          #print line
-          #print self.apmxlat
-          #print RevGAT
+          #print(line)
+          #print(self.apmxlat)
+          #print(RevGAT)
           raise RuntimeError, 'File %s has aperture definition "%s" not in global aperture table.' % (fullname, hash)
 
         # This says that all draw commands with this aperture code will
@@ -359,11 +359,11 @@ class Job:
         if (config.Config['measurementunits'] == 'inch'):
           raise RuntimeError, "File %s units do match config file" % fullname
         else:
-        #print "ignoring metric directive: " + line
+        #print("ignoring metric directive: " + line)
           continue # ignore it so func doesn't choke on it
 
       if line[:3] == '%SF': # scale factor - we will ignore it
-        print 'Scale factor parameter ignored: ' + line
+        print('Scale factor parameter ignored: ' + line)
         continue
       
 # end basic diptrace fixes
@@ -425,11 +425,11 @@ class Job:
               if item[0]=='X':      # M.N specification for X-axis.
                 fracpart = int(item[2])
                 x_div = 10.0**(3-fracpart)
-                #print "x_div= %5.3f." % x_div
+                #print("x_div= %5.3f." % x_div)
               if item[0]=='Y':      # M.N specification for Y-axis.
                 fracpart = int(item[2])
                 y_div = 10.0**(3-fracpart)
-                #print "y_div= %5.3f." % y_div
+                #print("y_div= %5.3f." % y_div)
       
           continue
 
@@ -608,11 +608,11 @@ class Job:
 
     fid.close()
     if 0:
-      print layername
-      print self.commands[layername]
+      print(layername)
+      print(self.commands[layername])
 
   def parseExcellon(self, fullname):
-    #print 'Reading data from %s ...' % fullname
+    #print('Reading data from %s ...' % fullname)
 
     fid = file(fullname, 'rt')
     currtool = None
@@ -653,7 +653,7 @@ class Job:
         if (config.Config['measurementunits'] == 'inch'):
           raise RuntimeError, "File %s units do match config file" % fullname
         else:
-        #print "ignoring METRIC directive: " + line
+        #print("ignoring METRIC directive: " + line)
           continue # ignore it so func doesn't choke on it
 
       if line[:3] == 'T00': # a tidying up that we can ignore
@@ -717,7 +717,7 @@ class Job:
             try:
               diam = config.DefaultToolList[currtool]
             except:
-              #print config.DefaultToolList
+              #print(config.DefaultToolList)
               raise RuntimeError, "File %s uses tool code %s that is not defined in default tool list" % (fullname, currtool)
 
         self.xdiam[currtool] = diam
@@ -1251,7 +1251,7 @@ def rotateJob(job, degrees = 90, firstpass = True):
   """Create a new job from an existing one, rotating by specified degrees in 90 degree passes"""
   GAT = config.GAT
   GAMT = config.GAMT
-  ##print "rotating job:", job.name, degrees, firstpass
+  ##print("rotating job:", job.name, degrees, firstpass)
   if firstpass:
     if degrees == 270:
         J = Job(job.name+'*rotated270')
@@ -1376,9 +1376,9 @@ def rotateJob(job, degrees = 90, firstpass = True):
         J.commands[layername].append((newx,newy,d))
 
     if 0:
-      print job.minx, job.miny, offset
-      print layername
-      print J.commands[layername]
+      print(job.minx, job.miny, offset)
+      print(layername)
+      print(J.commands[layername])
 
   # Finally, rotate drills. Offset is in hundred-thousandths (2.5) while Excellon
   # data is in 2.4 format.
@@ -1403,5 +1403,5 @@ def rotateJob(job, degrees = 90, firstpass = True):
   if degrees > 0:
     return rotateJob(J, degrees, False)
   else:
-    ##print "rotated:", J.name
+    ##print("rotated:", J.name)
     return J

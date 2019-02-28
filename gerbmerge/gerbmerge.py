@@ -57,8 +57,7 @@ config.PlacementFile = None
 GUI = None
 
 def usage():
-  print \
-"""
+  print("""
 Usage: gerbmerge [Options] configfile [layoutfile]
 
 Options:
@@ -86,7 +85,7 @@ the layout file (if any) is ignored.
 
 NOTE: The dimensions of each job are determined solely by the maximum extent of
 the board outline layer for each job.
-"""
+""")
   sys.exit(1)
 
 # changed these two writeGerberHeader files to take metric units (mm) into account:
@@ -246,7 +245,7 @@ def disclaimer():
   if (config.Config['skipdisclaimer'] > 0): # remove annoying disclaimer
     return 
 
-  print """
+  print("""
 ****************************************************
 *           R E A D    C A R E F U L L Y           *
 *                                                  *
@@ -271,14 +270,14 @@ def disclaimer():
 To agree to the above terms, press 'y' then Enter.
 Any other key will exit the program.
 
-"""
+""")
 
   s = raw_input()
   if s == 'y':
-    print
+    print("")
     return
 
-  print "\nExiting..."
+  print("\nExiting...")p
   sys.exit(0)
 
 def tile_jobs(Jobs):
@@ -374,29 +373,29 @@ def merge(opts, args, gui = None):
 
   # Display job properties                                                                
   for job in config.Jobs.values():
-    print 'Job %s:' % job.name,
+    print('Job %s:' % job.name, "\n")
     if job.Repeat > 1:
-      print '(%d instances)' % job.Repeat
+      print('(%d instances)' % job.Repeat)
     else:
-      print
-    print '  Extents: (%d,%d)-(%d,%d)' % (job.minx,job.miny,job.maxx,job.maxy)
+      print("\n")
+    print('  Extents: (%d,%d)-(%d,%d)' % (job.minx,job.miny,job.maxx,job.maxy))
     # add metric support (1/1000 mm vs. 1/100,000 inch)
     if config.Config['measurementunits'] == 'inch':
-      print '  Size: %f" x %f"' % (job.width_in(), job.height_in())
+      print('  Size: %f" x %f"' % (job.width_in(), job.height_in()))
     else:
-      print '  Size: %5.3fmm x %5.3fmm' % (job.width_in(), job.height_in())
-    print
+      print('  Size: %5.3fmm x %5.3fmm' % (job.width_in(), job.height_in()))
+    print("\n")
 
   # Trim drill locations and flash data to board extents
   if config.TrimExcellon:
     updateGUI("Trimming Excellon data...")
-    print 'Trimming Excellon data to board outlines ...'
+    print('Trimming Excellon data to board outlines ...')
     for job in config.Jobs.values():
       job.trimExcellon()
 
   if config.TrimGerber:
     updateGUI("Trimming Gerber data...")
-    print 'Trimming Gerber data to board outlines ...'
+    print('Trimming Gerber data to board outlines ...')
     for job in config.Jobs.values():
       job.trimGerber()
 
@@ -408,7 +407,7 @@ def merge(opts, args, gui = None):
   # Read the layout file and construct the nested list of jobs. If there
   # is no layout file, do auto-layout.
   updateGUI("Performing layout...")
-  print 'Performing layout ...'
+  print('Performing layout ...')
   if len(args) > 1:
     Layout = parselayout.parseLayoutFile(args[1])
 
@@ -483,7 +482,7 @@ def merge(opts, args, gui = None):
     drawing_code1 = aptable.addToApertureTable(AP)
 
   updateGUI("Writing merged files...")
-  print 'Writing merged output files ...'
+  print('Writing merged output files ...')
 
   for layername in config.LayerList.keys():
     lname = layername
@@ -495,7 +494,7 @@ def merge(opts, args, gui = None):
     except KeyError:
       fullname = 'merged.%s.ger' % lname
     OutputFiles.append(fullname)
-    #print 'Writing %s ...' % fullname
+    #print('Writing %s ...' % fullname)
     fid = file(fullname, 'wt')
     writeGerberHeader(fid)
     
@@ -510,7 +509,7 @@ def merge(opts, args, gui = None):
     # Increase aperature sizes to match minimum feature dimension                         
     if config.MinimumFeatureDimension.has_key(layername):
     
-      print '  Thickening', lname, 'feature dimensions ...'
+      print('  Thickening', lname, 'feature dimensions ...')
       
       # Fix each aperture used in this layer
       for ap in apUsedDict.keys():
@@ -566,7 +565,7 @@ def merge(opts, args, gui = None):
 
       if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
         fid.write('%s*\n' % drawing_code_cut)    # Choose drawing aperture
-        #print "writing drawcode_cut: %s" % drawing_code_cut
+        #print("writing drawcode_cut: %s" % drawing_code_cut)
         job.writeCutLines(fid, drawing_code_cut, OriginX, OriginY, MaxXExtent, MaxYExtent)
 
     if config.Config['cropmarklayers']:
@@ -586,7 +585,7 @@ def merge(opts, args, gui = None):
   fullname = config.Config['outlinelayerfile']
   if fullname and fullname.lower() != "none":
     OutputFiles.append(fullname)
-    #print 'Writing %s ...' % fullname
+    #print('Writing %s ...' % fullname)
     fid = file(fullname, 'wt')
     writeGerberHeader(fid)
 
@@ -615,7 +614,7 @@ def merge(opts, args, gui = None):
   fullname = config.Config['scoringfile']
   if fullname and fullname.lower() != "none":
     OutputFiles.append(fullname)
-    #print 'Writing %s ...' % fullname
+    #print('Writing %s ...' % fullname)
     fid = file(fullname, 'wt')
     writeGerberHeader(fid)
 
@@ -673,7 +672,7 @@ def merge(opts, args, gui = None):
       raise RuntimeError, "Only %d different tool sizes supported for fabrication drawing." % strokes.MaxNumDrillTools
 
     OutputFiles.append(fullname)
-    #print 'Writing %s ...' % fullname
+    #print('Writing %s ...' % fullname)
     fid = file(fullname, 'wt')
     writeGerberHeader(fid)
     writeApertures(fid, {drawing_code1: None})
@@ -690,7 +689,7 @@ def merge(opts, args, gui = None):
   except KeyError:
     fullname = 'merged.drills.xln'
   OutputFiles.append(fullname)
-  #print 'Writing %s ...' % fullname
+  #print('Writing %s ...' % fullname)
   fid = file(fullname, 'wt')
 
   writeExcellonHeader(fid)
@@ -742,58 +741,58 @@ def merge(opts, args, gui = None):
   except KeyError:
     fullname = 'merged.toollist.drl'
   OutputFiles.append(fullname)
-  #print 'Writing %s ...' % fullname
+  #print('Writing %s ...' % fullname)
   fid = file(fullname, 'wt')
 
-  print '-'*50
+  print('-'*50)
   # add metric support (1/1000 mm vs. 1/100,000 inch)
   if config.Config['measurementunits'] == 'inch':
-    print '     Job Size : %f" x %f"' % (MaxXExtent-OriginX, MaxYExtent-OriginY)
-    print '     Job Area : %.2f sq. in.' % totalarea
+    print('     Job Size : %f" x %f"' % (MaxXExtent-OriginX, MaxYExtent-OriginY))
+    print('     Job Area : %.2f sq. in.' % totalarea)
   else:
-    print '     Job Size : %.2fmm x %.2fmm' % (MaxXExtent-OriginX, MaxYExtent-OriginY)
-    print '     Job Area : %.0f mm2' % totalarea
+    print('     Job Size : %.2fmm x %.2fmm' % (MaxXExtent-OriginX, MaxYExtent-OriginY))
+    print('     Job Area : %.0f mm2' % totalarea)
 
-  print '   Area Usage : %.1f%%' % (jobarea/totalarea*100)
-  print '   Drill hits : %d' % drillhits
+  print('   Area Usage : %.1f%%' % (jobarea/totalarea*100))
+  print('   Drill hits : %d' % drillhits)
   if config.Config['measurementunits'] == 'inch':
-    print 'Drill density : %.1f hits/sq.in.' % (drillhits/totalarea)
+    print('Drill density : %.1f hits/sq.in.' % (drillhits/totalarea))
   else:
-    print 'Drill density : %.2f hits/cm2' % (100*drillhits/totalarea)
+    print('Drill density : %.2f hits/cm2' % (100*drillhits/totalarea))
 
-  print '\nTool List:'
+  print('\nTool List:')
   smallestDrill = 999.9
   for tool in Tools:
     if ToolStats[tool]:
       if config.Config['measurementunits'] == 'inch':
         fid.write('%s %.4fin\n' % (tool, config.GlobalToolMap[tool]))
-        print '  %s %.4f" %5d hits' % (tool, config.GlobalToolMap[tool], ToolStats[tool])
+        print('  %s %.4f" %5d hits' % (tool, config.GlobalToolMap[tool], ToolStats[tool]))
       else:
         fid.write('%s %.4fmm\n' % (tool, config.GlobalToolMap[tool]))
-        print '  %s %.4fmm %5d hits' % (tool, config.GlobalToolMap[tool], ToolStats[tool])
+        print('  %s %.4fmm %5d hits' % (tool, config.GlobalToolMap[tool], ToolStats[tool]))
       smallestDrill = min(smallestDrill, config.GlobalToolMap[tool])
 
   fid.close()
   if config.Config['measurementunits'] == 'inch':
-    print "Smallest Tool: %.4fin" % smallestDrill
+    print("Smallest Tool: %.4fin" % smallestDrill)
   else:
-    print "Smallest Tool: %.4fmm" % smallestDrill
+    print("Smallest Tool: %.4fmm" % smallestDrill)
 
   print
   print 'Output Files :'
   for f in OutputFiles:
-    print '  ', f
+    print('  ', f)
 
   if (MaxXExtent-OriginX)>config.Config['panelwidth'] or (MaxYExtent-OriginY)>config.Config['panelheight']:
-    print '*'*75
-    print '*'
+    print('*'*75)
+    print('*')
     # add metric support (1/1000 mm vs. 1/100,000 inch)
     if config.Config['measurementunits'] == 'inch':
-      print '* ERROR: Merged job exceeds panel dimensions of %.1f"x%.1f"' % (config.Config['panelwidth'],config.Config['panelheight'])
+      print('* ERROR: Merged job exceeds panel dimensions of %.1f"x%.1f"' % (config.Config['panelwidth'],config.Config['panelheight']))
     else:
-      print '* ERROR: Merged job exceeds panel dimensions of %.1fmmx%.1fmm' % (config.Config['panelwidth'],config.Config['panelheight'])
-    print '*'
-    print '*'*75
+      print('* ERROR: Merged job exceeds panel dimensions of %.1fmmx%.1fmm' % (config.Config['panelwidth'],config.Config['panelheight']))
+    print('*')
+    print('*'*75)
     sys.exit(1)
 
   # Done!
@@ -814,14 +813,14 @@ def main():
     if opt in ('-h', '--help'):
       usage()
     elif opt in ('-v', '--version'):
-      print """
+      print("""
 GerbMerge Version %d.%s  --  Combine multiple Gerber/Excellon files
 
 This program is licensed under the GNU General Public License (GPL)
 Version 3. See LICENSE file or http://www.fsf.org for details of this license.
 
 ProvideYourOwn - http://provideyourown.com
-""" % (VERSION_MAJOR, VERSION_MINOR)
+""" % (VERSION_MAJOR, VERSION_MINOR))
       sys.exit(0)
     elif opt in ('--octagons', '--random-search','--full-search','--rs-fsjobs','--place-file','--no-trim-gerber','--no-trim-excellon', '--search-timeout', '-s', '--skipdisclaimer'):
       pass ## arguments are valid

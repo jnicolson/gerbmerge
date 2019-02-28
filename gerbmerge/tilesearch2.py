@@ -38,11 +38,11 @@ def printTilingStats():
 
   # add metric support (1/1000 mm vs. 1/100,000 inch)
   if config.Config['measurementunits'] == 'inch':
-    print "\r  %ld placements / Smallest area: %.1f sq. in. / Best utilization: %.1f%%" % \
-        (_Placements, area, utilization),
+    print("\r  %ld placements / Smallest area: %.1f sq. in. / Best utilization: %.1f%%" % \
+        (_Placements, area, utilization), "\n")
   else:
-    print "\r  %ld placements / Smallest area: %.1f sq. mm / Best utilization: %.0f%%" % \
-        (_Placements, area, utilization),
+    print("\r  %ld placements / Smallest area: %.1f sq. mm / Best utilization: %.0f%%" % \
+        (_Placements, area, utilization), "\n")
 
   if gerbmerge.GUI is not None:
     sys.stdout.flush()
@@ -131,28 +131,28 @@ def tile_search2(Jobs, X, Y):
   _TBestTiling = None
   _TBestScore = float(sys.maxint)
 
-  print '='*70
+  print('='*70)
   if (config.Config['searchtimeout'] > 0):
-    print "Starting random placement trials. You can press Ctrl-C to"
-    print "stop the process and use the best placement so far, or wait"
-    print "for the automatic timeout in %i seconds." % config.Config['searchtimeout']
+    print("Starting random placement trials. You can press Ctrl-C to")
+    print("stop the process and use the best placement so far, or wait")
+    print("for the automatic timeout in %i seconds." % config.Config['searchtimeout'])
   else:
-    print "Starting random placement trials. You must press Ctrl-C to"
-    print "stop the process and use the best placement so far." 
-    print "You can specify a timeout by setting 'SearchTimeout' in  Layout.cfg"
-  print "Estimated maximum possible utilization is %.1f%%." % (tiling.maxUtilization(Jobs)*100)
+    print("Starting random placement trials. You must press Ctrl-C to")
+    print("stop the process and use the best placement so far." )
+    print("You can specify a timeout by setting 'SearchTimeout' in  Layout.cfg")
+  print("Estimated maximum possible utilization is %.1f%%." % (tiling.maxUtilization(Jobs)*100))
 
   try:
     _tile_search2(Jobs, X, Y)
     printTilingStats()
-    print
+    print("\n")
   except KeyboardInterrupt:
     printTilingStats()
-    print
-    print "Interrupted."
+    print("\n")
+    print("Interrupted.")
 
   computeTime = time.time() - _StartTime
-  print "Computed %ld placements in %d seconds / %.1f placements/second" % (_Placements, computeTime, _Placements/computeTime)
-  print '='*70
+  print("Computed %ld placements in %d seconds / %.1f placements/second" % (_Placements, computeTime, _Placements/computeTime))
+  print('='*70)
 
   return _TBestTiling
