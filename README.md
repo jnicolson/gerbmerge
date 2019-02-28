@@ -28,7 +28,7 @@ GerbMerge currently works with:
   * Artwork in Gerber RS274-X format</LI>
   * Drill files in Excellon format</LI>
 
-Here is [one sample](doc\sample.jpg) and [another sample](doc\sample2.jpg) of the program's output. These samples demonstrate panelizing multiple, different jobs, and also demonstrate board rotation.
+Here is [one sample](.\doc\sample.jpg) and [another sample](.\doc\sample2.jpg) of the program's output. These samples demonstrate panelizing multiple, different jobs, and also demonstrate board rotation.
 
 ## Requirements
 GerbMerge is written in pure Python. It depends upon the following packages for operation:
@@ -111,7 +111,7 @@ For the manual relative placement approach, GerbMerge needs two input text files
 The names of these files are the two required parameters to GerbMerge:
 `gerbmerge file.cfg file.def`
 
-The following links describe the contents of the [configuration file](doc\cfgfile.md) and [layout file](doc\layoutfile.md).
+The following links describe the contents of the [configuration file](.\doc\cfgfile.md) and [layout file](.\doc\layoutfile.md).
 
 #### Manual Absolute Placement
 For the manual absolute placement approach, GerbMerge also needs the configuration file as well as another text file that specifies where each job is located on the panel and whether or not it is rotated:
@@ -124,14 +124,14 @@ cpu 0.756 0.100
 cpu*rotated 1.35 1.50
 ```
 
-This method of placement is not meant for normal use. It can be used to recreate a previous invocation of GerbMerge, since GerbMerge saves its results in a text file (whose name is set in the [MergeOutputFiles](doc\cfgfile.md#MergeOutputFiles) section of the configuration file) after every run. Thus, you can experiment with different parameters, save a placement you like, do some more experimentation, then return to the saved placement if necessary.
+This method of placement is not meant for normal use. It can be used to recreate a previous invocation of GerbMerge, since GerbMerge saves its results in a text file (whose name is set in the [MergeOutputFiles](.\doc\cfgfile.md#MergeOutputFiles) section of the configuration file) after every run. Thus, you can experiment with different parameters, save a placement you like, do some more experimentation, then return to the saved placement if necessary.
 
 Alternatively, this method of placement can be used with third-party back ends that implement intelligent auto-placement algorithms, using GerbMerge only for doing the actual panelization.
 
 #### Automatic Placement
-For the [automatic placement](doc\autosearch.html) approach, GerbMerge only needs the configuration file:
+For the [automatic placement](.\doc\autosearch.html) approach, GerbMerge only needs the configuration file:
 `gerbmerge file.cfg`
-Command-line options can be used to modify the search algorithm. See the [Automatic Placement](doc\autosearch.html) page for more information.
+Command-line options can be used to modify the search algorithm. See the [Automatic Placement](.\doc\autosearch.html) page for more information.
 
 ### Input File Requirements
 GerbMerge requires the following input CAM files:
@@ -168,7 +168,6 @@ I recommend the following programs for viewing the final output data. Take the t
 ## Limitations
 
   * This program has mainly been tested with output from the Eagle CAD program. Limited testing has been performed with Orcad, Protel, and PCB. Other CAD programs will NOT WORK with a very high probability, as the input parser is quite primitive.
-
   If you have the need/motivation to adapt GerbMerge to other CAD programs, have a look at the `gerber2pdf` program. It is written in Python and implements a much more complete RS274-X input file parser. Combining GerbMerge with `gerber2pdf` should be a fairly simple exercise. Also, feel free to send us samples of Gerber/Excellon output of your CAD tool and we'll see if we can add support for it.
 
   * This program handles apertures that are rectangles, ovals, circles, macros without parameters or operators, and Eagle octagons (which are defined using a macro with a single parameter, hence currently handled as a special case).
@@ -222,7 +221,7 @@ Copyright &copy; 2013 <a href="http://provideyourown.com">ProvideYourOwn.com</a>
 This repo is a fork of gerbmerge, version 1.8 from Rugged Circuits LLC:
 
 Copyright &copy; 2011 [Rugged Circuits LLC](http://ruggedcircuits.com). All Rights Reserved.
-  mailto: [support@ruggedcircuits.com](support@ruggedcircuits.com?subject=GerbMerge)
+  mailto: [support@ruggedcircuits.com](mailto:support@ruggedcircuits.com?subject=GerbMerge)
 
 GerbMerge comes with ABSOLUTELY NO WARRANTY. This is free software licensed under the terms of the GNU General Public License Version 3. You are welcome to copy, modify and redistribute this software under certain conditions. For more details, see the LICENSE file or visit [The Free Software Foundation](http://www.fsf.org).
 
@@ -241,8 +240,8 @@ Thanks to Joe Pighetti for making me start writing this program, and to the Gran
 
 Thanks to Matt Kavalauskas for identifying Eagle's annulus and thermal macros and supporting the development of the aperture macro code.
 
-Thanks to Bohdan Zograf for the <A HREF="http://webhostingrating.com/libs/gerbmerge-be">Belorussian translation</A> of this documentation.
+Thanks to Bohdan Zograf for the [Belorussian translation](http://webhostingrating.com/libs/gerbmerge-be) of this documentation.
 
-Copyright &copy; 2013 <a href="http://provideyourown.com">ProvideYourOwn.com</a>. All Rights Reserved.
+Copyright &copy; 2013 [ProvideYourOwn.com](http://provideyourown.com). All Rights Reserved.
 
-Portions (version 1.8 & prior): Copyright &copy; 2003-2011, Copyright by [Rugged Circuits LLC](http://ruggedcircuits.com); All Rights Reserved. mailto: <A HREF="mailto:support@ruggedcircuits.com?subject=GerbMerge">support@ruggedcircuits.com</A>
+Portions (version 1.8 & prior): Copyright &copy; 2003-2011, Copyright by [Rugged Circuits LLC](http://ruggedcircuits.com); All Rights Reserved. mailto: [support@ruggedcircuits.com](mailto:support@ruggedcircuits.com?subject=GerbMerge)
