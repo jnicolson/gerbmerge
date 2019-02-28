@@ -804,7 +804,7 @@ def updateGUI(text = None):
   if GUI != None:
     GUI.updateProgress(text)
 
-if __name__=="__main__":
+def main():
   try:
     opts, args = getopt.getopt(sys.argv[1:], 'hvs', ['help', 'version', 'octagons=', 'random-search', 'full-search', 'rs-fsjobs=', 'search-timeout=', 'place-file=', 'no-trim-gerber', 'no-trim-excellon', 'skipdisclaimer'])
   except getopt.GetoptError:
@@ -832,4 +832,3 @@ ProvideYourOwn - http://provideyourown.com
     usage()
     
   sys.exit(merge(opts, args)) ## run germberge
-# vim: expandtab ts=2 sw=2 ai syntax=python
