@@ -1,10 +1,10 @@
 # GerbMerge -- Automatic Placement
 
 <A HREF="#Introduction">Introduction</A>
-<A HREF="#RandomizedSearch">Randomized Search</A>
-<A HREF="#ExhaustiveSearch">Exhaustive Search</A>
-<A HREF="#MultipleInstances">Multiple Instances</A>
-<A HREF="#UsageNotes">Usage Notes</A>
+<A HREF="#randomized-search">Randomized Search</A>
+<A HREF="#exhaustive-search">Exhaustive Search</A>
+<A HREF="#multiple-instances">Multiple Instances</A>
+<A HREF="#usage-notes">Usage Notes</A>
 
 ## Introduction
 As an alternative to manual placement, either using the <A HREF="layoutfile.md">layout file</A> approach or using the `--place-file` command-line option, GerbMerge can automatically try to find the best arrangement of jobs on a panel that minimizes the total panel area. Using automatic placement can save you time since you don't have to construct and experiment with a layout file. The tradeoff, however, is that automatic placement may take a long time to execute, and for panels with many, small jobs, the run time may be prohibitive. On the other hand, experience suggests that good results can be obtained in just a few minutes,
@@ -59,7 +59,7 @@ GerbMerge will estimate and display the maximum possible panel usage as a percen
 In summary, it is pointless to wait for a random search for hours to hit an estimated area utilization of 91% because, unless the dimensions of all boards line up just so, that utilization is not achievable.
 
 ### Panel Width and Height
-Note that the `PanelWidth` and `PanelHeight` options in the <A HREF="cfgfile.html">configuration file</A> constrain the search process. GerbMerge will not allow any placement, either by random search or exhaustive search, to exceed the panel dimensions. You can, therefore, guide the search process by choosing a panel size that is not too large, thus preventing highly-unlikely placements
+Note that the `PanelWidth` and `PanelHeight` options in the [configuration file](cfgfile.md) constrain the search process. GerbMerge will not allow any placement, either by random search or exhaustive search, to exceed the panel dimensions. You can, therefore, guide the search process by choosing a panel size that is not too large, thus preventing highly-unlikely placements
 (think all jobs in one row) from being considered.
 
 Similarly, by choosing panels that are slightly wider than taller, or vice versa, different placements can be considered and may lead to different results. Consider these two configuration file options as a source of
