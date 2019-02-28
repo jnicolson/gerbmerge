@@ -216,7 +216,7 @@ I recommend the following programs for viewing the final output data. Take the t
 </dl>
 
 ## Copyright &amp; License
-Copyright &copy; 2013 <a href="http://provideyourown.com">ProvideYourOwn.com</a>. All Rights Reserved.
+Copyright &copy; 2013 [ProvideYourOwn.com](http://provideyourown.com). All Rights Reserved.
 
 This repo is a fork of gerbmerge, version 1.8 from Rugged Circuits LLC:
 
