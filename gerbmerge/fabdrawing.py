@@ -25,7 +25,7 @@ def writeDrillHits(fid, Place, Tools):
     try:
       size = config.GlobalToolMap[tool]
     except:
-      raise RuntimeError, "INTERNAL ERROR: Tool code %s not found in global tool list" % tool
+      raise RuntimeError("INTERNAL ERROR: Tool code %s not found in global tool list" % tool)
 
     #for row in Layout:
     #  row.writeDrillHits(fid, size, toolNumber)
@@ -158,8 +158,8 @@ def writeUserText(fid, X, Y):
 
   try:
     tfile = file(fname, 'rt')
-  except Exception, detail:
-    raise RuntimeError, "Could not open fabrication drawing text file '%s':\n  %s" % (fname,str(detail))
+  except Exception as e:
+    raise RuntimeError("Could not open fabrication drawing text file '%s':\n  %s" % (fname,str(e)))
 
   lines = tfile.readlines()
   tfile.close()

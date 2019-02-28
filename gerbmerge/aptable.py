@@ -170,14 +170,14 @@ def parseAperture(s, knownMacroNames):
         if knownMacroNames.has_key(dimx):
           dimx = knownMacroNames[dimx]    # dimx is now GLOBAL, permanent macro name (e.g., 'M2')
         else:
-          raise RuntimeError, 'Aperture Macro name "%s" not defined' % dimx
+          raise RuntimeError('Aperture Macro name "%s" not defined' % dimx)
       else:
         try:
           dimx = float(dimx)
           if dimy:
             dimy = float(dimy)
         except:
-          raise RuntimeError, "Illegal floating point aperture size"
+          raise RuntimeError("Illegal floating point aperture size")
 
       return Aperture(ap, code, dimx, dimy)
 
@@ -218,7 +218,7 @@ def constructApertureTable(fileList):
 
     knownMacroNames = {}
 
-    fid = file(fname,'rt')
+    fid = open(fname,'rt')
     for line in fid:
       # Get rid of CR
       line = line.replace('\x0D', '')

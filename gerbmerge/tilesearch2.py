@@ -21,9 +21,9 @@ import gerbmerge
 
 _StartTime = 0.0           # Start time of tiling
 _CkpointTime = 0.0         # Next time to print stats
-_Placements = 0L           # Number of placements attempted
+_Placements = 0            # Number of placements attempted
 _TBestTiling = None        # Best tiling so far
-_TBestScore  = float(sys.maxint) # Smallest area so far
+_TBestScore  = float(sys.maxsize) # Smallest area so far
 
 def printTilingStats():
   global _CkpointTime
@@ -127,9 +127,9 @@ def tile_search2(Jobs, X, Y):
 
   _StartTime = time.time()
   _CkpointTime = _StartTime + 3
-  _Placements = 0L
+  _Placements = 0
   _TBestTiling = None
-  _TBestScore = float(sys.maxint)
+  _TBestScore = float(sys.maxsize)
 
   print('='*70)
   if (config.Config['searchtimeout'] > 0):

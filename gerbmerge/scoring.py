@@ -47,7 +47,7 @@ def clusterOrdinates(values):
 
   # First, make sure the values are sorted. Then, take the first one and go along
   # the list clustering as many as possible.
-  values.sort()
+  values = sorted(values)
   currCluster = None
   L = []
   for val in values:
@@ -113,7 +113,8 @@ def mergeVLines(Lines):
 
   # First, make sure lines are sorted by starting Y ordinate and that all lines
   # proceed up.
-  Lines.sort(sortByY)
+  # TODO: Check if this is correct (used to use sortByY helper function above)
+  Lines = sorted(Lines, key=lambda line: line[1])
   for line in Lines:
     assert line[1] < line[3]
 

@@ -19,11 +19,11 @@ import gerbmerge
 
 _StartTime = 0.0           # Start time of tiling
 _CkpointTime = 0.0         # Next time to print stats
-_Placements = 0L           # Number of placements attempted
-_PossiblePermutations = 0L # Number of different ways of ordering jobs
-_Permutations = 0L         # Number of different job orderings already computed
+_Placements = 0            # Number of placements attempted
+_PossiblePermutations = 0  # Number of different ways of ordering jobs
+_Permutations = 0          # Number of different job orderings already computed
 _TBestTiling = None        # Best tiling so far
-_TBestScore  = float(sys.maxint) # Smallest area so far
+_TBestScore  = float(sys.maxsize) # Smallest area so far
 _PrintStats = 1            # Print statistics every 3 seconds
 
 def printTilingStats():
@@ -42,11 +42,11 @@ def printTilingStats():
 
   # add metric support (1/1000 mm vs. 1/100,000 inch)
   if config.Config['measurementunits'] == 'inch':
-    print "\r  %5.2f%% complete / %ld/%ld Perm/Place / Smallest area: %.1f sq. in. / Best utilization: %.1f%%" % \
-        (percent, _Permutations, _Placements, area, utilization),
+    print("\r  %5.2f%% complete / %ld/%ld Perm/Place / Smallest area: %.1f sq. in. / Best utilization: %.1f%%" % \
+        (percent, _Permutations, _Placements, area, utilization), "\n")
   else:
-    print "\r  %5.2f%% complete / %ld/%ld Perm/Place / Smallest area: %.1f sq. mm / Best utilization: %.1f%%" % \
-        (percent, _Permutations, _Placements, area, utilization),
+    print("\r  %5.2f%% complete / %ld/%ld Perm/Place / Smallest area: %.1f sq. mm / Best utilization: %.1f%%" % \
+        (percent, _Permutations, _Placements, area, utilization), "\n")
 
 
   if gerbmerge.GUI is not None:
@@ -86,7 +86,7 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
   global _StartTime, _CkpointTime, _Placements, _TBestTiling, _TBestScore, _Permutations, _PrintStats
 
   if not TSoFar:
-    return (None, float(sys.maxint))
+    return (None, float(sys.maxsize))
 
   if not Jobs:
     # Update the best tiling and score. If the new tiling matches
@@ -154,7 +154,7 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
       # Premature prune due to not being able to put this job anywhere. We
       # have pruned off 2^M permutations where M is the length of the remaining
       # jobs.
-      _Permutations += 2L**len(remaining_jobs)
+      _Permutations += 2**len(remaining_jobs)
 
     if addpoints2:
       for ix in addpoints2:
@@ -170,7 +170,7 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
       # Premature prune due to not being able to put this job anywhere. We
       # have pruned off 2^M permutations where M is the length of the remaining
       # jobs.
-      _Permutations += 2L**len(remaining_jobs)
+      _Permutations += 2**len(remaining_jobs)
 
     # If we've been at this for 3 seconds, print some status information
     if _PrintStats and time.time() > _CkpointTime:
@@ -185,7 +185,7 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
   # end for each job in job list
 
 def factorial(N):
-  if (N <= 1): return 1L
+  if (N <= 1): return 1
 
   prod = long(N)
   while (N > 2):
@@ -198,10 +198,10 @@ def initialize(printStats=1):
   global _StartTime, _CkpointTime, _Placements, _TBestTiling, _TBestScore, _Permutations, _PossiblePermutations, _PrintStats
 
   _PrintStats = printStats
-  _Placements = 0L
-  _Permutations = 0L
+  _Placements = 0
+  _Permutations = 0
   _TBestTiling = None
-  _TBestScore = float(sys.maxint)
+  _TBestScore = float(sys.maxsize)
 
 def tile_search1(Jobs, X, Y):
   """Wrapper around _tile_search1 to handle keyboard interrupt, etc."""
@@ -215,7 +215,7 @@ def tile_search1(Jobs, X, Y):
   # This is assuming all jobs are unique and each job has a rotation (i.e., is not
   # square). Practically, these assumptions make no difference because the software
   # currently doesn't optimize for cases of repeated jobs.
-  _PossiblePermutations = (2L**len(Jobs))*factorial(len(Jobs))
+  _PossiblePermutations = (2**len(Jobs))*factorial(len(Jobs))
   #print("Possible permutations:", _PossiblePermutations)
 
   print('='*70)
@@ -240,8 +240,8 @@ def tile_search1(Jobs, X, Y):
     print
   except KeyboardInterrupt:
     printTilingStats()
-    print
-    print "Interrupted."
+    print("\n")
+    print("Interrupted.")
 
   computeTime = time.time() - _StartTime
   print("Computed %ld placements in %d seconds / %.1f placements/second" % (_Placements, computeTime, _Placements/computeTime))

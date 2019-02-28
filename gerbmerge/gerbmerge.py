@@ -142,15 +142,13 @@ G71*
 writeGerberHeader = writeGerberHeader22degrees
 
 def writeApertureMacros(fid, usedDict):
-  keys = config.GAMT.keys()
-  keys.sort()
+  keys = sorted(config.GAMT.keys())
   for key in keys:
     if key in usedDict:
       config.GAMT[key].writeDef(fid)
 
 def writeApertures(fid, usedDict):
-  keys = config.GAT.keys()
-  keys.sort()
+  keys = sorted(config.GAT.keys())
   for key in keys:
     if key in usedDict:
       config.GAT[key].writeDef(fid)
@@ -272,12 +270,12 @@ Any other key will exit the program.
 
 """)
 
-  s = raw_input()
+  s = input()
   if s == 'y':
     print("")
     return
 
-  print("\nExiting...")p
+  print("\nExiting...")
   sys.exit(0)
 
 def tile_jobs(Jobs):
@@ -309,9 +307,9 @@ def tile_jobs(Jobs):
   if not tile:
     # add metric support (1/1000 mm vs. 1/100,000 inch)
     if config.Config['measurementunits'] == 'inch':
-      raise RuntimeError, 'Panel size %.2f"x%.2f" is too small to hold jobs' % (PX,PY)
+      raise RuntimeError('Panel size %.2f"x%.2f" is too small to hold jobs' % (PX,PY))
     else:
-      raise RuntimeError, 'Panel size %.2fmmx%.2fmm is too small to hold jobs' % (PX,PY)
+      raise RuntimeError('Panel size %.2fmmx%.2fmm is too small to hold jobs' % (PX,PY))
 
   return tile
 
@@ -330,7 +328,7 @@ def merge(opts, args, gui = None):
       elif arg=='normal':
         writeGerberHeader = writeGerberHeader22degrees
       else:
-        raise RuntimeError, 'Unknown octagon format'
+        raise RuntimeError('Unknown octagon format')
     elif opt in ('--random-search',):
       config.AutoSearchType = RANDOM_SEARCH
     elif opt in ('--full-search',):
@@ -349,10 +347,10 @@ def merge(opts, args, gui = None):
     elif opt in ('-s', '--skipdisclaimer'):
       skipDisclaimer = 1
     else:
-      raise RuntimeError, "Unknown option: %s" % opt
+      raise RuntimeError("Unknown option: %s" % opt)
 
   if len(args) > 2 or len(args) < 1:
-    raise RuntimeError, 'Invalid number of arguments'
+    raise RuntimeError('Invalid number of arguments')
 
   if (skipDisclaimer == 0):
     disclaimer()
@@ -363,7 +361,7 @@ def merge(opts, args, gui = None):
   config.parseConfigFile(args[0])
 
   # Force all X and Y coordinates positive by adding absolute value of minimum X and Y
-  for name, job in config.Jobs.iteritems():
+  for name, job in config.Jobs.items():
     min_x, min_y = job.mincoordinates()
     shift_x = shift_y = 0
     if min_x < 0: shift_x = abs(min_x)
@@ -495,7 +493,7 @@ def merge(opts, args, gui = None):
       fullname = 'merged.%s.ger' % lname
     OutputFiles.append(fullname)
     #print('Writing %s ...' % fullname)
-    fid = file(fullname, 'wt')
+    fid = open(fullname, 'wt')
     writeGerberHeader(fid)
     
     # Determine which apertures and macros are truly needed
@@ -507,7 +505,7 @@ def merge(opts, args, gui = None):
       apmUsedDict.update(apmd)
 
     # Increase aperature sizes to match minimum feature dimension                         
-    if config.MinimumFeatureDimension.has_key(layername):
+    if layername in config.MinimumFeatureDimension:
     
       print('  Thickening', lname, 'feature dimensions ...')
       
@@ -586,7 +584,7 @@ def merge(opts, args, gui = None):
   if fullname and fullname.lower() != "none":
     OutputFiles.append(fullname)
     #print('Writing %s ...' % fullname)
-    fid = file(fullname, 'wt')
+    fid = open(fullname, 'wt')
     writeGerberHeader(fid)
 
     # Write width-1 aperture to file
@@ -615,7 +613,7 @@ def merge(opts, args, gui = None):
   if fullname and fullname.lower() != "none":
     OutputFiles.append(fullname)
     #print('Writing %s ...' % fullname)
-    fid = file(fullname, 'wt')
+    fid = open(fullname, 'wt')
     writeGerberHeader(fid)
 
     # Write width-1 aperture to file
@@ -663,17 +661,16 @@ def merge(opts, args, gui = None):
       config.GlobalToolMap[tool] = diam
 
     # Tools is just a list of tool names
-    Tools = config.GlobalToolMap.keys()
-    Tools.sort()   
+    Tools = sorted(config.GlobalToolMap.keys())
 
   fullname = config.Config['fabricationdrawingfile']
   if fullname and fullname.lower() != 'none':
     if len(Tools) > strokes.MaxNumDrillTools:
-      raise RuntimeError, "Only %d different tool sizes supported for fabrication drawing." % strokes.MaxNumDrillTools
+      raise RuntimeError("Only %d different tool sizes supported for fabrication drawing." % strokes.MaxNumDrillTools)
 
     OutputFiles.append(fullname)
     #print('Writing %s ...' % fullname)
-    fid = file(fullname, 'wt')
+    fid = open(fullname, 'wt')
     writeGerberHeader(fid)
     writeApertures(fid, {drawing_code1: None})
     fid.write('%s*\n' % drawing_code1)    # Choose drawing aperture
@@ -690,7 +687,7 @@ def merge(opts, args, gui = None):
     fullname = 'merged.drills.xln'
   OutputFiles.append(fullname)
   #print('Writing %s ...' % fullname)
-  fid = file(fullname, 'wt')
+  fid = open(fullname, 'wt')
 
   writeExcellonHeader(fid)
 
@@ -700,7 +697,7 @@ def merge(opts, args, gui = None):
     try:
       size = config.GlobalToolMap[tool]
     except:
-      raise RuntimeError, "INTERNAL ERROR: Tool code %s not found in global tool map" % tool
+      raise RuntimeError("INTERNAL ERROR: Tool code %s not found in global tool map" % tool)
       
     writeExcellonTool(fid, tool, size)
 
@@ -742,7 +739,7 @@ def merge(opts, args, gui = None):
     fullname = 'merged.toollist.drl'
   OutputFiles.append(fullname)
   #print('Writing %s ...' % fullname)
-  fid = file(fullname, 'wt')
+  fid = open(fullname, 'wt')
 
   print('-'*50)
   # add metric support (1/1000 mm vs. 1/100,000 inch)
@@ -778,8 +775,8 @@ def merge(opts, args, gui = None):
   else:
     print("Smallest Tool: %.4fmm" % smallestDrill)
 
-  print
-  print 'Output Files :'
+  print("\n")
+  print('Output Files :')
   for f in OutputFiles:
     print('  ', f)
 
@@ -825,7 +822,7 @@ ProvideYourOwn - http://provideyourown.com
     elif opt in ('--octagons', '--random-search','--full-search','--rs-fsjobs','--place-file','--no-trim-gerber','--no-trim-excellon', '--search-timeout', '-s', '--skipdisclaimer'):
       pass ## arguments are valid
     else:
-      raise RuntimeError, "Unknown option: %s" % opt
+      raise RuntimeError("Unknown option: %s" % opt)
 
   if len(args) > 2 or len(args) < 1:
     usage()

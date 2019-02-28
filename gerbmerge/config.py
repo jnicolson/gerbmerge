@@ -12,7 +12,7 @@ http://ruggedcircuits.com/gerbmerge
 """
 
 import sys
-import ConfigParser
+import configparser
 import re
 import string
 
@@ -124,12 +124,12 @@ def parseStringList(L):
   if 0:
     if L[0]=="'":
       if L[-1] != "'":
-        raise RuntimeError, "Illegal configuration string '%s'" % L
+        raise RuntimeError("Illegal configuration string '%s'" % L)
       L = L[1:-1]
 
     elif L[0]=='"':
       if L[-1] != '"':
-        raise RuntimeError, "Illegal configuration string '%s'" % L
+        raise RuntimeError("Illegal configuration string '%s'" % L)
       L = L[1:-1]
 
   # This pattern matches quotes at the beginning and end...quotes must match
@@ -151,8 +151,8 @@ def parseToolList(fname):
 
   try:
     fid = file(fname, 'rt')
-  except Exception, detail:
-    raise RuntimeError, "Unable to open tool list file '%s':\n  %s" % (fname, str(detail))
+  except Exception as e:
+    raise RuntimeError("Unable to open tool list file '%s':\n  %s" % (fname, str(e)))
 
   pat_in  = re.compile(r'\s*(T\d+)\s+([0-9.]+)\s*in\s*')
   pat_mm  = re.compile(r'\s*(T\d+)\s+([0-9.]+)\s*mm\s*')
@@ -179,7 +179,7 @@ def parseToolList(fname):
     try:
       size = float(size)
     except:
-      raise RuntimeError, "Tool size in file '%s' is not a valid floating-point number:\n  %s" % (fname,line)
+      raise RuntimeError("Tool size in file '%s' is not a valid floating-point number:\n  %s" % (fname,line))
 
     if mil:
       size = size*0.001  # Convert mil to inches
@@ -189,8 +189,8 @@ def parseToolList(fname):
     # Canonicalize tool so that T1 becomes T01
     tool = 'T%02d' % int(tool[1:])
 
-    if TL.has_key(tool):
-      raise RuntimeError, "Tool '%s' defined more than once in tool list file '%s'" % (tool,fname)
+    if tool in TL:
+      raise RuntimeError("Tool '%s' defined more than once in tool list file '%s'" % (tool,fname))
 
     TL[tool]=size
   fid.close()
@@ -212,18 +212,18 @@ def parseToolList(fname):
 def parseConfigFile(fname, Config=Config, Jobs=Jobs):
   global DefaultToolList
 
-  CP = ConfigParser.ConfigParser()
-  CP.readfp(file(fname,'rt'))
+  CP = configparser.ConfigParser()
+  CP.readfp(open(fname,'rt'))
 
   # First parse global options
   if CP.has_section('Options'):
     for opt in CP.options('Options'):
       # Is it one we expect
-      if Config.has_key(opt):
+      if opt in Config:
         # Yup...override it
         Config[opt] = CP.get('Options', opt)
 
-      elif CP.defaults().has_key(opt):
+      elif opt in CP.defaults():
         pass   # Ignore DEFAULTS section keys
 
       elif opt in ('fabricationdrawing', 'outlinelayer'):
@@ -234,13 +234,13 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
         print('*'*73)
         sys.exit(1)
       else:
-        raise RuntimeError, "Unknown option '%s' in [Options] section of configuration file" % opt
+        raise RuntimeError("Unknown option '%s' in [Options] section of configuration file" % opt)
   else:
-    raise RuntimeError, "Missing [Options] section in configuration file"
+    raise RuntimeError("Missing [Options] section in configuration file")
 
   # Ensure we got a tool list
-  if not Config.has_key('toollist'):
-    raise RuntimeError, "INTERNAL ERROR: Missing tool list assignment in [Options] section"
+  if not 'toollist' in Config:
+    raise RuntimeError("INTERNAL ERROR: Missing tool list assignment in [Options] section")
 
   # Make integers integers, floats floats
   for key,val in Config.items():
@@ -280,7 +280,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
       for index in range(0, len(temp), 2):
         MinimumFeatureDimension[ temp[index] ] = float( temp[index + 1] )
     except:
-      raise RuntimeError, "Illegal configuration string:" + Config['minimumfeaturesize']
+      raise RuntimeError("Illegal configuration string:" + Config['minimumfeaturesize'])
 
   # Process MergeOutputFiles section to set output file names
   if CP.has_section('MergeOutputFiles'):
@@ -300,10 +300,10 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
 
     # Ensure all jobs have a board outline
     if not CP.has_option(jobname, 'boardoutline'):
-      raise RuntimeError, "Job '%s' does not have a board outline specified" % jobname
+      raise RuntimeError("Job '%s' does not have a board outline specified" % jobname)
     
     if not CP.has_option(jobname, 'drills'):
-      raise RuntimeError, "Job '%s' does not have a drills layer specified" % jobname
+      raise RuntimeError("Job '%s' does not have a drills layer specified" % jobname)
 
     for layername in CP.options(jobname):
       if layername[0]=='*' or layername=='boardoutline':
@@ -323,7 +323,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
     keylist = GAMT.keys()
     keylist.sort()
     for key in keylist:
-      print('%s' % GAMT[key])`
+      print('%s' % GAMT[key])
     sys.exit(0)
 
   # Parse the tool list
@@ -366,12 +366,12 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
         try:
           J.ExcellonDecimals = int(fname)
         except:
-          raise RuntimeError, "Excellon decimals '%s' in config file is not a valid integer" % fname
+          raise RuntimeError("Excellon decimals '%s' in config file is not a valid integer" % fname)
       elif layername=='repeat':
         try:
           J.Repeat = int(fname)
         except:
-          raise RuntimeError, "Repeat count '%s' in config file is not a valid integer" % fname
+          raise RuntimeError("Repeat count '%s' in config file is not a valid integer" % fname)
 
     for layername in CP.options(jobname):
       fname = CP.get(jobname, layername)
@@ -386,7 +386,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
     # Emit warnings if some layers are missing
     LL = LayerList.copy()
     for layername in J.apxlat.keys():
-      assert LL.has_key(layername)
+      assert layername in LL
       del LL[layername]
 
     if LL:
@@ -401,7 +401,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
     Jobs[jobname] = J
 
   if do_abort:
-    raise RuntimeError, 'Exiting since jobs are missing layers. Set AllowMissingLayers=1\nto override.'
+    raise RuntimeError('Exiting since jobs are missing layers. Set AllowMissingLayers=1\nto override.')
 
 if __name__=="__main__":
   CP = parseConfigFile(sys.argv[1])

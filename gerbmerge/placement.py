@@ -52,7 +52,7 @@ class Placement(object):
 
   def write(self, fname):
     """Write placement to a file"""
-    fid = file(fname, 'wt')
+    fid = open(fname, 'wt')
     for job in self.jobs:
       fid.write('%s %.3f %.3f\n' % (job.job.name, job.x, job.y))
       # added; thought it would be useful to know
@@ -65,7 +65,7 @@ class Placement(object):
     comment = re.compile(r'\s*(?:#.+)?$')
    
     try:
-      fid = file(fname, 'rt')
+      fid = open(fname, 'rt')
     except:
       print('Unable to open placement file: "%s"' % fname)
       sys.exit(1)
