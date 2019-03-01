@@ -42,7 +42,7 @@ Apertures = (
 for ap in Apertures:
   globals()[ap[0]] = ap
 
-class Aperture:
+class Aperture(object):
   def __init__(self, aptype, code, dimx, dimy=None):
     assert aptype in Apertures
     self.apname, self.pat, self.format = aptype
@@ -63,16 +63,16 @@ class Aperture:
     dy = util.in2gerb(self.dimy)
 
     if dx & 1:    # Odd-sized: X extents are (dx+1)/2 on the left and (dx-1)/2 on the right
-      xm = (dx+1)/2
+      xm = int((dx+1)/2)
       xp = xm-1
     else:         # Even-sized: X extents are X-dx/2 and X+dx/2
-      xm = xp = dx/2
+      xm = xp = int(dx/2)
 
     if dy & 1:    # Odd-sized: Y extents are (dy+1)/2 below and (dy-1)/2 above
-      ym = (dy+1)/2
+      ym = int((dy+1)/2)
       yp = ym-1
     else:         # Even-sized: Y extents are Y-dy/2 and Y+dy/2
-      ym = yp = dy/2
+      ym = yp = int(dy/2)
 
     return (X-xm, Y-ym, X+xp, Y+yp)
     

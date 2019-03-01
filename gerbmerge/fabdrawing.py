@@ -157,7 +157,7 @@ def writeUserText(fid, X, Y):
   if not fname: return
 
   try:
-    tfile = file(fname, 'rt')
+    tfile = open(fname, 'rt')
   except Exception as e:
     raise RuntimeError("Could not open fabrication drawing text file '%s':\n  %s" % (fname,str(e)))
 
@@ -170,14 +170,14 @@ def writeUserText(fid, X, Y):
 
   for line in lines:
     # Get rid of CR
-    line = string.replace(line, '\x0D', '')
+    line = line.replace('\x0D', '')
 
     # Chop off \n
     #if line[-1] in string.whitespace:
     #  line = line[:-1]
 
     # Strip off trailing whitespace
-    line = string.rstrip(line)
+    line = line.rstrip()
 
     # Blank lines still need height, so must have at least one character
     if not line:

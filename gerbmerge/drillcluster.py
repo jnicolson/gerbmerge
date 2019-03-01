@@ -34,8 +34,7 @@ def cluster(drills, tolerance, debug = _DEBUG):
     debug_print("Clustering drill sizes ...", True)
 
     # Loop through all drill sizes
-    sizes = drills.keys()
-    sizes.sort()
+    sizes = sorted(drills.keys())
     for size in sizes:
         
         match = False
@@ -111,7 +110,7 @@ def remap(jobs, globalToolMap, debug = _DEBUG):
             ##debug_print("\n  Current tool: " + tool + " (" + str_d(diam) + ")")
         
             # Search for best matching tool
-            best_diam, best_tool = globalToolMap[0]          
+            best_diam, best_tool = list(globalToolMap)[0]          
 
             for glob_diam, glob_tool in globalToolMap:
                 if abs(glob_diam - diam) < abs(best_diam - diam):
@@ -180,8 +179,8 @@ def drillsToString(drills):
     """
     string = ""
     
-    drills = drills.items()
-    drills.sort()
+    drills = sorted(drills.items())
+
     for size, drill in drills:
         string += drill + " = " + str_d(size) + "\n  "
 

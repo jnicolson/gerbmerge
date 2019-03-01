@@ -1109,7 +1109,7 @@ class Job(object):
 
 # This class encapsulates a Job object, providing absolute
 # positioning information.
-class JobLayout:
+class JobLayout(object):
   def __init__(self, job):
     self.job = job
     self.x = None
@@ -1330,12 +1330,12 @@ def rotateJob(job, degrees = 90, firstpass = True):
 
     for cmd in job.commands[layername]:
       # Is it a drawing command?
-      if type(cmd) is types.TupleType:
+      if isinstance(cmd, tuple):
         if len(cmd)==3:
-          x, y, d = map(__builtin__.int, cmd)
+          x, y, d = map(builtins.int, cmd)
           II=JJ=None
         else:
-          x, y, II, JJ, d, signed = map(__builtin__.int, cmd)   # J is already used as Job object
+          x, y, II, JJ, d, signed = map(builtins.int, cmd)   # J is already used as Job object
       else:
         # No, must be a string indicating aperture change, G-code, or RS274-X command.
         if cmd[0] in ('G', '%'):

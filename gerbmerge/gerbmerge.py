@@ -510,7 +510,7 @@ def merge(opts, args, gui = None):
       print('  Thickening', lname, 'feature dimensions ...')
       
       # Fix each aperture used in this layer
-      for ap in apUsedDict.keys():
+      for ap in list(apUsedDict.keys()):
         new = config.GAT[ap].getAdjusted( config.MinimumFeatureDimension[layername] )
         if not new: ## current aperture size met minimum requirement
           continue
@@ -645,7 +645,7 @@ def merge(opts, args, gui = None):
     # First construct global mapping of diameters to tool numbers
     for job in config.Jobs.values():
       for tool,diam in job.xdiam.items():
-        if config.GlobalToolRMap.has_key(diam):
+        if diam in config.GlobalToolRMap:
           continue
 
         toolNum += 1
