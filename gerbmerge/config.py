@@ -69,9 +69,9 @@ Config = {
 # name to use for the output.
 MergeOutputFiles = {
     'boardoutline': 'merged.boardoutline.ger',
-    'drills':       'merged.drills.xln',
-    'placement':    'merged.placement.txt',
-    'toollist':     'merged.toollist.drl'
+    'drills': 'merged.drills.xln',
+    'placement': 'merged.placement.txt',
+    'toollist': 'merged.toollist.drl'
 }
 
 # The global aperture table, indexed by aperture code (e.g., 'D10')
@@ -120,7 +120,7 @@ MinimumFeatureDimension = {}
 # forever until a KeyboardInterrupt is raised.
 
 # moved to setting that can be loaded from config file
-#SearchTimeout = 0
+# SearchTimeout = 0
 
 # Construct the reverse-GAT/GAMT translation table, keyed by aperture/aperture macro
 # hash string. The value is the aperture code (e.g., 'D10') or macro name (e.g., 'M5').
@@ -236,18 +236,18 @@ def parseToolList(fname):
 def parseConfigFile(fname, Config=Config, Jobs=Jobs):
     global DefaultToolList
 
-    CP = configparser.ConfigParser()
-    CP.readfp(open(fname, 'rt'))
+    cp = configparser.ConfigParser()
+    cp.readfp(open(fname, 'rt'))
 
     # First parse global options
-    if CP.has_section('Options'):
-        for opt in CP.options('Options'):
+    if cp.has_section('Options'):
+        for opt in cp.options('Options'):
             # Is it one we expect
             if opt in Config:
                 # Yup...override it
-                Config[opt] = CP.get('Options', opt)
+                Config[opt] = cp.get('Options', opt)
 
-            elif opt in CP.defaults():
+            elif opt in cp.defaults():
                 pass   # Ignore DEFAULTS section keys
 
             elif opt in ('fabricationdrawing', 'outlinelayer'):
@@ -267,7 +267,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
         raise RuntimeError("Missing [Options] section in configuration file")
 
     # Ensure we got a tool list
-    if not 'toollist' in Config:
+    if 'toollist' not in Config:
         raise RuntimeError(
             "INTERNAL ERROR: Missing tool list assignment in [Options] section")
 
@@ -313,17 +313,17 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
                 "Illegal configuration string:" + Config['minimumfeaturesize'])
 
     # Process MergeOutputFiles section to set output file names
-    if CP.has_section('MergeOutputFiles'):
-        for opt in CP.options('MergeOutputFiles'):
+    if cp.has_section('MergeOutputFiles'):
+        for opt in cp.options('MergeOutputFiles'):
             # Each option is a layer name and the output file for this name
             if opt[0] == '*' or opt in ('boardoutline', 'drills', 'placement', 'toollist'):
-                MergeOutputFiles[opt] = CP.get('MergeOutputFiles', opt)
+                MergeOutputFiles[opt] = cp.get('MergeOutputFiles', opt)
 
     # Now, we go through all jobs and collect Gerber layers
     # so we can construct the Global Aperture Table.
     apfiles = []
 
-    for jobname in CP.sections():
+    for jobname in cp.sections():
         if jobname == 'Options':
             continue
         if jobname == 'MergeOutputFiles':
@@ -332,17 +332,17 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
             continue
 
         # Ensure all jobs have a board outline
-        if not CP.has_option(jobname, 'boardoutline'):
+        if not cp.has_option(jobname, 'boardoutline'):
             raise RuntimeError(
                 "Job '%s' does not have a board outline specified" % jobname)
 
-        if not CP.has_option(jobname, 'drills'):
+        if not cp.has_option(jobname, 'drills'):
             raise RuntimeError(
                 "Job '%s' does not have a drills layer specified" % jobname)
 
-        for layername in CP.options(jobname):
+        for layername in cp.options(jobname):
             if layername[0] == '*' or layername == 'boardoutline':
-                fname = CP.get(jobname, layername)
+                fname = cp.get(jobname, layername)
                 apfiles.append(fname)
 
                 if layername[0] == '*':
@@ -377,7 +377,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
     if Config['allowmissinglayers']:
         errstr = 'WARNING'
 
-    for jobname in CP.sections():
+    for jobname in cp.sections():
         if jobname == 'Options':
             continue
         if jobname == 'MergeOutputFiles':
@@ -395,8 +395,8 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
         # the user wrote them, and we may get Gerber files before we get a tool
         # list! Same thing goes for ExcellonDecimals. We need to know what this is
         # before parsing any Excellon files.
-        for layername in CP.options(jobname):
-            fname = CP.get(jobname, layername)
+        for layername in cp.options(jobname):
+            fname = cp.get(jobname, layername)
 
             if layername == 'toollist':
                 J.ToolList = parseToolList(fname)
@@ -413,8 +413,8 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
                     raise RuntimeError(
                         "Repeat count '%s' in config file is not a valid integer" % fname)
 
-        for layername in CP.options(jobname):
-            fname = CP.get(jobname, layername)
+        for layername in cp.options(jobname):
+            fname = cp.get(jobname, layername)
 
             if layername == 'boardoutline':
                 J.parseGerber(fname, layername, updateExtents=1)
@@ -424,18 +424,18 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
                 J.parseExcellon(fname)
 
         # Emit warnings if some layers are missing
-        LL = LayerList.copy()
+        ll = LayerList.copy()
         for layername in J.apxlat.keys():
-            assert layername in LL
-            del LL[layername]
+            assert layername in ll
+            del ll[layername]
 
-        if LL:
+        if ll:
             if errstr == 'ERROR':
                 do_abort = 1
 
             print('%s: Job %s is missing the following layers:' %
                   (errstr, jobname))
-            for layername in LL.keys():
+            for layername in ll.keys():
                 print('  %s' % layername)
 
         # Store the job in the global Jobs dictionary, keyed by job name
@@ -447,15 +447,15 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
 
 
 if __name__ == "__main__":
-    CP = parseConfigFile(sys.argv[1])
+    cp = parseConfigFile(sys.argv[1])
     print(Config)
     sys.exit(0)
 
     if 0:
-        for key, val in CP.defaults().items():
+        for key, val in cp.defaults().items():
             print('%s: %s' % (key, val))
 
-        for section in CP.sections():
+        for section in cp.sections():
             print('[%s]' % section)
-            for opt in CP.options(section):
-                print('  %s=%s' % (opt, CP.get(section, opt)))
+            for opt in cp.options(section):
+                print('  %s=%s' % (opt, cp.get(section, opt)))

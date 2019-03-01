@@ -17,7 +17,6 @@ import sys
 import re
 
 import parselayout
-import jobs
 
 
 class Placement(object):

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 """
 Define and manage aperture macros (%AM command). Currently,
 only macros without replaceable parameters (e.g., $1, $2, etc.)
@@ -67,23 +68,26 @@ PrimitiveParmTypes = (
 
 
 def rotatexy(x, y):
-    # Rotate point (x,y) counterclockwise 90 degrees about the origin
+    """Rotate point (x,y) counterclockwise 90 degrees about the origin."""
     return (-y, x)
 
 
 def rotatexypair(L, ix):
-    # Rotate list items L[ix],L[ix+1] by 90 degrees
+    """Rotate list items L[ix],L[ix+1] by 90 degrees."""
     L[ix], L[ix+1] = rotatexy(L[ix], L[ix+1])
 
 
 def swapxypair(L, ix):
-    # Swap two list elements
+    """Swap two list elements."""
     L[ix], L[ix+1] = L[ix+1], L[ix]
 
 
 def rotatetheta(th):
-    # Increase angle th in degrees by +90 degrees (counterclockwise).
-    # Handle modulo 360 issues
+    """
+    Increase angle th in degrees by +90 degrees (counterclockwise).
+
+    Handle modulo 360 issues.
+    """
     th += 90
     if th >= 360:
         th -= 360
@@ -91,7 +95,7 @@ def rotatetheta(th):
 
 
 def rotatethelem(L, ix):
-    # Increase angle th by +90 degrees for a list element
+    """Increase angle th by +90 degrees for a list element."""
     L[ix] = rotatetheta(L[ix])
 
 
@@ -240,7 +244,7 @@ class ApertureMacroPrimitive(object):
         fid.write('%s*\n' % str(self))
 
 
-class ApertureMacro:
+class ApertureMacro(object):
     def __init__(self, name):
         self.name = name
         self.prim = []

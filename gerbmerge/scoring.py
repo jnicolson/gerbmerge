@@ -13,11 +13,10 @@ import config
 import util
 import makestroke
 
-# Add a horizontal line if its within the extents of the panel. Also, trim
-# start and/or end points to the extents.
-
 
 def addHorizontalLine(Lines, x1, x2, y, extents):
+    # Add a horizontal line if its within the extents of the panel. Also, trim
+    # start and/or end points to the extents.
     assert (x1 < x2)
 
     # For a horizontal line, y must be above extents[1] and below extents[3].
@@ -26,11 +25,10 @@ def addHorizontalLine(Lines, x1, x2, y, extents):
         line = (max(extents[0], x1), y, min(extents[2], x2), y)
         Lines.append(line)
 
-# Add a vertical line if its within the extents of the panel. Also, trim
-# start and/or end points to the extents.
-
 
 def addVerticalLine(Lines, x, y1, y2, extents):
+    # Add a vertical line if its within the extents of the panel. Also, trim
+    # start and/or end points to the extents.
     assert (y1 < y2)
 
     # For a vertical line, x must be above extents[0] and below extents[2].

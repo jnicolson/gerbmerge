@@ -3,10 +3,10 @@
 Parse the job layout specification file.
 
 Requires:
-  
+
   - SimpleParse 2.1 or higher
               http://simpleparse.sourceforge.net
-              
+
 
 --------------------------------------------------------------------
 
@@ -17,7 +17,6 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 import sys
-import string
 
 from simpleparse.parser import Parser
 

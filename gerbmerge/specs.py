@@ -3,10 +3,9 @@
 Regular expression, SimpleParse, ane message constants.
 
 Requires:
-  
   - SimpleParse 2.1 or higher
               http://simpleparse.sourceforge.net
-              
+
 
 --------------------------------------------------------------------
 
@@ -18,8 +17,6 @@ http://ruggedcircuits.com/gerbmerge
 """
 
 import re
-
-from simpleparse.parser import Parser
 
 DISCLAIMER = """
 ****************************************************
@@ -58,70 +55,70 @@ DISCLAIMER = """
 #                                               THESE DATA TYPES ARE FIXED - CODE MUST CHANGE IF TYPES ARE ADDED/MODIFIED
 DEFAULT_OPTIONS = {
     # Spacing in horizontal direction
-    'xspacing':                  ('0.125',   "DP",   "XSpacing",                "1 XSPACING_HELP"),
+    'xspacing': ('0.125', "DP", "XSpacing", "1 XSPACING_HELP"),
     # Spacing in vertical direction
-    'yspacing':                  ('0.125',   "DP",   "YSpacing",                "2 YSPACING_HELP"),
+    'yspacing': ('0.125', "DP", "YSpacing", "2 YSPACING_HELP"),
     # X-Dimension maximum panel size (Olimex)
-    'panelwidth':                ('12.6',    "DP",   "PanelWidth",              "3 PANEL_WIDTH"),
+    'panelwidth': ('12.6', "DP", "PanelWidth", "3 PANEL_WIDTH"),
     # Y-Dimension maximum panel size (Olimex)
-    'panelheight':               ('7.8',     "DP",   "PanelHeight",             "4 PanelHeight"),
+    'panelheight': ('7.8', "DP", "PanelHeight", "4 PanelHeight"),
     # e.g., *toplayer,*bottomlayer
-    'cropmarklayers':            (None,      "L",    "CropMarkLayers",          "5 CropMarkLayers"),
+    'cropmarklayers': (None, "L", "CropMarkLayers", "5 CropMarkLayers"),
     # Width (inches) of crop lines
-    'cropmarkwidth':             ('0.01',    "DP",   "CropMarkWidth",           "6 CropMarkWidth"),
+    'cropmarkwidth': ('0.01', "DP", "CropMarkWidth", "6 CropMarkWidth"),
     # as for cropmarklayers
-    'cutlinelayers':             (None,      "L",    "CutLineLayers",           "7 CutLineLayers"),
+    'cutlinelayers': (None, "L", "CutLineLayers", "7 CutLineLayers"),
     # Width (inches) of cut lines
-    'cutlinewidth':              ('0.01',    "DP",   "CutLineWidth",            "8 CutLineWidth"),
+    'cutlinewidth': ('0.01', "DP", "CutLineWidth", "8 CutLineWidth"),
     # Minimum dimension for selected layers
-    'minimumfeaturesize':        (None,      "S",    "MinimumFeatureSize",      "Use this option to automatically thicken features on particular layers.\nThis is intended for thickening silkscreen to some minimum width.\nThe value of this option must be a comma-separated list\nof layer names followed by minimum feature sizes (in inches) for that layer.\nComment this out to disable thickening. Example usage is:\n\nMinimumFeatureSize = *topsilkscreen,0.008,*bottomsilkscreen,0.008"),
+    'minimumfeaturesize': (None, "S", "MinimumFeatureSize", "Use this option to automatically thicken features on particular layers.\nThis is intended for thickening silkscreen to some minimum width.\nThe value of this option must be a comma-separated list\nof layer names followed by minimum feature sizes (in inches) for that layer.\nComment this out to disable thickening. Example usage is:\n\nMinimumFeatureSize = *topsilkscreen,0.008,*bottomsilkscreen,0.008"),
     # Name of file containing default tool list
-    'toollist':                  (None,      "PI",   "ToolList",                "10 ToolList"),
+    'toollist': (None, "PI", "ToolList", "10 ToolList"),
     # Tolerance for clustering drill sizes
-    'drillclustertolerance':     ('.002',    "DP",    "DrillClusterTolerance",  "11 DrillClusterTolerance"),
+    'drillclustertolerance': ('.002', "DP", "DrillClusterTolerance", "11 DrillClusterTolerance"),
     # Set to 1 to allow multiple jobs to have non-matching layers
-    'allowmissinglayers':        (0,         "BI",   "AllowMissingLayers",      "12 AllowMissingLayers"),
+    'allowmissinglayers': (0, "BI", "AllowMissingLayers", "12 AllowMissingLayers"),
     # Name of file to which to write fabrication drawing, or None
-    'fabricationdrawingfile':    (None,      "PO",   "FabricationDrawingFile",  "13 FabricationDrawingFile"),
+    'fabricationdrawingfile': (None, "PO", "FabricationDrawingFile", "13 FabricationDrawingFile"),
     # Name of file containing text to write to fab drawing
-    'fabricationdrawingtext':    (None,      "PI",   "FabricationDrawingText",  "14 FabricationDrawingText"),
+    'fabricationdrawingtext': (None, "PI", "FabricationDrawingText", "14 FabricationDrawingText"),
     # Number of digits after the decimal point in input Excellon files
-    'excellondecimals':          (4,         "IP",   "ExcellonDecimals",        "15 ExcellonDecimals"),
+    'excellondecimals': (4, "IP", "ExcellonDecimals", "15 ExcellonDecimals"),
     # Generate leading zeros in merged Excellon output file
-    'excellonleadingzeros':      (0,         "IP",   "ExcellonLeadingZeros",    "16 ExcellonLeadingZeros"),
+    'excellonleadingzeros': (0, "IP", "ExcellonLeadingZeros", "16 ExcellonLeadingZeros"),
     # Name of file to which to write simple box outline, or None
-    'outlinelayerfile':          (None,      "PO",   "OutlineLayerFile",        "17 OutlineLayerFile"),
+    'outlinelayerfile': (None, "PO", "OutlineLayerFile", "17 OutlineLayerFile"),
     # Name of file to which to write scoring data, or None
-    'scoringfile':               (None,      "PO",   "ScoringFile",             "18 ScoringFile"),
+    'scoringfile': (None, "PO", "ScoringFile", "18 ScoringFile"),
     # Inches of extra room to leave on left side of panel for tooling
-    'leftmargin':                (0.0,       "DP",   "LeftMargin",              "19 LeftMargin"),
+    'leftmargin': (0.0, "DP", "LeftMargin", "19 LeftMargin"),
     # Inches of extra room to leave on top side of panel for tooling
-    'topmargin':                 (0.0,       "DP",   "TopMargin",               "20 TopMargin"),
+    'topmargin': (0.0, "DP", "TopMargin", "20 TopMargin"),
     # Inches of extra room to leave on right side of panel for tooling
-    'rightmargin':               (0.0,       "DP",   "RightMargin",             "21 RightMargin"),
+    'rightmargin': (0.0, "DP", "RightMargin", "21 RightMargin"),
     # Inches of extra room to leave on bottom side of panel for tooling
-    'bottommargin':              (0.0,       "DP",   "BottomMargin",            "22 BottomMargin"),
+    'bottommargin': (0.0, "DP", "BottomMargin", "22 BottomMargin"),
     # List of X,Y points at which to draw fiducials
-    'fiducialpoints':            (None,      "S",    "FiducialPoints",          "23 FiducialPoints"),
+    'fiducialpoints': (None, "S", "FiducialPoints", "23 FiducialPoints"),
 }
 # List of option types in display order
 DEFAULT_OPTIONS_TYPES = ["IP", "I", "DP", "D", "B", "BI", "S", "PI", "PO", "L"]
 
 # [GerbMergeGUI] section defaults
 DEFAULT_GERBMERGEGUI = {
-    'unit':                     "IN",           # Unit inidicator: IN, MIL, MM
+    'unit': "IN",           # Unit inidicator: IN, MIL, MM
     # Indicates layout: GRID, AUTOMATIC, MANUAL, GRID_FILE, MANUAL_FILE
-    'layout':                   "AUTOMATIC",
-    'runtime':                  10,             # Seconds to run automatic placement
-    'rows':                     1,              # Number of rows in grid layout
-    'columns':                  1,              # Number of columns in grid layout
-    'mergedoutput':             False,          # Path of output directory
-    'mergedname':               False,          # Prefix of merged output files
-    'layoutfilepath':           "",             # Path of layout file
-    'placementfilepath':        "",             # Path of placement file
-    'configurationfilepath':    "",             # Path of configuration file
+    'layout': "AUTOMATIC",
+    'runtime': 10,             # Seconds to run automatic placement
+    'rows': 1,              # Number of rows in grid layout
+    'columns': 1,              # Number of columns in grid layout
+    'mergedoutput': False,          # Path of output directory
+    'mergedname': False,          # Prefix of merged output files
+    'layoutfilepath': "",             # Path of layout file
+    'placementfilepath': "",             # Path of placement file
+    'configurationfilepath': "",             # Path of configuration file
     # Indicates that run dialog may be skipped to upon load
-    'configurationcomplete':    False,
+    'configurationcomplete': False,
 }
 
 # Job names
@@ -154,20 +151,20 @@ RE_VALID_OUTPUT_NAME_MESSAGE = "Vaild Characters: a-z, A-Z, 0-9, underscores, hy
 REQUIRED_LAYERS_OUTPUT = ["BoardOutline", "ToolList", "Placement", "Drills"]
 
 # Default dictionary of layer names to file extensions
-FILE_EXTENSIONS = {"boardoutline":             "GBO",
-                   "topcopper":                "GTL",
-                   "bottomcopper":             "GBL",
-                   "innerlayer2":              "G2",
-                   "innerlayer3":              "G3",
-                   "topsilkscreen":            "GTO",
-                   "bottomsilkscreen":         "GBO",
-                   "topsoldermask":            "GTS",
-                   "bottomsoldermask":         "GBS",
-                   "topsolderpastemask":       "GTP",
-                   "bottomsolderpastemask":    "GBP",
-                   "drills":                   "GDD",
-                   "placement":                "TXT",
-                   "toollist":                 "DRL",
+FILE_EXTENSIONS = {"boardoutline": "GBO",
+                   "topcopper": "GTL",
+                   "bottomcopper": "GBL",
+                   "innerlayer2": "G2",
+                   "innerlayer3": "G3",
+                   "topsilkscreen": "GTO",
+                   "bottomsilkscreen": "GBO",
+                   "topsoldermask": "GTS",
+                   "bottomsoldermask": "GBS",
+                   "topsolderpastemask": "GTP",
+                   "bottomsolderpastemask": "GBP",
+                   "drills": "GDD",
+                   "placement": "TXT",
+                   "toollist": "DRL",
                    }
 DEFAULT_EXTENSION = "GER"
 

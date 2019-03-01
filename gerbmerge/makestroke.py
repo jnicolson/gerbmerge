@@ -32,14 +32,14 @@ FacingDown = 1    # 90 degrees counterclockwise
 FacingRight = 2   # 180 degrees
 FacingUp = 3    # 270 degrees
 
-SpacingDX = 10*int(round(strokes.MaxWidth*SpacingX))
-SpacingDY = 10*int(round(strokes.MaxHeight*SpacingY))
+SpacingDX = 10 * int(round(strokes.MaxWidth * SpacingX))
+SpacingDY = 10 * int(round(strokes.MaxHeight * SpacingY))
 
 RotatedGlyphs = {}
 
 # Default arrow glyph is at 0 degrees rotation, facing left
-ArrowGlyph = [[(0, -BarLength/2), (0, BarLength/2)],
-              [(ArrowLength, ArrowWidth/2), (0, 0), (ArrowLength, -ArrowWidth/2)],
+ArrowGlyph = [[(0, -BarLength / 2), (0, BarLength / 2)],
+              [(ArrowLength, ArrowWidth / 2), (0, 0), (ArrowLength, -ArrowWidth / 2)],
               [(0, 0), (ArrowStemLength, 0)]
               ]
 
@@ -60,8 +60,8 @@ def rotateGlyph(glyph, degrees, glyphName):
     for path in glyph:
         newpath = []
         for X, Y in path:
-            x = int(round(X*cosx - Y*sinx))
-            y = int(round(X*sinx + Y*cosx))
+            x = int(round(X * cosx - Y * sinx))
+            y = int(round(X * sinx + Y * cosx))
             newpath.append((x, y))
         newglyph.append(newpath)
 
@@ -107,9 +107,9 @@ def writeChar(fid, c, X, Y, degrees):
 def writeString(fid, s, X, Y, degrees):
     posX = X
     posY = Y
-    rad = degrees/180.0*math.pi
-    dX = int(round(math.cos(rad)*SpacingDX))
-    dY = int(round(math.sin(rad)*SpacingDX))
+    rad = degrees / 180.0 * math.pi
+    dX = int(round(math.cos(rad) * SpacingDX))
+    dY = int(round(math.sin(rad) * SpacingDX))
 
     if 0:
         if dX < 0:
@@ -134,13 +134,13 @@ def boundingBox(s, X1, Y1):
     if not s:
         return (X1, Y1), (X1, Y1)
 
-    X2 = X1 + (len(s)-1)*SpacingDX + 10*strokes.MaxWidth
-    Y2 = Y1 + 10*strokes.MaxHeight  # Not including descenders
+    X2 = X1 + (len(s) - 1) * SpacingDX + 10 * strokes.MaxWidth
+    Y2 = Y1 + 10 * strokes.MaxHeight  # Not including descenders
     return (X1, Y1), (X2, Y2)
 
 
 def drawDimensionArrow(fid, X, Y, facing):
-    writeGlyph(fid, ArrowGlyph, X, Y, facing*90, "Arrow")
+    writeGlyph(fid, ArrowGlyph, X, Y, facing * 90, "Arrow")
 
 
 def drawDrillHit(fid, X, Y, toolNum):
@@ -150,7 +150,7 @@ def drawDrillHit(fid, X, Y, toolNum):
 
 if __name__ == "__main__":
     import string
-    s = string.digits+string.letters+string.punctuation
+    s = string.digits + string.letters + string.punctuation
     #s = "The quick brown fox jumped over the lazy dog!"
 
     fid = file('test.ger', 'wt')
@@ -175,7 +175,7 @@ D10*
 
     for diam in range(0, strokes.MaxNumDrillTools):
         writeGlyph(
-            fid, strokes.DrillStrokeList[diam], diam*1250, 15000, 0, "%02d" % diam)
+            fid, strokes.DrillStrokeList[diam], diam * 1250, 15000, 0, "%02d" % diam)
 
     fid.write("M02*\n")
     fid.close()
