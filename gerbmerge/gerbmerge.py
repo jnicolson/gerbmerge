@@ -43,8 +43,8 @@ import util
 import scoring
 import drillcluster
 
-VERSION_MAJOR=1
-VERSION_MINOR='9b'
+VERSION_MAJOR = 1
+VERSION_MINOR = '9b'
 
 RANDOM_SEARCH = 1
 EXHAUSTIVE_SEARCH = 2
@@ -56,8 +56,9 @@ config.PlacementFile = None
 # This is a handle to a GUI front end, if any, else None for command-line usage
 GUI = None
 
+
 def usage():
-  print("""
+    print("""
 Usage: gerbmerge [Options] configfile [layoutfile]
 
 Options:
@@ -86,14 +87,15 @@ the layout file (if any) is ignored.
 NOTE: The dimensions of each job are determined solely by the maximum extent of
 the board outline layer for each job.
 """)
-  sys.exit(1)
+    sys.exit(1)
 
 # changed these two writeGerberHeader files to take metric units (mm) into account:
 
+
 def writeGerberHeader22degrees(fid):
-  if config.Config['measurementunits'] == 'inch':
-    fid.write( \
-"""G75*
+    if config.Config['measurementunits'] == 'inch':
+        fid.write(
+            """G75*
 G70*
 %OFA0B0*%
 %FSLAX25Y25*%
@@ -103,9 +105,9 @@ G70*
 5,1,8,0,0,1.08239X$1,22.5*
 %
 """)
-  else:    # assume mm - also remove eagleware hack for %AMOC8
-    fid.write( \
-"""G75*
+    else:    # assume mm - also remove eagleware hack for %AMOC8
+        fid.write(
+            """G75*
 G71*
 %MOMM*%
 %OFA0B0*%
@@ -116,9 +118,9 @@ G71*
 
 
 def writeGerberHeader0degrees(fid):
-  if config.Config['measurementunits'] == 'inch':
-    fid.write( \
-"""G75*
+    if config.Config['measurementunits'] == 'inch':
+        fid.write(
+            """G75*
 G70*
 %OFA0B0*%
 %FSLAX25Y25*%
@@ -128,9 +130,9 @@ G70*
 5,1,8,0,0,1.08239X$1,0.0*
 %
 """)
-  else:    # assume mm - also remove eagleware hack for %AMOC8
-    fid.write( \
-"""G75*
+    else:    # assume mm - also remove eagleware hack for %AMOC8
+        fid.write(
+            """G75*
 G71*
 %MOMM*%
 %OFA0B0*%
@@ -139,111 +141,132 @@ G71*
 %LPD*%
 """)
 
+
 writeGerberHeader = writeGerberHeader22degrees
 
+
 def writeApertureMacros(fid, usedDict):
-  keys = sorted(config.GAMT.keys())
-  for key in keys:
-    if key in usedDict:
-      config.GAMT[key].writeDef(fid)
+    keys = sorted(config.GAMT.keys())
+    for key in keys:
+        if key in usedDict:
+            config.GAMT[key].writeDef(fid)
+
 
 def writeApertures(fid, usedDict):
-  keys = sorted(config.GAT.keys())
-  for key in keys:
-    if key in usedDict:
-      config.GAT[key].writeDef(fid)
+    keys = sorted(config.GAT.keys())
+    for key in keys:
+        if key in usedDict:
+            config.GAT[key].writeDef(fid)
+
 
 def writeGerberFooter(fid):
-  fid.write('M02*\n')
+    fid.write('M02*\n')
+
 
 def writeExcellonHeader(fid):
-  if config.Config['measurementunits'] != 'inch': # metric - mm
-    fid.write( \
-"""M48
+    if config.Config['measurementunits'] != 'inch':  # metric - mm
+        fid.write(
+            """M48
 METRIC,0000.00
 """)
-  fid.write('%\n')
+    fid.write('%\n')
+
 
 def writeExcellonFooter(fid):
-  fid.write('M30\n')
+    fid.write('M30\n')
+
 
 def writeExcellonTool(fid, tool, size):
-  fid.write('%sC%f\n' % (tool, size))
+    fid.write('%sC%f\n' % (tool, size))
+
 
 def writeFiducials(fid, drawcode, OriginX, OriginY, MaxXExtent, MaxYExtent):
-  """Place fiducials at arbitrary points. The FiducialPoints list in the config specifies
-  sets of X,Y co-ordinates. Positive values of X/Y represent offsets from the lower left
-  of the panel. Negative values of X/Y represent offsets from the top right. So:
-         FiducialPoints = 0.125,0.125,-0.125,-0.125
-  means to put a fiducial 0.125,0.125 from the lower left and 0.125,0.125 from the top right"""
-  fid.write('%s*\n' % drawcode)    # Choose drawing aperture
+    """Place fiducials at arbitrary points. The FiducialPoints list in the config specifies
+    sets of X,Y co-ordinates. Positive values of X/Y represent offsets from the lower left
+    of the panel. Negative values of X/Y represent offsets from the top right. So:
+           FiducialPoints = 0.125,0.125,-0.125,-0.125
+    means to put a fiducial 0.125,0.125 from the lower left and 0.125,0.125 from the top right"""
+    fid.write('%s*\n' % drawcode)    # Choose drawing aperture
 
-  fList = config.Config['fiducialpoints'].split(',')
-  for i in range(0, len(fList), 2):
-    x,y = float(fList[i]), float(fList[i+1])
-    if x>=0:
-      x += OriginX
-    else:
-      x = MaxXExtent + x
-    if y>=0:
-      y += OriginX
-    else:
-      y = MaxYExtent + y
-    fid.write('X%07dY%07dD03*\n' % (util.in2gerb(x), util.in2gerb(y)))
+    fList = config.Config['fiducialpoints'].split(',')
+    for i in range(0, len(fList), 2):
+        x, y = float(fList[i]), float(fList[i+1])
+        if x >= 0:
+            x += OriginX
+        else:
+            x = MaxXExtent + x
+        if y >= 0:
+            y += OriginX
+        else:
+            y = MaxYExtent + y
+        fid.write('X%07dY%07dD03*\n' % (util.in2gerb(x), util.in2gerb(y)))
+
 
 def writeCropMarks(fid, drawing_code, OriginX, OriginY, MaxXExtent, MaxYExtent):
-  """Add corner crop marks on the given layer"""
+    """Add corner crop marks on the given layer"""
 
-  # Draw 125mil lines at each corner, with line edge right up against
-  # panel border. This means the center of the line is D/2 offset
-  # from the panel border, where D is the drawing line diameter.
+    # Draw 125mil lines at each corner, with line edge right up against
+    # panel border. This means the center of the line is D/2 offset
+    # from the panel border, where D is the drawing line diameter.
 
-  # use 3mm lines for metric
+    # use 3mm lines for metric
 
-  fid.write('%s*\n' % drawing_code)    # Choose drawing aperture
+    fid.write('%s*\n' % drawing_code)    # Choose drawing aperture
 
-  offset = config.GAT[drawing_code].dimx/2.0
+    offset = config.GAT[drawing_code].dimx/2.0
 
-  # should we be using 'cropmarkwidth' from config.py?
-  if config.Config['measurementunits'] == 'inch':
-    cropW = 0.125 #inch
-  else:
-    cropW = 3 #mm
+    # should we be using 'cropmarkwidth' from config.py?
+    if config.Config['measurementunits'] == 'inch':
+        cropW = 0.125  # inch
+    else:
+        cropW = 3  # mm
 
-  
-  # Lower-left
-  x = OriginX + offset
-  y = OriginY + offset
-  fid.write('X%07dY%07dD02*\n' % (util.in2gerb(x+cropW), util.in2gerb(y+0.000)))
-  fid.write('X%07dY%07dD01*\n' % (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
-  fid.write('X%07dY%07dD01*\n' % (util.in2gerb(x+0.000), util.in2gerb(y+cropW)))
+    # Lower-left
+    x = OriginX + offset
+    y = OriginY + offset
+    fid.write('X%07dY%07dD02*\n' %
+              (util.in2gerb(x+cropW), util.in2gerb(y+0.000)))
+    fid.write('X%07dY%07dD01*\n' %
+              (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
+    fid.write('X%07dY%07dD01*\n' %
+              (util.in2gerb(x+0.000), util.in2gerb(y+cropW)))
 
-  # Lower-right
-  x = MaxXExtent - offset
-  y = OriginY + offset
-  fid.write('X%07dY%07dD02*\n' % (util.in2gerb(x+0.000), util.in2gerb(y+cropW)))
-  fid.write('X%07dY%07dD01*\n' % (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
-  fid.write('X%07dY%07dD01*\n' % (util.in2gerb(x-cropW), util.in2gerb(y+0.000)))
+    # Lower-right
+    x = MaxXExtent - offset
+    y = OriginY + offset
+    fid.write('X%07dY%07dD02*\n' %
+              (util.in2gerb(x+0.000), util.in2gerb(y+cropW)))
+    fid.write('X%07dY%07dD01*\n' %
+              (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
+    fid.write('X%07dY%07dD01*\n' %
+              (util.in2gerb(x-cropW), util.in2gerb(y+0.000)))
 
-  # Upper-right
-  x = MaxXExtent - offset
-  y = MaxYExtent - offset
-  fid.write('X%07dY%07dD02*\n' % (util.in2gerb(x-cropW), util.in2gerb(y+0.000)))
-  fid.write('X%07dY%07dD01*\n' % (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
-  fid.write('X%07dY%07dD01*\n' % (util.in2gerb(x+0.000), util.in2gerb(y-cropW)))
+    # Upper-right
+    x = MaxXExtent - offset
+    y = MaxYExtent - offset
+    fid.write('X%07dY%07dD02*\n' %
+              (util.in2gerb(x-cropW), util.in2gerb(y+0.000)))
+    fid.write('X%07dY%07dD01*\n' %
+              (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
+    fid.write('X%07dY%07dD01*\n' %
+              (util.in2gerb(x+0.000), util.in2gerb(y-cropW)))
 
-  # Upper-left
-  x = OriginX + offset
-  y = MaxYExtent - offset
-  fid.write('X%07dY%07dD02*\n' % (util.in2gerb(x+0.000), util.in2gerb(y-cropW)))
-  fid.write('X%07dY%07dD01*\n' % (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
-  fid.write('X%07dY%07dD01*\n' % (util.in2gerb(x+cropW), util.in2gerb(y+0.000)))
+    # Upper-left
+    x = OriginX + offset
+    y = MaxYExtent - offset
+    fid.write('X%07dY%07dD02*\n' %
+              (util.in2gerb(x+0.000), util.in2gerb(y-cropW)))
+    fid.write('X%07dY%07dD01*\n' %
+              (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
+    fid.write('X%07dY%07dD01*\n' %
+              (util.in2gerb(x+cropW), util.in2gerb(y+0.000)))
+
 
 def disclaimer():
-  if (config.Config['skipdisclaimer'] > 0): # remove annoying disclaimer
-    return 
+    if (config.Config['skipdisclaimer'] > 0):  # remove annoying disclaimer
+        return
 
-  print("""
+    print("""
 ****************************************************
 *           R E A D    C A R E F U L L Y           *
 *                                                  *
@@ -270,547 +293,590 @@ Any other key will exit the program.
 
 """)
 
-  s = input()
-  if s == 'y':
-    print("")
-    return
+    s = input()
+    if s == 'y':
+        print("")
+        return
 
-  print("\nExiting...")
-  sys.exit(0)
+    print("\nExiting...")
+    sys.exit(0)
+
 
 def tile_jobs(Jobs):
-  """Take a list of raw Job objects and find best tiling by calling tile_search"""
+    """Take a list of raw Job objects and find best tiling by calling tile_search"""
 
-  # We must take the raw jobs and construct a list of 4-tuples (Xdim,Ydim,job,rjob).
-  # This means we must construct a rotated job for each entry. We first sort all
-  # jobs from largest to smallest. This should give us the best tilings first so
-  # we can interrupt the tiling process and get a decent layout.
-  L = []
-  #sortJobs = schwartz.schwartz(Jobs, jobs.Job.jobarea)
-  sortJobs = schwartz.schwartz(Jobs, jobs.Job.maxdimension)
-  sortJobs.reverse()
+    # We must take the raw jobs and construct a list of 4-tuples (Xdim,Ydim,job,rjob).
+    # This means we must construct a rotated job for each entry. We first sort all
+    # jobs from largest to smallest. This should give us the best tilings first so
+    # we can interrupt the tiling process and get a decent layout.
+    L = []
+    #sortJobs = schwartz.schwartz(Jobs, jobs.Job.jobarea)
+    sortJobs = schwartz.schwartz(Jobs, jobs.Job.maxdimension)
+    sortJobs.reverse()
 
-  for job in sortJobs:
-    Xdim = job.width_in()
-    Ydim = job.height_in()
-    rjob = jobs.rotateJob(job, 90)  ##NOTE: This will only try 90 degree rotations though 180 & 270 are available
+    for job in sortJobs:
+        Xdim = job.width_in()
+        Ydim = job.height_in()
+        # NOTE: This will only try 90 degree rotations though 180 & 270 are available
+        rjob = jobs.rotateJob(job, 90)
 
-    for count in range(job.Repeat):
-      L.append( (Xdim,Ydim,job,rjob) )
+        for count in range(job.Repeat):
+            L.append((Xdim, Ydim, job, rjob))
 
-  PX,PY = config.Config['panelwidth'],config.Config['panelheight']
-  if config.AutoSearchType==RANDOM_SEARCH:
-    tile = tilesearch2.tile_search2(L, PX, PY)
-  else:
-    tile = tilesearch1.tile_search1(L, PX, PY)
-
-  if not tile:
-    # add metric support (1/1000 mm vs. 1/100,000 inch)
-    if config.Config['measurementunits'] == 'inch':
-      raise RuntimeError('Panel size %.2f"x%.2f" is too small to hold jobs' % (PX,PY))
+    PX, PY = config.Config['panelwidth'], config.Config['panelheight']
+    if config.AutoSearchType == RANDOM_SEARCH:
+        tile = tilesearch2.tile_search2(L, PX, PY)
     else:
-      raise RuntimeError('Panel size %.2fmmx%.2fmm is too small to hold jobs' % (PX,PY))
+        tile = tilesearch1.tile_search1(L, PX, PY)
 
-  return tile
+    if not tile:
+        # add metric support (1/1000 mm vs. 1/100,000 inch)
+        if config.Config['measurementunits'] == 'inch':
+            raise RuntimeError(
+                'Panel size %.2f"x%.2f" is too small to hold jobs' % (PX, PY))
+        else:
+            raise RuntimeError(
+                'Panel size %.2fmmx%.2fmm is too small to hold jobs' % (PX, PY))
 
-def merge(opts, args, gui = None):
-  writeGerberHeader = writeGerberHeader22degrees
-  
-  global GUI
-  GUI = gui
+    return tile
 
-  skipDisclaimer = 0
-  
-  for opt, arg in opts:
-    if opt in ('--octagons',):
-      if arg=='rotate':
-        writeGerberHeader = writeGerberHeader0degrees
-      elif arg=='normal':
-        writeGerberHeader = writeGerberHeader22degrees
-      else:
-        raise RuntimeError('Unknown octagon format')
-    elif opt in ('--random-search',):
-      config.AutoSearchType = RANDOM_SEARCH
-    elif opt in ('--full-search',):
-      config.AutoSearchType = EXHAUSTIVE_SEARCH
-    elif opt in ('--rs-fsjobs',):
-      config.RandomSearchExhaustiveJobs = int(arg)
-    elif opt in ('--search-timeout',):
-      config.SearchTimeout = int(arg)
-    elif opt in ('--place-file',):
-      config.AutoSearchType = FROM_FILE
-      config.PlacementFile = arg
-    elif opt in ('--no-trim-gerber',):
-      config.TrimGerber = 0
-    elif opt in ('--no-trim-excellon',):
-      config.TrimExcellon = 0
-    elif opt in ('-s', '--skipdisclaimer'):
-      skipDisclaimer = 1
-    else:
-      raise RuntimeError("Unknown option: %s" % opt)
 
-  if len(args) > 2 or len(args) < 1:
-    raise RuntimeError('Invalid number of arguments')
+def merge(opts, args, gui=None):
+    writeGerberHeader = writeGerberHeader22degrees
 
-  if (skipDisclaimer == 0):
-    disclaimer()
-    
-  # Load up the Jobs global dictionary, also filling out GAT, the
-  # global aperture table and GAMT, the global aperture macro table.
-  updateGUI("Reading job files...")
-  config.parseConfigFile(args[0])
+    global GUI
+    GUI = gui
 
-  # Force all X and Y coordinates positive by adding absolute value of minimum X and Y
-  for name, job in config.Jobs.items():
-    min_x, min_y = job.mincoordinates()
-    shift_x = shift_y = 0
-    if min_x < 0: shift_x = abs(min_x)
-    if min_y < 0: shift_y = abs(min_y)
-    if (shift_x > 0) or (shift_y > 0):
-      job.fixcoordinates( shift_x, shift_y )
+    skipDisclaimer = 0
 
-  # Display job properties                                                                
-  for job in config.Jobs.values():
-    print('Job %s:' % job.name, "\n")
-    if job.Repeat > 1:
-      print('(%d instances)' % job.Repeat)
-    else:
-      print("\n")
-    print('  Extents: (%d,%d)-(%d,%d)' % (job.minx,job.miny,job.maxx,job.maxy))
-    # add metric support (1/1000 mm vs. 1/100,000 inch)
-    if config.Config['measurementunits'] == 'inch':
-      print('  Size: %f" x %f"' % (job.width_in(), job.height_in()))
-    else:
-      print('  Size: %5.3fmm x %5.3fmm' % (job.width_in(), job.height_in()))
-    print("\n")
+    for opt, arg in opts:
+        if opt in ('--octagons',):
+            if arg == 'rotate':
+                writeGerberHeader = writeGerberHeader0degrees
+            elif arg == 'normal':
+                writeGerberHeader = writeGerberHeader22degrees
+            else:
+                raise RuntimeError('Unknown octagon format')
+        elif opt in ('--random-search',):
+            config.AutoSearchType = RANDOM_SEARCH
+        elif opt in ('--full-search',):
+            config.AutoSearchType = EXHAUSTIVE_SEARCH
+        elif opt in ('--rs-fsjobs',):
+            config.RandomSearchExhaustiveJobs = int(arg)
+        elif opt in ('--search-timeout',):
+            config.SearchTimeout = int(arg)
+        elif opt in ('--place-file',):
+            config.AutoSearchType = FROM_FILE
+            config.PlacementFile = arg
+        elif opt in ('--no-trim-gerber',):
+            config.TrimGerber = 0
+        elif opt in ('--no-trim-excellon',):
+            config.TrimExcellon = 0
+        elif opt in ('-s', '--skipdisclaimer'):
+            skipDisclaimer = 1
+        else:
+            raise RuntimeError("Unknown option: %s" % opt)
 
-  # Trim drill locations and flash data to board extents
-  if config.TrimExcellon:
-    updateGUI("Trimming Excellon data...")
-    print('Trimming Excellon data to board outlines ...')
+    if len(args) > 2 or len(args) < 1:
+        raise RuntimeError('Invalid number of arguments')
+
+    if (skipDisclaimer == 0):
+        disclaimer()
+
+    # Load up the Jobs global dictionary, also filling out GAT, the
+    # global aperture table and GAMT, the global aperture macro table.
+    updateGUI("Reading job files...")
+    config.parseConfigFile(args[0])
+
+    # Force all X and Y coordinates positive by adding absolute value of minimum X and Y
+    for name, job in config.Jobs.items():
+        min_x, min_y = job.mincoordinates()
+        shift_x = shift_y = 0
+        if min_x < 0:
+            shift_x = abs(min_x)
+        if min_y < 0:
+            shift_y = abs(min_y)
+        if (shift_x > 0) or (shift_y > 0):
+            job.fixcoordinates(shift_x, shift_y)
+
+    # Display job properties
     for job in config.Jobs.values():
-      job.trimExcellon()
+        print('Job %s:' % job.name, "\n")
+        if job.Repeat > 1:
+            print('(%d instances)' % job.Repeat)
+        else:
+            print("\n")
+        print('  Extents: (%d,%d)-(%d,%d)' %
+              (job.minx, job.miny, job.maxx, job.maxy))
+        # add metric support (1/1000 mm vs. 1/100,000 inch)
+        if config.Config['measurementunits'] == 'inch':
+            print('  Size: %f" x %f"' % (job.width_in(), job.height_in()))
+        else:
+            print('  Size: %5.3fmm x %5.3fmm' %
+                  (job.width_in(), job.height_in()))
+        print("\n")
 
-  if config.TrimGerber:
-    updateGUI("Trimming Gerber data...")
-    print('Trimming Gerber data to board outlines ...')
-    for job in config.Jobs.values():
-      job.trimGerber()
+    # Trim drill locations and flash data to board extents
+    if config.TrimExcellon:
+        updateGUI("Trimming Excellon data...")
+        print('Trimming Excellon data to board outlines ...')
+        for job in config.Jobs.values():
+            job.trimExcellon()
 
-  # We start origin at (0.1", 0.1") just so we don't get numbers close to 0
-  # which could trip up Excellon leading-0 elimination.
-  # I don't want to change the origin. If this a code bug, then it should be fixed (SDD)
-  OriginX = OriginY = 0 #0.1
+    if config.TrimGerber:
+        updateGUI("Trimming Gerber data...")
+        print('Trimming Gerber data to board outlines ...')
+        for job in config.Jobs.values():
+            job.trimGerber()
 
-  # Read the layout file and construct the nested list of jobs. If there
-  # is no layout file, do auto-layout.
-  updateGUI("Performing layout...")
-  print('Performing layout ...')
-  if len(args) > 1:
-    Layout = parselayout.parseLayoutFile(args[1])
+    # We start origin at (0.1", 0.1") just so we don't get numbers close to 0
+    # which could trip up Excellon leading-0 elimination.
+    # I don't want to change the origin. If this a code bug, then it should be fixed (SDD)
+    OriginX = OriginY = 0  # 0.1
 
-    # Do the layout, updating offsets for each component job.
-    X = OriginX + config.Config['leftmargin']
-    Y = OriginY + config.Config['bottommargin']
+    # Read the layout file and construct the nested list of jobs. If there
+    # is no layout file, do auto-layout.
+    updateGUI("Performing layout...")
+    print('Performing layout ...')
+    if len(args) > 1:
+        Layout = parselayout.parseLayoutFile(args[1])
 
-    for row in Layout:
-      row.setPosition(X, Y)
-      Y += row.height_in() + config.Config['yspacing']
+        # Do the layout, updating offsets for each component job.
+        X = OriginX + config.Config['leftmargin']
+        Y = OriginY + config.Config['bottommargin']
 
-    # Construct a canonical placement from the layout
-    Place = placement.Placement()
-    Place.addFromLayout(Layout)
+        for row in Layout:
+            row.setPosition(X, Y)
+            Y += row.height_in() + config.Config['yspacing']
 
-    del Layout
+        # Construct a canonical placement from the layout
+        Place = placement.Placement()
+        Place.addFromLayout(Layout)
 
-  elif config.AutoSearchType == FROM_FILE:
-    Place = placement.Placement()
-    Place.addFromFile(config.PlacementFile, config.Jobs)
-  else:
-    # Do an automatic layout based on our tiling algorithm.
-    tile = tile_jobs(config.Jobs.values())
+        del Layout
 
-    Place = placement.Placement()
-    Place.addFromTiling(tile, OriginX + config.Config['leftmargin'], OriginY + config.Config['bottommargin'])
+    elif config.AutoSearchType == FROM_FILE:
+        Place = placement.Placement()
+        Place.addFromFile(config.PlacementFile, config.Jobs)
+    else:
+        # Do an automatic layout based on our tiling algorithm.
+        tile = tile_jobs(config.Jobs.values())
 
-  (MaxXExtent,MaxYExtent) = Place.extents()
-  MaxXExtent += config.Config['rightmargin']
-  MaxYExtent += config.Config['topmargin']
+        Place = placement.Placement()
+        Place.addFromTiling(
+            tile, OriginX + config.Config['leftmargin'], OriginY + config.Config['bottommargin'])
 
-  # Start printing out the Gerbers. In preparation for drawing cut marks
-  # and crop marks, make sure we have an aperture to draw with. Use a 10mil line.
-  # If we're doing a fabrication drawing, we'll need a 1mil line.
-  OutputFiles = []
+    (MaxXExtent, MaxYExtent) = Place.extents()
+    MaxXExtent += config.Config['rightmargin']
+    MaxYExtent += config.Config['topmargin']
 
-  try:
-    fullname = config.MergeOutputFiles['placement']
-  except KeyError:
-    fullname = 'merged.placement.txt'
-  Place.write(fullname)
-  OutputFiles.append(fullname)
-
-  # For cut lines
-  AP = aptable.Aperture(aptable.Circle, 'D??', config.Config['cutlinewidth'])
-  drawing_code_cut = aptable.findInApertureTable(AP)
-  if drawing_code_cut is None:
-    drawing_code_cut = aptable.addToApertureTable(AP)
-
-  # For crop marks
-  AP = aptable.Aperture(aptable.Circle, 'D??', config.Config['cropmarkwidth'])
-  drawing_code_crop = aptable.findInApertureTable(AP)
-  if drawing_code_crop is None:
-    drawing_code_crop = aptable.addToApertureTable(AP)
-
-  # For fiducials
-  drawing_code_fiducial_copper = drawing_code_fiducial_soldermask = None
-  if config.Config['fiducialpoints']:
-    AP = aptable.Aperture(aptable.Circle, 'D??', config.Config['fiducialcopperdiameter'])
-    drawing_code_fiducial_copper = aptable.findInApertureTable(AP)
-    if drawing_code_fiducial_copper is None:
-      drawing_code_fiducial_copper = aptable.addToApertureTable(AP)
-    AP = aptable.Aperture(aptable.Circle, 'D??', config.Config['fiducialmaskdiameter'])
-    drawing_code_fiducial_soldermask = aptable.findInApertureTable(AP)
-    if drawing_code_fiducial_soldermask is None:
-      drawing_code_fiducial_soldermask = aptable.addToApertureTable(AP)
-
-  # For fabrication drawing.
-  AP = aptable.Aperture(aptable.Circle, 'D??', 0.001)
-  drawing_code1 = aptable.findInApertureTable(AP)
-  if drawing_code1 is None:
-    drawing_code1 = aptable.addToApertureTable(AP)
-
-  updateGUI("Writing merged files...")
-  print('Writing merged output files ...')
-
-  for layername in config.LayerList.keys():
-    lname = layername
-    if lname[0]=='*':
-      lname = lname[1:]
+    # Start printing out the Gerbers. In preparation for drawing cut marks
+    # and crop marks, make sure we have an aperture to draw with. Use a 10mil line.
+    # If we're doing a fabrication drawing, we'll need a 1mil line.
+    OutputFiles = []
 
     try:
-      fullname = config.MergeOutputFiles[layername]
+        fullname = config.MergeOutputFiles['placement']
     except KeyError:
-      fullname = 'merged.%s.ger' % lname
+        fullname = 'merged.placement.txt'
+    Place.write(fullname)
     OutputFiles.append(fullname)
-    #print('Writing %s ...' % fullname)
-    fid = open(fullname, 'wt')
-    writeGerberHeader(fid)
-    
-    # Determine which apertures and macros are truly needed
-    apUsedDict = {}
-    apmUsedDict = {}
-    for job in Place.jobs:
-      apd, apmd = job.aperturesAndMacros(layername)
-      apUsedDict.update(apd)
-      apmUsedDict.update(apmd)
 
-    # Increase aperature sizes to match minimum feature dimension                         
-    if layername in config.MinimumFeatureDimension:
-    
-      print('  Thickening', lname, 'feature dimensions ...')
-      
-      # Fix each aperture used in this layer
-      for ap in list(apUsedDict.keys()):
-        new = config.GAT[ap].getAdjusted( config.MinimumFeatureDimension[layername] )
-        if not new: ## current aperture size met minimum requirement
-          continue
-        else:       ## new aperture was created
-          new_code = aptable.findOrAddAperture(new) ## get name of existing aperture or create new one if needed
-          del apUsedDict[ap]                        ## the old aperture is no longer used in this layer
-          apUsedDict[new_code] = None               ## the new aperture will be used in this layer
-     
-          # Replace all references to the old aperture with the new one
-          for joblayout in Place.jobs:
-            job = joblayout.job ##access job inside job layout 
-            temp = []
-            if job.hasLayer(layername):
-              for x in job.commands[layername]:
-                if x == ap:
-                  temp.append(new_code) ## replace old aperture with new one
-                else:
-                  temp.append(x)        ## keep old command
-              job.commands[layername] = temp
+    # For cut lines
+    AP = aptable.Aperture(aptable.Circle, 'D??', config.Config['cutlinewidth'])
+    drawing_code_cut = aptable.findInApertureTable(AP)
+    if drawing_code_cut is None:
+        drawing_code_cut = aptable.addToApertureTable(AP)
 
-    if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
-      apUsedDict[drawing_code_cut]=None
+    # For crop marks
+    AP = aptable.Aperture(aptable.Circle, 'D??',
+                          config.Config['cropmarkwidth'])
+    drawing_code_crop = aptable.findInApertureTable(AP)
+    if drawing_code_crop is None:
+        drawing_code_crop = aptable.addToApertureTable(AP)
 
-    if config.Config['cropmarklayers'] and (layername in config.Config['cropmarklayers']):
-      apUsedDict[drawing_code_crop]=None
-      
+    # For fiducials
+    drawing_code_fiducial_copper = drawing_code_fiducial_soldermask = None
     if config.Config['fiducialpoints']:
-      if ((layername=='*toplayer') or (layername=='*bottomlayer')):
-        apUsedDict[drawing_code_fiducial_copper] = None
-      elif ((layername=='*topsoldermask') or (layername=='*bottomsoldermask')):
-        apUsedDict[drawing_code_fiducial_soldermask] = None
+        AP = aptable.Aperture(aptable.Circle, 'D??',
+                              config.Config['fiducialcopperdiameter'])
+        drawing_code_fiducial_copper = aptable.findInApertureTable(AP)
+        if drawing_code_fiducial_copper is None:
+            drawing_code_fiducial_copper = aptable.addToApertureTable(AP)
+        AP = aptable.Aperture(aptable.Circle, 'D??',
+                              config.Config['fiducialmaskdiameter'])
+        drawing_code_fiducial_soldermask = aptable.findInApertureTable(AP)
+        if drawing_code_fiducial_soldermask is None:
+            drawing_code_fiducial_soldermask = aptable.addToApertureTable(AP)
 
-    # Write only necessary macro and aperture definitions to Gerber file
-    writeApertureMacros(fid, apmUsedDict)
-    writeApertures(fid, apUsedDict)
+    # For fabrication drawing.
+    AP = aptable.Aperture(aptable.Circle, 'D??', 0.001)
+    drawing_code1 = aptable.findInApertureTable(AP)
+    if drawing_code1 is None:
+        drawing_code1 = aptable.addToApertureTable(AP)
 
-    #for row in Layout:
-    #  row.writeGerber(fid, layername)
+    updateGUI("Writing merged files...")
+    print('Writing merged output files ...')
 
-    #  # Do cut lines
-    #  if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
-    #    fid.write('%s*\n' % drawing_code_cut)    # Choose drawing aperture
-    #    row.writeCutLines(fid, drawing_code_cut, OriginX, OriginY, MaxXExtent, MaxYExtent)
+    for layername in config.LayerList.keys():
+        lname = layername
+        if lname[0] == '*':
+            lname = lname[1:]
 
-    # Finally, write actual flash data
-    for job in Place.jobs:
-    
-      updateGUI("Writing merged output files...")
-      job.writeGerber(fid, layername)
+        try:
+            fullname = config.MergeOutputFiles[layername]
+        except KeyError:
+            fullname = 'merged.%s.ger' % lname
+        OutputFiles.append(fullname)
+        #print('Writing %s ...' % fullname)
+        fid = open(fullname, 'wt')
+        writeGerberHeader(fid)
 
-      if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
-        fid.write('%s*\n' % drawing_code_cut)    # Choose drawing aperture
-        #print("writing drawcode_cut: %s" % drawing_code_cut)
-        job.writeCutLines(fid, drawing_code_cut, OriginX, OriginY, MaxXExtent, MaxYExtent)
+        # Determine which apertures and macros are truly needed
+        apUsedDict = {}
+        apmUsedDict = {}
+        for job in Place.jobs:
+            apd, apmd = job.aperturesAndMacros(layername)
+            apUsedDict.update(apd)
+            apmUsedDict.update(apmd)
 
-    if config.Config['cropmarklayers']:
-      if layername in config.Config['cropmarklayers']:
-        writeCropMarks(fid, drawing_code_crop, OriginX, OriginY, MaxXExtent, MaxYExtent)
+        # Increase aperature sizes to match minimum feature dimension
+        if layername in config.MinimumFeatureDimension:
 
-    if config.Config['fiducialpoints']:
-      if ((layername=='*toplayer') or (layername=='*bottomlayer')):
-        writeFiducials(fid, drawing_code_fiducial_copper, OriginX, OriginY, MaxXExtent, MaxYExtent)
-      elif ((layername=='*topsoldermask') or (layername=='*bottomsoldermask')):
-        writeFiducials(fid, drawing_code_fiducial_soldermask, OriginX, OriginY, MaxXExtent, MaxYExtent)
-      
-    writeGerberFooter(fid)
-    fid.close()
+            print('  Thickening', lname, 'feature dimensions ...')
 
-  # Write board outline layer if selected
-  fullname = config.Config['outlinelayerfile']
-  if fullname and fullname.lower() != "none":
-    OutputFiles.append(fullname)
-    #print('Writing %s ...' % fullname)
-    fid = open(fullname, 'wt')
-    writeGerberHeader(fid)
+            # Fix each aperture used in this layer
+            for ap in list(apUsedDict.keys()):
+                new = config.GAT[ap].getAdjusted(
+                    config.MinimumFeatureDimension[layername])
+                if not new:  # current aperture size met minimum requirement
+                    continue
+                else:  # new aperture was created
+                    # get name of existing aperture or create new one if needed
+                    new_code = aptable.findOrAddAperture(new)
+                    # the old aperture is no longer used in this layer
+                    del apUsedDict[ap]
+                    # the new aperture will be used in this layer
+                    apUsedDict[new_code] = None
 
-    # Write width-1 aperture to file
-    # add metric support
-    if config.Config['measurementunits'] == 'inch':
-      AP = aptable.Aperture(aptable.Circle, 'D10', 0.001)
+                    # Replace all references to the old aperture with the new one
+                    for joblayout in Place.jobs:
+                        job = joblayout.job  # access job inside job layout
+                        temp = []
+                        if job.hasLayer(layername):
+                            for x in job.commands[layername]:
+                                if x == ap:
+                                    # replace old aperture with new one
+                                    temp.append(new_code)
+                                else:
+                                    temp.append(x)  # keep old command
+                            job.commands[layername] = temp
+
+        if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
+            apUsedDict[drawing_code_cut] = None
+
+        if config.Config['cropmarklayers'] and (layername in config.Config['cropmarklayers']):
+            apUsedDict[drawing_code_crop] = None
+
+        if config.Config['fiducialpoints']:
+            if ((layername == '*toplayer') or (layername == '*bottomlayer')):
+                apUsedDict[drawing_code_fiducial_copper] = None
+            elif ((layername == '*topsoldermask') or (layername == '*bottomsoldermask')):
+                apUsedDict[drawing_code_fiducial_soldermask] = None
+
+        # Write only necessary macro and aperture definitions to Gerber file
+        writeApertureMacros(fid, apmUsedDict)
+        writeApertures(fid, apUsedDict)
+
+        # for row in Layout:
+        #  row.writeGerber(fid, layername)
+
+        #  # Do cut lines
+        #  if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
+        #    fid.write('%s*\n' % drawing_code_cut)    # Choose drawing aperture
+        #    row.writeCutLines(fid, drawing_code_cut, OriginX, OriginY, MaxXExtent, MaxYExtent)
+
+        # Finally, write actual flash data
+        for job in Place.jobs:
+
+            updateGUI("Writing merged output files...")
+            job.writeGerber(fid, layername)
+
+            if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
+                # Choose drawing aperture
+                fid.write('%s*\n' % drawing_code_cut)
+                #print("writing drawcode_cut: %s" % drawing_code_cut)
+                job.writeCutLines(fid, drawing_code_cut, OriginX,
+                                  OriginY, MaxXExtent, MaxYExtent)
+
+        if config.Config['cropmarklayers']:
+            if layername in config.Config['cropmarklayers']:
+                writeCropMarks(fid, drawing_code_crop, OriginX,
+                               OriginY, MaxXExtent, MaxYExtent)
+
+        if config.Config['fiducialpoints']:
+            if ((layername == '*toplayer') or (layername == '*bottomlayer')):
+                writeFiducials(fid, drawing_code_fiducial_copper,
+                               OriginX, OriginY, MaxXExtent, MaxYExtent)
+            elif ((layername == '*topsoldermask') or (layername == '*bottomsoldermask')):
+                writeFiducials(fid, drawing_code_fiducial_soldermask,
+                               OriginX, OriginY, MaxXExtent, MaxYExtent)
+
+        writeGerberFooter(fid)
+        fid.close()
+
+    # Write board outline layer if selected
+    fullname = config.Config['outlinelayerfile']
+    if fullname and fullname.lower() != "none":
+        OutputFiles.append(fullname)
+        #print('Writing %s ...' % fullname)
+        fid = open(fullname, 'wt')
+        writeGerberHeader(fid)
+
+        # Write width-1 aperture to file
+        # add metric support
+        if config.Config['measurementunits'] == 'inch':
+            AP = aptable.Aperture(aptable.Circle, 'D10', 0.001)
+        else:
+            # we'll use 0.25 mm - same as Diptrace
+            AP = aptable.Aperture(aptable.Circle, 'D10', 0.25)
+        AP.writeDef(fid)
+
+        # Choose drawing aperture D10
+        fid.write('D10*\n')
+
+        # Draw the rectangle
+        fid.write('X%07dY%07dD02*\n' % (util.in2gerb(OriginX),
+                                        util.in2gerb(OriginY)))        # Bottom-left
+        fid.write('X%07dY%07dD01*\n' % (util.in2gerb(OriginX),
+                                        util.in2gerb(MaxYExtent)))     # Top-left
+        fid.write('X%07dY%07dD01*\n' % (util.in2gerb(MaxXExtent),
+                                        util.in2gerb(MaxYExtent)))  # Top-right
+        fid.write('X%07dY%07dD01*\n' % (util.in2gerb(MaxXExtent),
+                                        util.in2gerb(OriginY)))     # Bottom-right
+        fid.write('X%07dY%07dD01*\n' % (util.in2gerb(OriginX),
+                                        util.in2gerb(OriginY)))        # Bottom-left
+
+        writeGerberFooter(fid)
+        fid.close()
+
+    # Write scoring layer if selected
+    fullname = config.Config['scoringfile']
+    if fullname and fullname.lower() != "none":
+        OutputFiles.append(fullname)
+        #print('Writing %s ...' % fullname)
+        fid = open(fullname, 'wt')
+        writeGerberHeader(fid)
+
+        # Write width-1 aperture to file
+        AP = aptable.Aperture(aptable.Circle, 'D10', 0.001)
+        AP.writeDef(fid)
+
+        # Choose drawing aperture D10
+        fid.write('D10*\n')
+
+        # Draw the scoring lines
+        scoring.writeScoring(fid, Place, OriginX, OriginY,
+                             MaxXExtent, MaxYExtent)
+
+        writeGerberFooter(fid)
+        fid.close()
+
+    # Get a list of all tools used by merging keys from each job's dictionary
+    # of tools.
+    if 0:
+        Tools = {}
+        for job in config.Jobs.values():
+            for key in job.xcommands.keys():
+                Tools[key] = 1
+
+        Tools = Tools.keys()
+        Tools.sort()
     else:
-      AP = aptable.Aperture(aptable.Circle, 'D10', 0.25) # we'll use 0.25 mm - same as Diptrace
-    AP.writeDef(fid)
+        toolNum = 0
 
-    # Choose drawing aperture D10
-    fid.write('D10*\n')
+        # First construct global mapping of diameters to tool numbers
+        for job in config.Jobs.values():
+            for tool, diam in job.xdiam.items():
+                if diam in config.GlobalToolRMap:
+                    continue
 
-    # Draw the rectangle
-    fid.write('X%07dY%07dD02*\n' % (util.in2gerb(OriginX), util.in2gerb(OriginY)))        # Bottom-left
-    fid.write('X%07dY%07dD01*\n' % (util.in2gerb(OriginX), util.in2gerb(MaxYExtent)))     # Top-left
-    fid.write('X%07dY%07dD01*\n' % (util.in2gerb(MaxXExtent), util.in2gerb(MaxYExtent)))  # Top-right
-    fid.write('X%07dY%07dD01*\n' % (util.in2gerb(MaxXExtent), util.in2gerb(OriginY)))     # Bottom-right
-    fid.write('X%07dY%07dD01*\n' % (util.in2gerb(OriginX), util.in2gerb(OriginY)))        # Bottom-left
+                toolNum += 1
+                config.GlobalToolRMap[diam] = "T%02d" % toolNum
 
-    writeGerberFooter(fid)
-    fid.close()
+        # Cluster similar tool sizes to reduce number of drills
+        if config.Config['drillclustertolerance'] > 0:
+            config.GlobalToolRMap = drillcluster.cluster(
+                config.GlobalToolRMap, config.Config['drillclustertolerance'])
+            drillcluster.remap(Place.jobs, config.GlobalToolRMap.items())
 
-  # Write scoring layer if selected
-  fullname = config.Config['scoringfile']
-  if fullname and fullname.lower() != "none":
-    OutputFiles.append(fullname)
-    #print('Writing %s ...' % fullname)
-    fid = open(fullname, 'wt')
-    writeGerberHeader(fid)
+        # Now construct mapping of tool numbers to diameters
+        for diam, tool in config.GlobalToolRMap.items():
+            config.GlobalToolMap[tool] = diam
 
-    # Write width-1 aperture to file
-    AP = aptable.Aperture(aptable.Circle, 'D10', 0.001)
-    AP.writeDef(fid)
+        # Tools is just a list of tool names
+        Tools = sorted(config.GlobalToolMap.keys())
 
-    # Choose drawing aperture D10
-    fid.write('D10*\n')
+    fullname = config.Config['fabricationdrawingfile']
+    if fullname and fullname.lower() != 'none':
+        if len(Tools) > strokes.MaxNumDrillTools:
+            raise RuntimeError(
+                "Only %d different tool sizes supported for fabrication drawing." % strokes.MaxNumDrillTools)
 
-    # Draw the scoring lines
-    scoring.writeScoring(fid, Place, OriginX, OriginY, MaxXExtent, MaxYExtent)
+        OutputFiles.append(fullname)
+        #print('Writing %s ...' % fullname)
+        fid = open(fullname, 'wt')
+        writeGerberHeader(fid)
+        writeApertures(fid, {drawing_code1: None})
+        fid.write('%s*\n' % drawing_code1)    # Choose drawing aperture
 
-    writeGerberFooter(fid)
-    fid.close()
+        fabdrawing.writeFabDrawing(
+            fid, Place, Tools, OriginX, OriginY, MaxXExtent, MaxYExtent)
 
-  # Get a list of all tools used by merging keys from each job's dictionary
-  # of tools.
-  if 0:
-    Tools = {}
-    for job in config.Jobs.values():
-      for key in job.xcommands.keys():
-        Tools[key] = 1
+        writeGerberFooter(fid)
+        fid.close()
 
-    Tools = Tools.keys()
-    Tools.sort()
-  else:
-    toolNum = 0
-
-    # First construct global mapping of diameters to tool numbers
-    for job in config.Jobs.values():
-      for tool,diam in job.xdiam.items():
-        if diam in config.GlobalToolRMap:
-          continue
-
-        toolNum += 1
-        config.GlobalToolRMap[diam] = "T%02d" % toolNum
-
-    # Cluster similar tool sizes to reduce number of drills
-    if config.Config['drillclustertolerance'] > 0:
-      config.GlobalToolRMap = drillcluster.cluster( config.GlobalToolRMap, config.Config['drillclustertolerance'] )
-      drillcluster.remap( Place.jobs, config.GlobalToolRMap.items() )
-
-    # Now construct mapping of tool numbers to diameters
-    for diam,tool in config.GlobalToolRMap.items():
-      config.GlobalToolMap[tool] = diam
-
-    # Tools is just a list of tool names
-    Tools = sorted(config.GlobalToolMap.keys())
-
-  fullname = config.Config['fabricationdrawingfile']
-  if fullname and fullname.lower() != 'none':
-    if len(Tools) > strokes.MaxNumDrillTools:
-      raise RuntimeError("Only %d different tool sizes supported for fabrication drawing." % strokes.MaxNumDrillTools)
-
-    OutputFiles.append(fullname)
-    #print('Writing %s ...' % fullname)
-    fid = open(fullname, 'wt')
-    writeGerberHeader(fid)
-    writeApertures(fid, {drawing_code1: None})
-    fid.write('%s*\n' % drawing_code1)    # Choose drawing aperture
-
-    fabdrawing.writeFabDrawing(fid, Place, Tools, OriginX, OriginY, MaxXExtent, MaxYExtent)
-
-    writeGerberFooter(fid)
-    fid.close()
-    
-  # Finally, print out the Excellon
-  try:
-    fullname = config.MergeOutputFiles['drills']
-  except KeyError:
-    fullname = 'merged.drills.xln'
-  OutputFiles.append(fullname)
-  #print('Writing %s ...' % fullname)
-  fid = open(fullname, 'wt')
-
-  writeExcellonHeader(fid)
-
-  # Ensure each one of our tools is represented in the tool list specified
-  # by the user.
-  for tool in Tools:
+    # Finally, print out the Excellon
     try:
-      size = config.GlobalToolMap[tool]
-    except:
-      raise RuntimeError("INTERNAL ERROR: Tool code %s not found in global tool map" % tool)
-      
-    writeExcellonTool(fid, tool, size)
+        fullname = config.MergeOutputFiles['drills']
+    except KeyError:
+        fullname = 'merged.drills.xln'
+    OutputFiles.append(fullname)
+    #print('Writing %s ...' % fullname)
+    fid = open(fullname, 'wt')
 
-    #for row in Layout:
-    #  row.writeExcellon(fid, size)
+    writeExcellonHeader(fid)
+
+    # Ensure each one of our tools is represented in the tool list specified
+    # by the user.
+    for tool in Tools:
+        try:
+            size = config.GlobalToolMap[tool]
+        except:
+            raise RuntimeError(
+                "INTERNAL ERROR: Tool code %s not found in global tool map" % tool)
+
+        writeExcellonTool(fid, tool, size)
+
+        # for row in Layout:
+        #  row.writeExcellon(fid, size)
+        for job in Place.jobs:
+            job.writeExcellon(fid, size)
+
+    writeExcellonFooter(fid)
+    fid.close()
+
+    updateGUI("Closing files...")
+
+    # Compute stats
+    jobarea = 0.0
+    # for row in Layout:
+    #  jobarea += row.jobarea()
     for job in Place.jobs:
-        job.writeExcellon(fid, size)
-  
-  writeExcellonFooter(fid)
-  fid.close()
-  
-  updateGUI("Closing files...")
+        jobarea += job.jobarea()
 
-  # Compute stats
-  jobarea = 0.0
-  #for row in Layout:
-  #  jobarea += row.jobarea()
-  for job in Place.jobs:
-    jobarea += job.jobarea()
-    
-  totalarea = ((MaxXExtent-OriginX)*(MaxYExtent-OriginY))
+    totalarea = ((MaxXExtent-OriginX)*(MaxYExtent-OriginY))
 
-  ToolStats = {}
-  drillhits = 0
-  for tool in Tools:
-    ToolStats[tool]=0
-    #for row in Layout:
-    #  hits = row.drillhits(config.GlobalToolMap[tool])
-    #  ToolStats[tool] += hits
-    #  drillhits += hits
-    for job in Place.jobs:
-      hits = job.drillhits(config.GlobalToolMap[tool])
-      ToolStats[tool] += hits
-      drillhits += hits
+    ToolStats = {}
+    drillhits = 0
+    for tool in Tools:
+        ToolStats[tool] = 0
+        # for row in Layout:
+        #  hits = row.drillhits(config.GlobalToolMap[tool])
+        #  ToolStats[tool] += hits
+        #  drillhits += hits
+        for job in Place.jobs:
+            hits = job.drillhits(config.GlobalToolMap[tool])
+            ToolStats[tool] += hits
+            drillhits += hits
 
-  try:
-    fullname = config.MergeOutputFiles['toollist']
-  except KeyError:
-    fullname = 'merged.toollist.drl'
-  OutputFiles.append(fullname)
-  #print('Writing %s ...' % fullname)
-  fid = open(fullname, 'wt')
+    try:
+        fullname = config.MergeOutputFiles['toollist']
+    except KeyError:
+        fullname = 'merged.toollist.drl'
+    OutputFiles.append(fullname)
+    #print('Writing %s ...' % fullname)
+    fid = open(fullname, 'wt')
 
-  print('-'*50)
-  # add metric support (1/1000 mm vs. 1/100,000 inch)
-  if config.Config['measurementunits'] == 'inch':
-    print('     Job Size : %f" x %f"' % (MaxXExtent-OriginX, MaxYExtent-OriginY))
-    print('     Job Area : %.2f sq. in.' % totalarea)
-  else:
-    print('     Job Size : %.2fmm x %.2fmm' % (MaxXExtent-OriginX, MaxYExtent-OriginY))
-    print('     Job Area : %.0f mm2' % totalarea)
-
-  print('   Area Usage : %.1f%%' % (jobarea/totalarea*100))
-  print('   Drill hits : %d' % drillhits)
-  if config.Config['measurementunits'] == 'inch':
-    print('Drill density : %.1f hits/sq.in.' % (drillhits/totalarea))
-  else:
-    print('Drill density : %.2f hits/cm2' % (100*drillhits/totalarea))
-
-  print('\nTool List:')
-  smallestDrill = 999.9
-  for tool in Tools:
-    if ToolStats[tool]:
-      if config.Config['measurementunits'] == 'inch':
-        fid.write('%s %.4fin\n' % (tool, config.GlobalToolMap[tool]))
-        print('  %s %.4f" %5d hits' % (tool, config.GlobalToolMap[tool], ToolStats[tool]))
-      else:
-        fid.write('%s %.4fmm\n' % (tool, config.GlobalToolMap[tool]))
-        print('  %s %.4fmm %5d hits' % (tool, config.GlobalToolMap[tool], ToolStats[tool]))
-      smallestDrill = min(smallestDrill, config.GlobalToolMap[tool])
-
-  fid.close()
-  if config.Config['measurementunits'] == 'inch':
-    print("Smallest Tool: %.4fin" % smallestDrill)
-  else:
-    print("Smallest Tool: %.4fmm" % smallestDrill)
-
-  print("\n")
-  print('Output Files :')
-  for f in OutputFiles:
-    print('  ', f)
-
-  if (MaxXExtent-OriginX)>config.Config['panelwidth'] or (MaxYExtent-OriginY)>config.Config['panelheight']:
-    print('*'*75)
-    print('*')
+    print('-'*50)
     # add metric support (1/1000 mm vs. 1/100,000 inch)
     if config.Config['measurementunits'] == 'inch':
-      print('* ERROR: Merged job exceeds panel dimensions of %.1f"x%.1f"' % (config.Config['panelwidth'],config.Config['panelheight']))
+        print('     Job Size : %f" x %f"' %
+              (MaxXExtent-OriginX, MaxYExtent-OriginY))
+        print('     Job Area : %.2f sq. in.' % totalarea)
     else:
-      print('* ERROR: Merged job exceeds panel dimensions of %.1fmmx%.1fmm' % (config.Config['panelwidth'],config.Config['panelheight']))
-    print('*')
-    print('*'*75)
-    sys.exit(1)
+        print('     Job Size : %.2fmm x %.2fmm' %
+              (MaxXExtent-OriginX, MaxYExtent-OriginY))
+        print('     Job Area : %.0f mm2' % totalarea)
 
-  # Done!
-  return 0
+    print('   Area Usage : %.1f%%' % (jobarea/totalarea*100))
+    print('   Drill hits : %d' % drillhits)
+    if config.Config['measurementunits'] == 'inch':
+        print('Drill density : %.1f hits/sq.in.' % (drillhits/totalarea))
+    else:
+        print('Drill density : %.2f hits/cm2' % (100*drillhits/totalarea))
 
-def updateGUI(text = None):
-  global GUI
-  if GUI != None:
-    GUI.updateProgress(text)
+    print('\nTool List:')
+    smallestDrill = 999.9
+    for tool in Tools:
+        if ToolStats[tool]:
+            if config.Config['measurementunits'] == 'inch':
+                fid.write('%s %.4fin\n' % (tool, config.GlobalToolMap[tool]))
+                print('  %s %.4f" %5d hits' %
+                      (tool, config.GlobalToolMap[tool], ToolStats[tool]))
+            else:
+                fid.write('%s %.4fmm\n' % (tool, config.GlobalToolMap[tool]))
+                print('  %s %.4fmm %5d hits' %
+                      (tool, config.GlobalToolMap[tool], ToolStats[tool]))
+            smallestDrill = min(smallestDrill, config.GlobalToolMap[tool])
+
+    fid.close()
+    if config.Config['measurementunits'] == 'inch':
+        print("Smallest Tool: %.4fin" % smallestDrill)
+    else:
+        print("Smallest Tool: %.4fmm" % smallestDrill)
+
+    print("\n")
+    print('Output Files :')
+    for f in OutputFiles:
+        print('  ', f)
+
+    if (MaxXExtent-OriginX) > config.Config['panelwidth'] or (MaxYExtent-OriginY) > config.Config['panelheight']:
+        print('*'*75)
+        print('*')
+        # add metric support (1/1000 mm vs. 1/100,000 inch)
+        if config.Config['measurementunits'] == 'inch':
+            print('* ERROR: Merged job exceeds panel dimensions of %.1f"x%.1f"' %
+                  (config.Config['panelwidth'], config.Config['panelheight']))
+        else:
+            print('* ERROR: Merged job exceeds panel dimensions of %.1fmmx%.1fmm' %
+                  (config.Config['panelwidth'], config.Config['panelheight']))
+        print('*')
+        print('*'*75)
+        sys.exit(1)
+
+    # Done!
+    return 0
+
+
+def updateGUI(text=None):
+    global GUI
+    if GUI != None:
+        GUI.updateProgress(text)
+
 
 def main():
-  try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hvs', ['help', 'version', 'octagons=', 'random-search', 'full-search', 'rs-fsjobs=', 'search-timeout=', 'place-file=', 'no-trim-gerber', 'no-trim-excellon', 'skipdisclaimer'])
-  except getopt.GetoptError:
-    usage()
-    
-  for opt, arg in opts:
-    if opt in ('-h', '--help'):
-      usage()
-    elif opt in ('-v', '--version'):
-      print("""
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'hvs', ['help', 'version', 'octagons=', 'random-search', 'full-search',
+                                                         'rs-fsjobs=', 'search-timeout=', 'place-file=', 'no-trim-gerber', 'no-trim-excellon', 'skipdisclaimer'])
+    except getopt.GetoptError:
+        usage()
+
+    for opt, arg in opts:
+        if opt in ('-h', '--help'):
+            usage()
+        elif opt in ('-v', '--version'):
+            print("""
 GerbMerge Version %d.%s  --  Combine multiple Gerber/Excellon files
 
 This program is licensed under the GNU General Public License (GPL)
@@ -818,13 +884,13 @@ Version 3. See LICENSE file or http://www.fsf.org for details of this license.
 
 ProvideYourOwn - http://provideyourown.com
 """ % (VERSION_MAJOR, VERSION_MINOR))
-      sys.exit(0)
-    elif opt in ('--octagons', '--random-search','--full-search','--rs-fsjobs','--place-file','--no-trim-gerber','--no-trim-excellon', '--search-timeout', '-s', '--skipdisclaimer'):
-      pass ## arguments are valid
-    else:
-      raise RuntimeError("Unknown option: %s" % opt)
+            sys.exit(0)
+        elif opt in ('--octagons', '--random-search', '--full-search', '--rs-fsjobs', '--place-file', '--no-trim-gerber', '--no-trim-excellon', '--search-timeout', '-s', '--skipdisclaimer'):
+            pass  # arguments are valid
+        else:
+            raise RuntimeError("Unknown option: %s" % opt)
 
-  if len(args) > 2 or len(args) < 1:
-    usage()
-    
-  sys.exit(merge(opts, args)) ## run germberge
+    if len(args) > 2 or len(args) < 1:
+        usage()
+
+    sys.exit(merge(opts, args))  # run germberge
