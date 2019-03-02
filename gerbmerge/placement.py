@@ -19,7 +19,7 @@ import re
 import parselayout
 import jobs
 
-class Placement:
+class Placement(object):
   def __init__(self):
     self.jobs = []    # A list of JobLayout objects
 
@@ -52,11 +52,11 @@ class Placement:
 
   def write(self, fname):
     """Write placement to a file"""
-    fid = file(fname, 'wt')
+    fid = open(fname, 'wt')
     for job in self.jobs:
       fid.write('%s %.3f %.3f\n' % (job.job.name, job.x, job.y))
       # added; thought it would be useful to know
-      print "job locations: job - %s x,y(%f,%f)" % (job.job.name, job.x, job.y)
+      print("job locations: job - %s x,y(%f,%f)" % (job.job.name, job.x, job.y))
     fid.close()
 
   def addFromFile(self, fname, Jobs):
@@ -65,9 +65,9 @@ class Placement:
     comment = re.compile(r'\s*(?:#.+)?$')
    
     try:
-      fid = file(fname, 'rt')
+      fid = open(fname, 'rt')
     except:
-      print 'Unable to open placement file: "%s"' % fname
+      print('Unable to open placement file: "%s"' % fname)
       sys.exit(1)
 
     lines = fid.readlines()
@@ -78,7 +78,7 @@ class Placement:
 
       match = pat.match(line)
       if not match:
-        print 'Cannot interpret placement line in placement file:\n  %s' % line
+        print('Cannot interpret placement line in placement file:\n  %s' % line)
         sys.exit(1)
 
       jobname, X, Y = match.groups()
@@ -86,7 +86,7 @@ class Placement:
         X = float(X)
         Y = float(Y)
       except:
-        print 'Illegal (X,Y) co-ordinates in placement file:\n  %s' % line
+        print('Illegal (X,Y) co-ordinates in placement file:\n  %s' % line)
         sys.exit(1)
 
       rotated = 0

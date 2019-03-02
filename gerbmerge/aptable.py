@@ -42,7 +42,7 @@ Apertures = (
 for ap in Apertures:
   globals()[ap[0]] = ap
 
-class Aperture:
+class Aperture(object):
   def __init__(self, aptype, code, dimx, dimy=None):
     assert aptype in Apertures
     self.apname, self.pat, self.format = aptype
@@ -63,16 +63,16 @@ class Aperture:
     dy = util.in2gerb(self.dimy)
 
     if dx & 1:    # Odd-sized: X extents are (dx+1)/2 on the left and (dx-1)/2 on the right
-      xm = (dx+1)/2
+      xm = int((dx+1)/2)
       xp = xm-1
     else:         # Even-sized: X extents are X-dx/2 and X+dx/2
-      xm = xp = dx/2
+      xm = xp = int(dx/2)
 
     if dy & 1:    # Odd-sized: Y extents are (dy+1)/2 below and (dy-1)/2 above
-      ym = (dy+1)/2
+      ym = int((dy+1)/2)
       yp = ym-1
     else:         # Even-sized: Y extents are Y-dy/2 and Y+dy/2
-      ym = yp = dy/2
+      ym = yp = int(dy/2)
 
     return (X-xm, Y-ym, X+xp, Y+yp)
     
@@ -170,14 +170,14 @@ def parseAperture(s, knownMacroNames):
         if knownMacroNames.has_key(dimx):
           dimx = knownMacroNames[dimx]    # dimx is now GLOBAL, permanent macro name (e.g., 'M2')
         else:
-          raise RuntimeError, 'Aperture Macro name "%s" not defined' % dimx
+          raise RuntimeError('Aperture Macro name "%s" not defined' % dimx)
       else:
         try:
           dimx = float(dimx)
           if dimy:
             dimy = float(dimy)
         except:
-          raise RuntimeError, "Illegal floating point aperture size"
+          raise RuntimeError("Illegal floating point aperture size")
 
       return Aperture(ap, code, dimx, dimy)
 
@@ -214,11 +214,11 @@ def constructApertureTable(fileList):
 
   AT = {}               # Aperture Table for this file
   for fname in fileList:
-    #print 'Reading apertures from %s ...' % fname
+    #print('Reading apertures from %s ...' % fname)
 
     knownMacroNames = {}
 
-    fid = file(fname,'rt')
+    fid = open(fname,'rt')
     for line in fid:
       # Get rid of CR
       line = line.replace('\x0D', '')
@@ -270,10 +270,10 @@ def constructApertureTable(fileList):
   if 0:
     keylist = config.GAT.keys()
     keylist.sort()
-    print 'Apertures'
-    print '========='
+    print('Apertures')
+    print('=========')
     for key in keylist:
-      print '%s' % config.GAT[key]
+      print('%s' % config.GAT[key])
     sys.exit(0)
 
 def findHighestApertureCode(keys):
@@ -322,14 +322,14 @@ if __name__=="__main__":
 
   keylist = config.GAMT.keys()
   keylist.sort()
-  print 'Aperture Macros'
-  print '==============='
+  print('Aperture Macros')
+  print('===============')
   for key in keylist:
-    print '%s' % config.GAMT[key]
+    print('%s' % config.GAMT[key])
 
   keylist = config.GAT.keys()
   keylist.sort()
-  print 'Apertures'
-  print '========='
+  print('Apertures')
+  print('=========')
   for key in keylist:
-    print '%s' % config.GAT[key]
+    print('%s' % config.GAT[key])
