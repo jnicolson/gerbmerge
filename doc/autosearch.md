@@ -40,15 +40,15 @@ You can stop the search at any time by pressing Ctrl-C. The best placement found
 ## Multiple Instances
 There is no need to repeat sections of a job in the configuration file if you want a job to appear multiple times on a panel. You can use the `Repeat=N` configuration option to indicate that a particular job is to have N copies on a panel. For example:
 ```
-  [irtx]
-  Prefix=%(projdir)s/IRTransmitter/irtx
-  *TopLayer=%(prefix)s.cmp
-  *BottomLayer=%(prefix)s.sol
-  Drills=%(prefix)s.xln
-  BoardOutline=%(prefix)s.bor
-  *SolderMaskTop=%(prefix)s.stc
-  *SolderMaskBottom=%(prefix)s.sts
-  <B>Repeat=5</B>
+[irtx]
+Prefix=%(projdir)s/IRTransmitter/irtx
+*TopLayer=%(prefix)s.cmp
+*BottomLayer=%(prefix)s.sol
+Drills=%(prefix)s.xln
+BoardOutline=%(prefix)s.bor
+*SolderMaskTop=%(prefix)s.stc
+*SolderMaskBottom=%(prefix)s.sts
+<B>Repeat=5</B>
 ```
 This job specifies all the layers as usual, then the last line indicates that 5 such jobs are to appear on the final panel. They may appear in various positions and states of rotation, however.
 

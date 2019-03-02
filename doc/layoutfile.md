@@ -1,17 +1,18 @@
 ## Introduction
 
-The layout file tells GerbMerge how to replicate and/or arrange the jobs that you specified in the <A HREF="cfgfile.html">configuration file</A>. The layout file must be specified when using manual relative placement. See the <A HREF="autosearch.html">Automatic Placement</A> page for an alternative to using the layout file approach.
+The layout file tells GerbMerge how to replicate and/or arrange the jobs that you specified in the [configuration file](cfgfile.md) The layout file must be specified when using manual relative placement. See the [Automatic Placement](autosearch.md) page for an alternative to using the layout file approach.
 
 The layout file is a plain text file that can be created with any text editor.
 
-Have a look at the sample layout files <A HREF="layout1.def"><TT>layout1.def</TT></A> and <A HREF="layout2.def"><TT>layout2.def</TT></A> for a quick overview of this file.
+Have a look at the sample layout files [`layout1.def`](layout1.def) and [`layout2.def`](layout2.def) for a quick overview of this file.
 
 ## Rows and Columns
 
 The panel layout is specified in terms of cells. Each cell is part of either a row or column of cells. Each row or column can itself be a part of a column or row, respectively. In this way, a large variety of layouts can be specified. Unfortunately, this scheme is fairly easy to implement in code, but it does not allow for arbitrary placement of jobs.
 
 At the top level, you specify the layout of the final panel by specifying the contents of each row, from left to right. Let's begin with an example. The input job, named `example` is as follows:
-<CENTER><IMG SRC="ex1.png"></CENTER>
+
+![ex1](ex1.png)
 
 We will place three copies of this job, all in a row, using the following layout:
 ```
@@ -22,7 +23,8 @@ We will place three copies of this job, all in a row, using the following layout
   }
 ```
 The above layout file leads to the following panel:
-<CENTER><IMG SRC="ex1a.png"></CENTER>
+
+![ex1a](ex1a.png)
 
 The `Row { .... }` construct indicates a single row of the layout. While you can add spaces and comments as you please, the word `Row` and its associated open-bracket must appear on one line, each job name on a separate line, and the closing bracket on its own line. Thus, the following is illegal:
 
@@ -41,7 +43,8 @@ The word `Rotate` following a job indicates that the given instance of the job i
 ```
 
 The above layout file leads to the following panel:
-<CENTER><IMG SRC="ex1b.png"></CENTER>
+
+![ex1b](ex1b.png)
 
 Rows stack vertically beginning at the bottom of the panel and moving up. For example:
 
@@ -59,7 +62,8 @@ Rows stack vertically beginning at the bottom of the panel and moving up. For ex
 ```
 
 The above layout file leads to the following panel:
-<CENTER><IMG SRC="ex1c.png"></CENTER>
+
+![ex1c](ex1c.png)
 
 Suppose now that we want the two jobs on the right to be rotated so the final panel has a smaller width, but larger height. We can try the following:
 
@@ -77,7 +81,8 @@ Suppose now that we want the two jobs on the right to be rotated so the final pa
 ```
 
 The above layout file leads to the following panel:
-<CENTER><IMG SRC="ex1d.png"></CENTER>
+
+![ex1d](ex1d.png)
 
 This layout is quite wasteful and not quite what we intended. The problem is that GerbMerge stacks rows on top of each other based upon the highest job within a row. The height of the first (bottom-most) row, then, is the height of the rotated job.
 
@@ -101,7 +106,8 @@ For example:
 ```
 
 The above layout file leads to the following panel:
-<CENTER><IMG SRC="ex1e.png"></CENTER>
+
+![ex1e](ex1e.png)
 
 Study that layout file carefully. The panel has only a single row with 4 elements. The first element is a column with two jobs. The second element (immediately to the right of the first element) is also a column with two jobs. The third element is a rotated job. The fourth and right-most element is a rotated job.
 
@@ -124,7 +130,8 @@ Now, let's get fancy and embed a row within a column, like this:
 ```
 
 The above layout file leads to the following panel:
-<CENTER><IMG SRC="ex1f.png"></CENTER>
+
+![ex1f](ex1f.png)
 
 In words, the job consists of a single row. The first cell in the row is a column. The first cell in the column is a job. Above this cell is another row, which has two cells (rotated jobs) laid out left-to-right.
 
@@ -154,12 +161,12 @@ To add a job on top of the two rotated jobs at the right of the panel, we must c
 ```
 
 The above layout file leads to the following panel:
-<CENTER><IMG SRC="ex1g.png"></CENTER>
 
-Once you get the hang of thinking in terms of recursive rows and columns, the process is not all that difficult. There is one important rule to remember, however: <CENTER>*Columns can only be defined within a row, and rows can only be defined within a column.*</CENTER>
+![ex1g](ex1g.png)
 
-Make sure you have a look at the sample layout files <A HREF="layout1.def"><TT>layout1.def</TT></A>
-and <A HREF="layout2.def"><TT>layout2.def</TT></A> for more examples.
+Once you get the hang of thinking in terms of recursive rows and columns, the process is not all that difficult. There is one important rule to remember, however: *Columns can only be defined within a row, and rows can only be defined within a column.*
+
+Make sure you have a look at the sample layout files [`layout1.def`](layout1.def) and [`layout2.def`](layout2.def) for more examples.
 
 ## Rotation Angles
 
@@ -167,6 +174,6 @@ For rotating jobs, most users will simply want to rotate jobs by 90 degrees (cou
 
 The full list of rotation keywords recognized in the layout file is as follows:
 
-    * `Rotate`, `Rotate90`: rotate by 90 degrees counterclockwise
-    * `Rotate180`: rotate by 180 degrees
-    * `Rotate270`: rotate by 270 degrees counterclockwise<
+* `Rotate`, `Rotate90`: rotate by 90 degrees counterclockwise
+* `Rotate180`: rotate by 180 degrees
+* `Rotate270`: rotate by 270 degrees counterclockwise
