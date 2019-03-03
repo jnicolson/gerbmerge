@@ -15,7 +15,7 @@ http://ruggedcircuits.com/gerbmerge
 import sys
 import re
 import string
-import __builtin__
+import builtins
 import copy
 import types
 
@@ -104,7 +104,7 @@ XIgnoreList = ( \
 # The board outline and Excellon filenames must be given separately.
 # The board outline file determines the extents of the job.
 
-class Job:
+class Job(object):
   def __init__(self, name):
     self.name = name
 
@@ -222,17 +222,17 @@ class Job:
     self.maxy += y_shift
 
     # Shift all commands
-    for layer, command in self.commands.iteritems():
+    for layer, command in self.commands.items():
     
       # Loop through each command in each layer
       for index in range( len(command) ):
         c = command[index]
         
         # Shift X and Y coordinate of command
-        if type(c) == types.TupleType:                      ## ensure that command is of type tuple
+        if isinstance(c, tuple):                      ## ensure that command is of type tuple
           command_list = list(c)                            ## convert tuple to list
-          if  (type( command_list[0] ) == types.IntType) \
-          and (type( command_list[1] ) == types.IntType):  ## ensure that first two elemenst are integers
+          if  isinstance(command_list[0], int) \
+          and isinstance(command_list[1], int):  ## ensure that first two elemenst are integers
             command_list[0] += x_shift
             command_list[1] += y_shift
           command[index] = tuple(command_list)              ## convert list back to tuple
@@ -240,7 +240,7 @@ class Job:
       self.commands[layer] = command                        ## set modified command
      
     # Shift all excellon commands
-    for tool, command in self.xcommands.iteritems():
+    for tool, command in self.xcommands.items():
     
       # Loop through each command in each layer
       for index in range( len(command) ):
@@ -248,8 +248,8 @@ class Job:
         
         # Shift X and Y coordinate of command
         command_list = list(c)                              ## convert tuple to list
-        if ( type( command_list[0] ) == types.IntType ) \
-        and ( type( command_list[1] ) == types.IntType ):  ## ensure that first two elemenst are integers
+        if isinstance(command_list[0], int) \
+        and isinstance(command_list[1], int) :  ## ensure that first two elemenst are integers
           command_list[0] += x_shift / 10
           command_list[1] += y_shift / 10
         command[index] = tuple(command_list)                ## convert list back to tuple
@@ -266,9 +266,9 @@ class Job:
     RevGAT = config.buildRevDict(GAT)     # RevGAT[hash] = aperturename
     RevGAMT = config.buildRevDict(GAMT)   # RevGAMT[hash] = aperturemacroname
 
-    #print 'Reading data from %s ...' % fullname
+    #print('Reading data from %s ...' % fullname)
 
-    fid = file(fullname, 'rt')
+    fid = open(fullname, 'rt')
     currtool = None
 
     self.apxlat[layername] = {}
@@ -314,7 +314,7 @@ class Job:
 
     for line in fid:
       # Get rid of CR characters (0x0D) and leading/trailing blanks
-      line = string.replace(line, '\x0D', '').strip()
+      line = line.replace('\x0D', '').strip()
 
       # Old location of format_pat search. Now moved down into the sub-line parse loop below.
 
@@ -330,18 +330,18 @@ class Job:
       match = apdef_pat.match(line)
       if match:
         if currtool:
-          raise RuntimeError, "File %s has an aperture definition that comes after drawing commands." % fullname
+          raise RuntimeError("File %s has an aperture definition that comes after drawing commands." % fullname)
 
         A = aptable.parseAperture(line, self.apmxlat[layername])
         if not A:
-          raise RuntimeError, "Unknown aperture definition in file %s" % fullname
+          raise RuntimeError("Unknown aperture definition in file %s" % fullname)
 
         hash = A.hash()
-        if not RevGAT.has_key(hash):
-          #print line
-          #print self.apmxlat
-          #print RevGAT
-          raise RuntimeError, 'File %s has aperture definition "%s" not in global aperture table.' % (fullname, hash)
+        if not hash in RevGAT:
+          #print(line)
+          #print(self.apmxlat)
+          #print(RevGAT)
+          raise RuntimeError('File %s has aperture definition "%s" not in global aperture table.' % (fullname, hash))
 
         # This says that all draw commands with this aperture code will
         # be replaced by aperture self.apxlat[layername][code].
@@ -357,13 +357,13 @@ class Job:
       # a hack to fix lack of recognition for metric direction from DipTrace - %MOMM*%
       if (line[:7] == '%MOMM*%'):
         if (config.Config['measurementunits'] == 'inch'):
-          raise RuntimeError, "File %s units do match config file" % fullname
+          raise RuntimeError("File %s units do match config file" % fullname)
         else:
-        #print "ignoring metric directive: " + line
+        #print("ignoring metric directive: " + line)
           continue # ignore it so func doesn't choke on it
 
       if line[:3] == '%SF': # scale factor - we will ignore it
-        print 'Scale factor parameter ignored: ' + line
+        print('Scale factor parameter ignored: ' + line)
         continue
       
 # end basic diptrace fixes
@@ -372,11 +372,11 @@ class Job:
       M = amacro.parseApertureMacro(line,fid)
       if M:
         if currtool:
-          raise RuntimeError, "File %s has an aperture macro definition that comes after drawing commands." % fullname
+          raise RuntimeError("File %s has an aperture macro definition that comes after drawing commands." % fullname)
 
         hash = M.hash()
-        if not RevGAMT.has_key(hash):
-          raise RuntimeError, 'File %s has aperture macro definition not in global aperture macro table:\n%s' % (fullname, hash)
+        if not hash in RevGAMT:
+          raise RuntimeError('File %s has aperture macro definition not in global aperture macro table:\n%s' % (fullname, hash))
 
         # This says that all aperture definition commands that reference this macro name
         # will be replaced by aperture macro name self.apmxlat[layername][macroname].
@@ -406,9 +406,9 @@ class Job:
               continue
 
             if item[0]=='T':      # omit trailing zeroes
-              raise RuntimeError, "Trailing zeroes not supported in RS274X files"
+              raise RuntimeError("Trailing zeroes not supported in RS274X files")
             if item[0]=='I':      # incremental co-ordinates
-              raise RuntimeError, "Incremental co-ordinates not supported in RS274X files"
+              raise RuntimeError("Incremental co-ordinates not supported in RS274X files")
 
             if item[0]=='N':      # Maximum digits for N* commands...ignore it
               continue
@@ -425,11 +425,11 @@ class Job:
               if item[0]=='X':      # M.N specification for X-axis.
                 fracpart = int(item[2])
                 x_div = 10.0**(3-fracpart)
-                #print "x_div= %5.3f." % x_div
+                #print("x_div= %5.3f." % x_div)
               if item[0]=='Y':      # M.N specification for Y-axis.
                 fracpart = int(item[2])
                 y_div = 10.0**(3-fracpart)
-                #print "y_div= %5.3f." % y_div
+                #print("y_div= %5.3f." % y_div)
       
           continue
 
@@ -462,7 +462,7 @@ class Job:
               
             continue
 
-          raise RuntimeError, "G-Code 'G%02d' is not supported" % gcode
+          raise RuntimeError("G-Code 'G%02d' is not supported" % gcode)
 
         # See if this is a tool change (aperture change) command
         match = tool_pat.match(sub_line)
@@ -495,8 +495,8 @@ class Job:
             continue
 
           # Map it using our translation table
-          if not self.apxlat[layername].has_key(currtool):
-            raise RuntimeError, 'File %s has tool change command "%s" with no corresponding translation' % (fullname, currtool)
+          if not currtool in self.apxlat[layername]:
+            raise RuntimeError('File %s has tool change command "%s" with no corresponding translation' % (fullname, currtool))
 
           currtool = self.apxlat[layername][currtool]
 
@@ -515,17 +515,17 @@ class Job:
         match = drawXY_pat.match(sub_line)
         isLastShorthand = False    # By default assume we don't make use of last_x and last_y
         if match:
-          x, y, d = map(__builtin__.int, match.groups())
+          x, y, d = map(builtins.int, match.groups())
         else:
           match = drawX_pat.match(sub_line)
           if match:
-            x, d = map(__builtin__.int, match.groups())
+            x, d = map(builtins.int, match.groups())
             y = last_y
             isLastShorthand = True  # Indicate we're making use of last_x/last_y
           else:
             match = drawY_pat.match(sub_line)
             if match:
-              y, d = map(__builtin__.int, match.groups())
+              y, d = map(builtins.int, match.groups())
               x = last_x
               isLastShorthand = True  # Indicate we're making use of last_x/last_y
 
@@ -533,17 +533,17 @@ class Job:
         if match is None:
           match = cdrawXY_pat.match(sub_line)
           if match:
-            x, y, I, J, d = map(__builtin__.int, match.groups())
+            x, y, I, J, d = map(builtins.int, match.groups())
           else:
             match = cdrawX_pat.match(sub_line)
             if match:
-              x, I, J, d = map(__builtin__.int, match.groups())
+              x, I, J, d = map(builtins.int, match.groups())
               y = last_y
               isLastShorthand = True  # Indicate we're making use of last_x/last_y
             else:
               match = cdrawY_pat.match(sub_line)
               if match:
-                y, I, J, d = map(__builtin__.int, match.groups())
+                y, I, J, d = map(builtins.int, match.groups())
                 x = last_x
                 isLastShorthand = True  # Indicate we're making use of last_x/last_y
 
@@ -553,7 +553,7 @@ class Job:
             # It's also OK if we're in the middle of a G36 polygon fill as we're only defining
             # the polygon extents.
             if (d != 2) and (last_gmode != 36):
-              raise RuntimeError, 'File %s has draw command %s with no aperture chosen' % (fullname, sub_line)
+              raise RuntimeError('File %s has draw command %s with no aperture chosen' % (fullname, sub_line))
 
           # Save last_x/y BEFORE scaling to 2.5 format else subsequent single-ordinate
           # flashes (e.g., Y with no X) will be scaled twice!
@@ -600,7 +600,7 @@ class Job:
           if match:
             break
         else:
-          raise RuntimeError, 'File %s has uninterpretable line:\n  %s' % (fullname, line)
+          raise RuntimeError('File %s has uninterpretable line:\n  %s' % (fullname, line))
 
         sub_line = sub_line[match.end():]
       # end while still things to match on this line
@@ -608,13 +608,13 @@ class Job:
 
     fid.close()
     if 0:
-      print layername
-      print self.commands[layername]
+      print(layername)
+      print(self.commands[layername])
 
   def parseExcellon(self, fullname):
-    #print 'Reading data from %s ...' % fullname
+    #print('Reading data from %s ...' % fullname)
 
-    fid = file(fullname, 'rt')
+    fid = open(fullname, 'rt')
     currtool = None
     suppress_leading = True     # Suppress leading zeros by default, equivalent to 'INCH,TZ'
 
@@ -644,16 +644,16 @@ class Job:
         V.append(int(round(int(s)*divisor)))
       return tuple(V)
 
-    for line in fid.xreadlines():
+    for line in fid:
       # Get rid of CR characters
-      line = string.replace(line, '\x0D', '')
+      line = line.replace('\x0D', '')
 
 # add support for DipTrace
       if line[:6]=='METRIC':
         if (config.Config['measurementunits'] == 'inch'):
-          raise RuntimeError, "File %s units do match config file" % fullname
+          raise RuntimeError("File %s units do match config file" % fullname)
         else:
-        #print "ignoring METRIC directive: " + line
+        #print("ignoring METRIC directive: " + line)
           continue # ignore it so func doesn't choke on it
 
       if line[:3] == 'T00': # a tidying up that we can ignore
@@ -684,14 +684,14 @@ class Job:
         try:
           diam = float(diam)
         except:
-          raise RuntimeError, "File %s has illegal tool diameter '%s'" % (fullname, diam)
+          raise RuntimeError("File %s has illegal tool diameter '%s'" % (fullname, diam))
 
         # Canonicalize tool number because Protel (of course) sometimes specifies it
         # as T01 and sometimes as T1. We canonicalize to T01.
         currtool = 'T%02d' % int(currtool[1:])
 
-        if self.xdiam.has_key(currtool):
-          raise RuntimeError, "File %s defines tool %s more than once" % (fullname, currtool)
+        if currtool in self.xdiam:
+          raise RuntimeError("File %s defines tool %s more than once" % (fullname, currtool))
         self.xdiam[currtool] = diam
         continue
 
@@ -712,13 +712,13 @@ class Job:
             try:
               diam = self.ToolList[currtool]
             except:
-              raise RuntimeError, "File %s uses tool code %s that is not defined in the job's tool list" % (fullname, currtool)
+              raise RuntimeError("File %s uses tool code %s that is not defined in the job's tool list" % (fullname, currtool))
           else:
             try:
               diam = config.DefaultToolList[currtool]
             except:
-              #print config.DefaultToolList
-              raise RuntimeError, "File %s uses tool code %s that is not defined in default tool list" % (fullname, currtool)
+              #print(config.DefaultToolList)
+              raise RuntimeError("File %s uses tool code %s that is not defined in default tool list" % (fullname, currtool))
 
         self.xdiam[currtool] = diam
         continue
@@ -740,7 +740,7 @@ class Job:
           
       if match:
         if currtool is None:
-          raise RuntimeError, 'File %s has plunge command without previous tool selection' % fullname
+          raise RuntimeError('File %s has plunge command without previous tool selection' % fullname)
 
         try:
           self.xcommands[currtool].append((x,y))
@@ -756,10 +756,10 @@ class Job:
         if pat.match(line):
           break
       else:
-        raise RuntimeError, 'File %s has uninterpretable line:\n  %s' % (fullname, line)
+        raise RuntimeError('File %s has uninterpretable line:\n  %s' % (fullname, line))
 
   def hasLayer(self, layername):
-    return self.commands.has_key(layername)
+    return layername in self.commands
 
   def writeGerber(self, fid, layername, Xoff, Yoff):
     "Write out the data such that the lower-left corner of this job is at the given (X,Y) position, in inches"
@@ -787,7 +787,7 @@ class Job:
     # due to panelizing.
     fid.write('X%07dY%07dD02*\n' % (X, Y))
     for cmd in self.commands[layername]:
-      if type(cmd) is types.TupleType:
+      if isinstance(cmd, tuple):
         if len(cmd)==3:
           x, y, d = cmd
           fid.write('X%07dY%07dD%02d*\n' % (x+DX, y+DY, d))
@@ -844,7 +844,7 @@ class Job:
 
     # Boogie
     for ltool in ltools:
-      if self.xcommands.has_key(ltool):
+      if ltool in self.xcommands:
         for cmd in self.xcommands[ltool]:
           x, y = cmd
           fid.write(fmtstr % (x+DX, y+DY))
@@ -873,7 +873,7 @@ class Job:
     ltools = self.findTools(diameter)
 
     for ltool in ltools:
-      if self.xcommands.has_key(ltool):
+      if ltool in self.xcommands:
         for cmd in self.xcommands[ltool]:
           x, y = cmd
           # add metric support (1/1000 mm vs. 1/100,000 inch)
@@ -885,7 +885,7 @@ class Job:
 
     GAT=config.GAT
 
-    if self.apertures.has_key(layername):
+    if layername in self.apertures:
       apdict = {}.fromkeys(self.apertures[layername])
       apmlist = [GAT[ap].dimx for ap in self.apertures[layername] if GAT[ap].apname=='Macro']
       apmdict = {}.fromkeys(apmlist)
@@ -914,7 +914,7 @@ class Job:
     lastAperture = None
 
     for cmd in self.commands[layername]:
-      if type(cmd) == types.TupleType:
+      if isinstance(cmd, tuple):
         # It is a data command: tuple (X, Y, D), all integers, or (X, Y, I, J, D), all integers.
         if len(cmd)==3:
           x, y, d = cmd
@@ -1091,7 +1091,7 @@ class Job:
 
   def trimExcellon(self):
     "Remove plunge commands that are outside job dimensions"
-    keys = self.xcommands.keys()
+    keys = list(self.xcommands.keys())
     for toolname in keys:
       # Remember Excellon is 2.4 format while Gerber data is 2.5 format
 # add metric support (1/1000 mm vs. 1/100,000 inch)
@@ -1109,7 +1109,7 @@ class Job:
 
 # This class encapsulates a Job object, providing absolute
 # positioning information.
-class JobLayout:
+class JobLayout(object):
   def __init__(self, job):
     self.job = job
     self.x = None
@@ -1251,7 +1251,7 @@ def rotateJob(job, degrees = 90, firstpass = True):
   """Create a new job from an existing one, rotating by specified degrees in 90 degree passes"""
   GAT = config.GAT
   GAMT = config.GAMT
-  ##print "rotating job:", job.name, degrees, firstpass
+  ##print("rotating job:", job.name, degrees, firstpass)
   if firstpass:
     if degrees == 270:
         J = Job(job.name+'*rotated270')
@@ -1330,12 +1330,12 @@ def rotateJob(job, degrees = 90, firstpass = True):
 
     for cmd in job.commands[layername]:
       # Is it a drawing command?
-      if type(cmd) is types.TupleType:
+      if isinstance(cmd, tuple):
         if len(cmd)==3:
-          x, y, d = map(__builtin__.int, cmd)
+          x, y, d = map(builtins.int, cmd)
           II=JJ=None
         else:
-          x, y, II, JJ, d, signed = map(__builtin__.int, cmd)   # J is already used as Job object
+          x, y, II, JJ, d, signed = map(builtins.int, cmd)   # J is already used as Job object
       else:
         # No, must be a string indicating aperture change, G-code, or RS274-X command.
         if cmd[0] in ('G', '%'):
@@ -1376,9 +1376,9 @@ def rotateJob(job, degrees = 90, firstpass = True):
         J.commands[layername].append((newx,newy,d))
 
     if 0:
-      print job.minx, job.miny, offset
-      print layername
-      print J.commands[layername]
+      print(job.minx, job.miny, offset)
+      print(layername)
+      print(J.commands[layername])
 
   # Finally, rotate drills. Offset is in hundred-thousandths (2.5) while Excellon
   # data is in 2.4 format.
@@ -1403,5 +1403,5 @@ def rotateJob(job, degrees = 90, firstpass = True):
   if degrees > 0:
     return rotateJob(J, degrees, False)
   else:
-    ##print "rotated:", J.name
+    ##print("rotated:", J.name)
     return J
