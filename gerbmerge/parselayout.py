@@ -20,8 +20,7 @@ import sys
 
 from simpleparse.parser import Parser
 
-import config
-import jobs
+from . import config, jobs
 
 declaration = r'''
 file         := (commentline/nullline/rowspec)+

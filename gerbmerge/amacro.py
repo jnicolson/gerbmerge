@@ -18,7 +18,7 @@ import sys
 import re
 import copy
 
-import config
+from . import config
 
 _macro_pat = re.compile(r'^%AM([^*]+)\*$')
 

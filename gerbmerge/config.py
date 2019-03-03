@@ -14,10 +14,8 @@ http://ruggedcircuits.com/gerbmerge
 import sys
 import configparser
 import re
-import string
 
-import jobs
-import aptable
+from . import aptable, jobs
 
 # Configuration dictionary. Specify floats as strings. Ints can be specified
 # as ints or strings.
@@ -171,7 +169,7 @@ def parseToolList(fname):
     TL = {}
 
     try:
-        fid = file(fname, 'rt')
+        fid = open(fname, 'rt')
     except Exception as e:
         raise RuntimeError(
             "Unable to open tool list file '%s':\n  %s" % (fname, str(e)))
@@ -180,7 +178,7 @@ def parseToolList(fname):
     pat_mm = re.compile(r'\s*(T\d+)\s+([0-9.]+)\s*mm\s*')
     pat_mil = re.compile(r'\s*(T\d+)\s+([0-9.]+)\s*(?:mil)?')
     for line in fid:
-        line = string.strip(line)
+        line = line.strip()
         if (not line) or (line[0] in ('#', ';')):
             continue
 

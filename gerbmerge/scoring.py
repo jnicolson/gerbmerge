@@ -9,9 +9,7 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 
-import config
-import util
-import makestroke
+from . import config, makestroke, util
 
 
 def addHorizontalLine(Lines, x1, x2, y, extents):

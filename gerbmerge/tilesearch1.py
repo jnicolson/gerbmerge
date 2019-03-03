@@ -12,10 +12,7 @@ http://ruggedcircuits.com/gerbmerge
 import sys
 import time
 
-import config
-import tiling
-
-import gerbmerge
+from . import config, gerbmerge, tiling
 
 _StartTime = 0.0           # Start time of tiling
 _CkpointTime = 0.0         # Next time to print stats
@@ -195,7 +192,7 @@ def factorial(N):
     if (N <= 1):
         return 1
 
-    prod = long(N)
+    prod = int(N)
     while (N > 2):
         N -= 1
         prod *= N
@@ -226,7 +223,7 @@ def tile_search1(Jobs, X, Y):
     # square). Practically, these assumptions make no difference because the software
     # currently doesn't optimize for cases of repeated jobs.
     _PossiblePermutations = (2**len(Jobs)) * factorial(len(Jobs))
-    #print("Possible permutations:", _PossiblePermutations)
+    # print("Possible permutations:", _PossiblePermutations)
 
     print('=' * 70)
     print("Starting placement using exhaustive search.")

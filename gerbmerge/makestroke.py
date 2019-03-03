@@ -11,7 +11,7 @@ http://ruggedcircuits.com/gerbmerge
 
 import math
 
-import strokes
+from . import strokes
 
 # Define percentage of cell height and width to determine
 # intercharacter spacing

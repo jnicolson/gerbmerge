@@ -10,10 +10,7 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 
-
-import config
-import makestroke
-import util
+from . import config, makestroke, util
 
 
 def writeDrillHits(fid, Place, Tools):

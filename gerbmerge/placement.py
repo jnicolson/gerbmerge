@@ -16,7 +16,7 @@ http://ruggedcircuits.com/gerbmerge
 import sys
 import re
 
-import parselayout
+from . import parselayout
 
 
 class Placement(object):
