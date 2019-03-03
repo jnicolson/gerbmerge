@@ -10,7 +10,6 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 
-import string
 
 import config
 import makestroke
@@ -25,7 +24,7 @@ def writeDrillHits(fid, Place, Tools):
 
         try:
             size = config.GlobalToolMap[tool]
-        except:
+        except Exception:
             raise RuntimeError(
                 "INTERNAL ERROR: Tool code %s not found in global tool list" % tool)
 
@@ -83,16 +82,16 @@ def writeDrillLegend(fid, Tools, OriginY, MaxXExtent):
         # Determine string to write and midpoint of string
         s = '%.3f"' % size
         # Returns lower-left point, upper-right point
-        ll, ur = makestroke.boundingBox(s, posX+glyphspace, posY)
-        midpoint = (ur[1]+ll[1])/2
+        ll, ur = makestroke.boundingBox(s, posX + glyphspace, posY)
+        midpoint = (ur[1] + ll[1]) / 2
 
         # Keep track of maximum extent of legend
         maxX = max(maxX, ur[0])
 
         makestroke.drawDrillHit(fid, posX, midpoint, toolNum)
-        makestroke.writeString(fid, s, posX+glyphspace, posY, 0)
+        makestroke.writeString(fid, s, posX + glyphspace, posY, 0)
 
-        posY += int(round((ur[1]-ll[1])*1.5))
+        posY += int(round((ur[1] - ll[1]) * 1.5))
 
     # Return value is lower-left of user text area, without any padding.
     return maxX, util.in2gerb(OriginY)

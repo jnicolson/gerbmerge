@@ -76,22 +76,22 @@ def _tile_search2(Jobs, X, Y, cfg=config.Config):
             T.removeInlets(minInletSize)
 
             if r.choice([0, 1]):
-                addpoints = T.validAddPoints(Xdim+xspacing, Ydim+yspacing)
+                addpoints = T.validAddPoints(Xdim + xspacing, Ydim + yspacing)
                 if not addpoints:
                     break
 
                 pt = r.choice(addpoints)
-                T.addJob(pt, Xdim+xspacing, Ydim+yspacing, job)
+                T.addJob(pt, Xdim + xspacing, Ydim + yspacing, job)
             else:
-                addpoints = T.validAddPoints(Ydim+xspacing, Xdim+yspacing)
+                addpoints = T.validAddPoints(Ydim + xspacing, Xdim + yspacing)
                 if not addpoints:
                     break
 
                 pt = r.choice(addpoints)
-                T.addJob(pt, Ydim+xspacing, Xdim+yspacing, rjob)
+                T.addJob(pt, Ydim + xspacing, Xdim + yspacing, rjob)
         else:
             # Do exhaustive search on remaining jobs
-            if N-M:
+            if N - M:
                 remainingJobs = []
                 for ix in joborder[M:]:
                     remainingJobs.append(Jobs[ix])
@@ -134,7 +134,7 @@ def tile_search2(Jobs, X, Y):
     _TBestTiling = None
     _TBestScore = float(sys.maxsize)
 
-    print('='*70)
+    print('=' * 70)
     if (config.Config['searchtimeout'] > 0):
         print("Starting random placement trials. You can press Ctrl-C to")
         print("stop the process and use the best placement so far, or wait")
@@ -145,7 +145,7 @@ def tile_search2(Jobs, X, Y):
         print("stop the process and use the best placement so far.")
         print("You can specify a timeout by setting 'SearchTimeout' in  Layout.cfg")
     print("Estimated maximum possible utilization is %.1f%%." %
-          (tiling.maxUtilization(Jobs)*100))
+          (tiling.maxUtilization(Jobs) * 100))
 
     try:
         _tile_search2(Jobs, X, Y)
@@ -158,7 +158,7 @@ def tile_search2(Jobs, X, Y):
 
     computeTime = time.time() - _StartTime
     print("Computed %ld placements in %d seconds / %.1f placements/second" %
-          (_Placements, computeTime, _Placements/computeTime))
-    print('='*70)
+          (_Placements, computeTime, _Placements / computeTime))
+    print('=' * 70)
 
     return _TBestTiling

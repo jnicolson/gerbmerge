@@ -188,7 +188,7 @@ def writeFiducials(fid, drawcode, OriginX, OriginY, MaxXExtent, MaxYExtent):
 
     fList = config.Config['fiducialpoints'].split(',')
     for i in range(0, len(fList), 2):
-        x, y = float(fList[i]), float(fList[i+1])
+        x, y = float(fList[i]), float(fList[i + 1])
         if x >= 0:
             x += OriginX
         else:
@@ -211,7 +211,7 @@ def writeCropMarks(fid, drawing_code, OriginX, OriginY, MaxXExtent, MaxYExtent):
 
     fid.write('%s*\n' % drawing_code)    # Choose drawing aperture
 
-    offset = config.GAT[drawing_code].dimx/2.0
+    offset = config.GAT[drawing_code].dimx / 2.0
 
     # should we be using 'cropmarkwidth' from config.py?
     if config.Config['measurementunits'] == 'inch':
@@ -223,41 +223,41 @@ def writeCropMarks(fid, drawing_code, OriginX, OriginY, MaxXExtent, MaxYExtent):
     x = OriginX + offset
     y = OriginY + offset
     fid.write('X%07dY%07dD02*\n' %
-              (util.in2gerb(x+cropW), util.in2gerb(y+0.000)))
+              (util.in2gerb(x + cropW), util.in2gerb(y + 0.000)))
     fid.write('X%07dY%07dD01*\n' %
-              (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
+              (util.in2gerb(x + 0.000), util.in2gerb(y + 0.000)))
     fid.write('X%07dY%07dD01*\n' %
-              (util.in2gerb(x+0.000), util.in2gerb(y+cropW)))
+              (util.in2gerb(x + 0.000), util.in2gerb(y + cropW)))
 
     # Lower-right
     x = MaxXExtent - offset
     y = OriginY + offset
     fid.write('X%07dY%07dD02*\n' %
-              (util.in2gerb(x+0.000), util.in2gerb(y+cropW)))
+              (util.in2gerb(x + 0.000), util.in2gerb(y + cropW)))
     fid.write('X%07dY%07dD01*\n' %
-              (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
+              (util.in2gerb(x + 0.000), util.in2gerb(y + 0.000)))
     fid.write('X%07dY%07dD01*\n' %
-              (util.in2gerb(x-cropW), util.in2gerb(y+0.000)))
+              (util.in2gerb(x - cropW), util.in2gerb(y + 0.000)))
 
     # Upper-right
     x = MaxXExtent - offset
     y = MaxYExtent - offset
     fid.write('X%07dY%07dD02*\n' %
-              (util.in2gerb(x-cropW), util.in2gerb(y+0.000)))
+              (util.in2gerb(x - cropW), util.in2gerb(y + 0.000)))
     fid.write('X%07dY%07dD01*\n' %
-              (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
+              (util.in2gerb(x + 0.000), util.in2gerb(y + 0.000)))
     fid.write('X%07dY%07dD01*\n' %
-              (util.in2gerb(x+0.000), util.in2gerb(y-cropW)))
+              (util.in2gerb(x + 0.000), util.in2gerb(y - cropW)))
 
     # Upper-left
     x = OriginX + offset
     y = MaxYExtent - offset
     fid.write('X%07dY%07dD02*\n' %
-              (util.in2gerb(x+0.000), util.in2gerb(y-cropW)))
+              (util.in2gerb(x + 0.000), util.in2gerb(y - cropW)))
     fid.write('X%07dY%07dD01*\n' %
-              (util.in2gerb(x+0.000), util.in2gerb(y+0.000)))
+              (util.in2gerb(x + 0.000), util.in2gerb(y + 0.000)))
     fid.write('X%07dY%07dD01*\n' %
-              (util.in2gerb(x+cropW), util.in2gerb(y+0.000)))
+              (util.in2gerb(x + cropW), util.in2gerb(y + 0.000)))
 
 
 def disclaimer():
@@ -308,7 +308,7 @@ def tile_jobs(Jobs):
     # jobs from largest to smallest. This should give us the best tilings first so
     # we can interrupt the tiling process and get a decent layout.
     L = []
-    #sortJobs = schwartz.schwartz(Jobs, jobs.Job.jobarea)
+    # sortJobs = schwartz.schwartz(Jobs, jobs.Job.jobarea)
     sortJobs = schwartz.schwartz(Jobs, jobs.Job.maxdimension)
     sortJobs.reverse()
 
@@ -526,7 +526,7 @@ def merge(opts, args, gui=None):
         except KeyError:
             fullname = 'merged.%s.ger' % lname
         OutputFiles.append(fullname)
-        #print('Writing %s ...' % fullname)
+        # print('Writing %s ...' % fullname)
         fid = open(fullname, 'wt')
         writeGerberHeader(fid)
 
@@ -603,7 +603,7 @@ def merge(opts, args, gui=None):
             if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
                 # Choose drawing aperture
                 fid.write('%s*\n' % drawing_code_cut)
-                #print("writing drawcode_cut: %s" % drawing_code_cut)
+                # print("writing drawcode_cut: %s" % drawing_code_cut)
                 job.writeCutLines(fid, drawing_code_cut, OriginX,
                                   OriginY, MaxXExtent, MaxYExtent)
 
@@ -627,7 +627,7 @@ def merge(opts, args, gui=None):
     fullname = config.Config['outlinelayerfile']
     if fullname and fullname.lower() != "none":
         OutputFiles.append(fullname)
-        #print('Writing %s ...' % fullname)
+        # print('Writing %s ...' % fullname)
         fid = open(fullname, 'wt')
         writeGerberHeader(fid)
 
@@ -662,7 +662,7 @@ def merge(opts, args, gui=None):
     fullname = config.Config['scoringfile']
     if fullname and fullname.lower() != "none":
         OutputFiles.append(fullname)
-        #print('Writing %s ...' % fullname)
+        # print('Writing %s ...' % fullname)
         fid = open(fullname, 'wt')
         writeGerberHeader(fid)
 
@@ -722,7 +722,7 @@ def merge(opts, args, gui=None):
                 "Only %d different tool sizes supported for fabrication drawing." % strokes.MaxNumDrillTools)
 
         OutputFiles.append(fullname)
-        #print('Writing %s ...' % fullname)
+        # print('Writing %s ...' % fullname)
         fid = open(fullname, 'wt')
         writeGerberHeader(fid)
         writeApertures(fid, {drawing_code1: None})
@@ -740,7 +740,7 @@ def merge(opts, args, gui=None):
     except KeyError:
         fullname = 'merged.drills.xln'
     OutputFiles.append(fullname)
-    #print('Writing %s ...' % fullname)
+    # print('Writing %s ...' % fullname)
     fid = open(fullname, 'wt')
 
     writeExcellonHeader(fid)
@@ -750,7 +750,7 @@ def merge(opts, args, gui=None):
     for tool in Tools:
         try:
             size = config.GlobalToolMap[tool]
-        except:
+        except Exception:
             raise RuntimeError(
                 "INTERNAL ERROR: Tool code %s not found in global tool map" % tool)
 
@@ -773,7 +773,7 @@ def merge(opts, args, gui=None):
     for job in Place.jobs:
         jobarea += job.jobarea()
 
-    totalarea = ((MaxXExtent-OriginX)*(MaxYExtent-OriginY))
+    totalarea = ((MaxXExtent - OriginX) * (MaxYExtent - OriginY))
 
     ToolStats = {}
     drillhits = 0
@@ -793,26 +793,26 @@ def merge(opts, args, gui=None):
     except KeyError:
         fullname = 'merged.toollist.drl'
     OutputFiles.append(fullname)
-    #print('Writing %s ...' % fullname)
+    # print('Writing %s ...' % fullname)
     fid = open(fullname, 'wt')
 
-    print('-'*50)
+    print('-' * 50)
     # add metric support (1/1000 mm vs. 1/100,000 inch)
     if config.Config['measurementunits'] == 'inch':
         print('     Job Size : %f" x %f"' %
-              (MaxXExtent-OriginX, MaxYExtent-OriginY))
+              (MaxXExtent - OriginX, MaxYExtent - OriginY))
         print('     Job Area : %.2f sq. in.' % totalarea)
     else:
         print('     Job Size : %.2fmm x %.2fmm' %
-              (MaxXExtent-OriginX, MaxYExtent-OriginY))
+              (MaxXExtent - OriginX, MaxYExtent - OriginY))
         print('     Job Area : %.0f mm2' % totalarea)
 
-    print('   Area Usage : %.1f%%' % (jobarea/totalarea*100))
+    print('   Area Usage : %.1f%%' % (jobarea / totalarea * 100))
     print('   Drill hits : %d' % drillhits)
     if config.Config['measurementunits'] == 'inch':
-        print('Drill density : %.1f hits/sq.in.' % (drillhits/totalarea))
+        print('Drill density : %.1f hits/sq.in.' % (drillhits / totalarea))
     else:
-        print('Drill density : %.2f hits/cm2' % (100*drillhits/totalarea))
+        print('Drill density : %.2f hits/cm2' % (100 * drillhits / totalarea))
 
     print('\nTool List:')
     smallestDrill = 999.9
@@ -839,8 +839,8 @@ def merge(opts, args, gui=None):
     for f in OutputFiles:
         print('  ', f)
 
-    if (MaxXExtent-OriginX) > config.Config['panelwidth'] or (MaxYExtent-OriginY) > config.Config['panelheight']:
-        print('*'*75)
+    if (MaxXExtent - OriginX) > config.Config['panelwidth'] or (MaxYExtent - OriginY) > config.Config['panelheight']:
+        print('*' * 75)
         print('*')
         # add metric support (1/1000 mm vs. 1/100,000 inch)
         if config.Config['measurementunits'] == 'inch':
@@ -850,7 +850,7 @@ def merge(opts, args, gui=None):
             print('* ERROR: Merged job exceeds panel dimensions of %.1fmmx%.1fmm' %
                   (config.Config['panelwidth'], config.Config['panelheight']))
         print('*')
-        print('*'*75)
+        print('*' * 75)
         sys.exit(1)
 
     # Done!

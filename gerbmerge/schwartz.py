@@ -20,9 +20,8 @@ def schwartz(List, Metric):
     def pairing(element, M=Metric):
         return (M(element), element)
 
-    paired = map(pairing, List)
-    paired.sort()
-    return map(stripit, paired)
+    paired = sorted(map(pairing, List))
+    return list(map(stripit, paired))
 
 
 def stripit2(pair):
@@ -35,8 +34,7 @@ def schwartz2(List, Metric):
     def pairing(element, M=Metric):
         return (M(element), element)
 
-    paired = map(pairing, List)
-    paired.sort()
+    paired = sorted(map(pairing, List))
     theList = map(stripit, paired)
     theMetrics = map(stripit2, paired)
     return (theList, theMetrics)

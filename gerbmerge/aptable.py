@@ -74,14 +74,14 @@ class Aperture(object):
             xm = int((dx+1)/2)
             xp = xm-1
         else:         # Even-sized: X extents are X-dx/2 and X+dx/2
-            xm = xp = int(dx/2)
+            xm = xp = int(dx / 2)
 
         # Odd-sized: Y extents are (dy+1)/2 below and (dy-1)/2 above
         if dy & 1:
-            ym = int((dy+1)/2)
-            yp = ym-1
+            ym = int((dy + 1) / 2)
+            yp = ym - 1
         else:         # Even-sized: Y extents are Y-dy/2 and Y+dy/2
-            ym = yp = int(dy/2)
+            ym = yp = int(dy / 2)
 
         return (X-xm, Y-ym, X+xp, Y+yp)
 

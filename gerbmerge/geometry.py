@@ -11,37 +11,30 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 
-import math
-
-# Ensure all list elements are unique
-
 
 def uniqueify(L):
+    # Ensure all list elements are unique
     return list({}.fromkeys(L).keys())
-
-# This function rounds an (X,Y) point to integer co-ordinates
 
 
 def roundPoint(pt):
+    # This function rounds an (X,Y) point to integer co-ordinates
     return (int(round(pt[0])), int(round(pt[1])))
-
-# Returns True if the segment defined by endpoints p1 and p2 is vertical
 
 
 def isSegmentVertical(p1, p2):
+    # Returns True if the segment defined by endpoints p1 and p2 is vertical
     return p1[0] == p2[0]
-
-# Returns True if the segment defined by endpoints p1 and p2 is horizontal
 
 
 def isSegmentHorizontal(p1, p2):
+    # Returns True if the segment defined by endpoints p1 and p2 is horizontal
     return p1[1] == p2[1]
-
-# Returns slope of a non-vertical line segment
 
 
 def segmentSlope(p1, p2):
-    return float(p2[1]-p1[1])/(p2[0]-p1[0])
+    # Returns slope of a non-vertical line segment
+    return float(p2[1] - p1[1]) / (p2[0] - p1[0])
 
 # Determine if the (X,Y) 'point' is on the line segment defined by endpoints p1
 # and p2, both (X,Y) tuples. It's assumed that the point is on the line defined
@@ -53,10 +46,10 @@ def segmentSlope(p1, p2):
 def isPointOnSegment(point, p1, p2):
     if isSegmentVertical(p1, p2):
         # Treat vertical lines by comparing Y-ordinates
-        return (point[1]-p2[1])*(point[1]-p1[1]) <= 0
+        return (point[1] - p2[1]) * (point[1] - p1[1]) <= 0
     else:
         # Treat other lines, including horizontal lines, by comparing X-ordinates
-        return (point[0]-p2[0])*(point[0]-p1[0]) <= 0
+        return (point[0] - p2[0]) * (point[0] - p1[0]) <= 0
 
 # Returns (X,Y) point where the line segment defined by (X,Y) endpoints p1 and
 # p2 intersects the line segment defined by endpoints q1 and q2. Only a single

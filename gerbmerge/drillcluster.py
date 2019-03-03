@@ -81,8 +81,8 @@ def cluster(drills, tolerance, debug=_DEBUG):
 
     debug_print("\n  " + str(len(new_drills)) + " Clustered Drills:")
     debug_print(drillsToString(new_drills))
-    debug_print("Drill count reduced from " + str(len(drills)) +
-                " to " + str(len(new_drills)), True)
+    debug_print("Drill count reduced from " + str(len(drills))
+                + " to " + str(len(new_drills)), True)
 
     return new_drills
 
@@ -194,7 +194,7 @@ def drillsToString(drills):
     return string
 
 
-""" 
+"""
     The following code runs test drill clusterings with random drill sets.
 """
 

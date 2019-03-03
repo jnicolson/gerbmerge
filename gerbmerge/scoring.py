@@ -99,7 +99,7 @@ def mergeHLines(Lines):
         else:
             # If the line to examine starts to the left of (within 0.002") the end
             # of the current line, extend the current line.
-            if line[0] <= currLine[2]+0.002:
+            if line[0] <= currLine[2] + 0.002:
                 currLine = (currLine[0], yavg, max(line[2], currLine[2]), yavg)
             else:
                 NewLines.append(currLine)
@@ -108,11 +108,6 @@ def mergeHLines(Lines):
     NewLines.append(currLine)
 
     return NewLines
-
-
-def sortByY(A, B):
-    "Helper function to sort two lines (4-tuples) by their starting Y ordinate"
-    return cmp(A[1], B[1])
 
 
 def mergeVLines(Lines):
@@ -144,7 +139,7 @@ def mergeVLines(Lines):
         else:
             # If the line to examine starts below (within 0.002") the end
             # of the current line, extend the current line.
-            if line[1] <= currLine[3]+0.002:
+            if line[1] <= currLine[3] + 0.002:
                 currLine = (xavg, currLine[1], xavg, max(line[3], currLine[3]))
             else:
                 NewLines.append(currLine)
@@ -274,8 +269,8 @@ def writeScoring(fid, Place, OriginX, OriginY, MaxXExtent, MaxYExtent):
     # For each job, write out 4 score lines, above, to the right, below, and
     # to the left. After we collect all potential scoring lines, we worry
     # about merging, etc.
-    dx = config.Config['xspacing']/2.0
-    dy = config.Config['yspacing']/2.0
+    dx = config.Config['xspacing'] / 2.0
+    dy = config.Config['yspacing'] / 2.0
     extents = (OriginX, OriginY, MaxXExtent, MaxYExtent)
 
     Lines = []
