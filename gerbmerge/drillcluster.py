@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Drill clustering routines to reduce total number of drills and remap 
+Drill clustering routines to reduce total number of drills and remap
 drilling commands to the new reduced drill set.
 
 --------------------------------------------------------------------
@@ -167,7 +167,7 @@ def str_d(drills):
 
     try:
         len(drills)
-    except:
+    except Exception:
         string = "%.4f" % drills
     else:
         string = "["

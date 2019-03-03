@@ -64,7 +64,7 @@ def _tile_search2(Jobs, X, Y, cfg=config.Config):
     yspacing = cfg['yspacing']
 
     # Must escape with Ctrl-C
-    while 1:
+    while True:
         T = tiling.Tiling(X, Y)
         joborder = r.sample(range(N), N)
 
@@ -116,7 +116,8 @@ def _tile_search2(Jobs, X, Y, cfg=config.Config):
             printTilingStats()
 
             # Check for timeout - changed to file config
-            if (config.Config['searchtimeout'] > 0) and ((time.time() - _StartTime) > config.Config['searchtimeout']):
+            if (config.Config['searchtimeout'] > 0) and (
+                    (time.time() - _StartTime) > config.Config['searchtimeout']):
                 raise KeyboardInterrupt
 
         gerbmerge.updateGUI("Performing automatic layout...")

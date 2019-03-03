@@ -25,7 +25,8 @@ Config = {
     'measurementunits': 'inch',       # Unit system to use: inch or mm
     'searchtimeout': 0,               # moved here from hardcoded below
     'skipdisclaimer': 0,              # set to 1 to skip disclaimer prompt
-    # Spacing in horizontal direction - default is set in parseConfigFile based on units
+    # Spacing in horizontal direction - default is set in parseConfigFile
+    # based on units
     'xspacing': 0,
     'yspacing': 0,                    # Spacing in vertical direction - ditto
     'panelwidth': '12.6',             # X-Dimension maximum panel size (Olimex)
@@ -77,7 +78,8 @@ MergeOutputFiles = {
 # The global aperture table, indexed by aperture code (e.g., 'D10')
 GAT = {}
 
-# The global aperture macro table, indexed by macro name (e.g., 'M3', 'M4R' for rotated macros)
+# The global aperture macro table, indexed by macro name (e.g., 'M3',
+# 'M4R' for rotated macros)
 GAMT = {}
 
 # The list of all jobs loaded, indexed by job name (e.g., 'PowerBoard')
@@ -123,7 +125,8 @@ MinimumFeatureDimension = {}
 # SearchTimeout = 0
 
 # Construct the reverse-GAT/GAMT translation table, keyed by aperture/aperture macro
-# hash string. The value is the aperture code (e.g., 'D10') or macro name (e.g., 'M5').
+# hash string. The value is the aperture code (e.g., 'D10') or macro name
+# (e.g., 'M5').
 
 
 def buildRevDict(D):
@@ -176,7 +179,7 @@ def parseToolList(fname):
     pat_in = re.compile(r'\s*(T\d+)\s+([0-9.]+)\s*in\s*')
     pat_mm = re.compile(r'\s*(T\d+)\s+([0-9.]+)\s*mm\s*')
     pat_mil = re.compile(r'\s*(T\d+)\s+([0-9.]+)\s*(?:mil)?')
-    for line in fid.xreadlines():
+    for line in fid:
         line = string.strip(line)
         if (not line) or (line[0] in ('#', ';')):
             continue
@@ -192,20 +195,21 @@ def parseToolList(fname):
                 match = pat_mil.match(line)
                 if not match:
                     continue
-                    # raise RuntimeError, "Illegal tool list specification:\n  %s" % line
+                    # raise RuntimeError, "Illegal tool list specification:\n
+                    # %s" % line
 
         tool, size = match.groups()
 
         try:
             size = float(size)
-        except:
+        except Exception:
             raise RuntimeError(
                 "Tool size in file '%s' is not a valid floating-point number:\n  %s" % (fname, line))
 
         if mil:
-            size = size*0.001  # Convert mil to inches
+            size = size * 0.001  # Convert mil to inches
         elif mm:
-            size = size/25.4   # Convert mm to inches
+            size = size / 25.4   # Convert mm to inches
 
         # Canonicalize tool so that T1 becomes T01
         tool = 'T%02d' % int(tool[1:])
@@ -251,14 +255,14 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
                 pass   # Ignore DEFAULTS section keys
 
             elif opt in ('fabricationdrawing', 'outlinelayer'):
-                print('*'*73)
+                print('*' * 73)
                 print(
                     '\nThe FabricationDrawing and OutlineLayer configuration options have been')
                 print(
                     'renamed as of GerbMerge version 1.0. Please consult the documentation for')
                 print(
                     'a description of the new options, then modify your configuration file.\n')
-                print('*'*73)
+                print('*' * 73)
                 sys.exit(1)
             else:
                 raise RuntimeError(
@@ -276,11 +280,11 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
         try:
             val = int(val)
             Config[key] = val
-        except:
+        except Exception:
             try:
                 val = float(val)
                 Config[key] = val
-            except:
+            except Exception:
                 pass
 
     # Process lists of strings
@@ -308,7 +312,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
         try:
             for index in range(0, len(temp), 2):
                 MinimumFeatureDimension[temp[index]] = float(temp[index + 1])
-        except:
+        except Exception:
             raise RuntimeError(
                 "Illegal configuration string:" + Config['minimumfeaturesize'])
 
@@ -316,7 +320,8 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
     if cp.has_section('MergeOutputFiles'):
         for opt in cp.options('MergeOutputFiles'):
             # Each option is a layer name and the output file for this name
-            if opt[0] == '*' or opt in ('boardoutline', 'drills', 'placement', 'toollist'):
+            if opt[0] == '*' or opt in ('boardoutline',
+                                        'drills', 'placement', 'toollist'):
                 MergeOutputFiles[opt] = cp.get('MergeOutputFiles', opt)
 
     # Now, we go through all jobs and collect Gerber layers
@@ -355,8 +360,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
     del apfiles
 
     if 0:
-        keylist = GAMT.keys()
-        keylist.sort()
+        keylist = sorted(GAMT.keys())
         for key in keylist:
             print('%s' % GAMT[key])
         sys.exit(0)
@@ -403,13 +407,13 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
             elif layername == 'excellondecimals':
                 try:
                     J.ExcellonDecimals = int(fname)
-                except:
+                except Exception:
                     raise RuntimeError(
                         "Excellon decimals '%s' in config file is not a valid integer" % fname)
             elif layername == 'repeat':
                 try:
                     J.Repeat = int(fname)
-                except:
+                except Exception:
                     raise RuntimeError(
                         "Repeat count '%s' in config file is not a valid integer" % fname)
 

@@ -58,7 +58,8 @@ class Tiling(object):
         self.xmax = Xmax + config.Config['xspacing']
         self.ymax = Ymax + config.Config['yspacing']
 
-        self.points = [(0, Ymax), (0, 0), (Xmax, 0)]    # List of (X,Y) co-ordinates
+        # List of (X,Y) co-ordinates
+        self.points = [(0, Ymax), (0, 0), (Xmax, 0)]
         self.jobs = []
         # List of 3-tuples: ((Xbl,Ybl),(Xtr,Ytr),Job) where
         # (Xbl,Ybl) is bottom left, (Xtr,Ytr) is top-right of the cell.
@@ -79,7 +80,11 @@ class Tiling(object):
         return len(self.points) - 2
 
     def clone(self):
-        T = Tiling(self.xmax - config.Config['xspacing'], self.ymax - config.Config['yspacing'])
+        T = Tiling(
+            self.xmax -
+            config.Config['xspacing'],
+            self.ymax -
+            config.Config['yspacing'])
         T.points = self.points[:]
         T.jobs = self.jobs[:]
         return T
@@ -204,7 +209,8 @@ mirrored-L corner __  |      |
         mirrored-L-points and which would support the given job with no overlaps
         are returned.
         """
-        return [ix for ix in range(1, len(self.points) - 1) if (self.isL(ix) or self.isMirrorL(ix)) and not self.isOverlap(ix, X, Y)]
+        return [ix for ix in range(1, len(self.points) - 1) if (
+            self.isL(ix) or self.isMirrorL(ix)) and not self.isOverlap(ix, X, Y)]
 
     def mergePoints(self, ix):
         """Inspect points self.points[ix] and self.points[ix+1] as well
@@ -212,7 +218,8 @@ mirrored-L corner __  |      |
         both points, thus merging lines formed when the corners of two jobs coincide.
         """
 
-        # Do farther-on points first so we can delete things right from the list
+        # Do farther-on points first so we can delete things right from the
+        # list
         if self.points[ix + 3] == self.points[ix + 4]:
             del self.points[ix + 3: ix + 5]
 
@@ -256,32 +263,39 @@ mirrored-L corner __  |      |
             for ix in range(0, len(pt) - 3):
 
                 # Check for horizontal left-going inlet
-                if right_of(pt[ix], pt[ix + 1]) and above(pt[ix + 1], pt[ix + 2]) and left_of(pt[ix + 2], pt[ix + 3]):
+                if right_of(pt[ix], pt[ix + 1]) and above(pt[ix + 1],
+                                                          pt[ix + 2]) and left_of(pt[ix + 2], pt[ix + 3]):
                     # Make sure minSize requirement is met
                     if pt[ix][1] - pt[ix + 3][1] < minSize:
-                        # Get rid of middle two points, extend Y-value of highest point down to lowest point
+                        # Get rid of middle two points, extend Y-value of
+                        # highest point down to lowest point
                         pt[ix] = (pt[ix][0], pt[ix + 3][1])
                         del pt[ix + 1: ix + 3]
                         break
 
                 # Check for horizontal right-going inlet
-                if left_of(pt[ix], pt[ix + 1]) and below(pt[ix + 1], pt[ix + 2]) and right_of(pt[ix + 2], pt[ix + 3]):
+                if left_of(pt[ix], pt[ix + 1]) and below(pt[ix + 1],
+                                                         pt[ix + 2]) and right_of(pt[ix + 2], pt[ix + 3]):
                     # Make sure minSize requirement is met
                     if pt[ix + 3][1] - pt[ix][1] < minSize:
-                        # Get rid of middle two points, exten Y-value of highest point down to lowest point
+                        # Get rid of middle two points, exten Y-value of
+                        # highest point down to lowest point
                         pt[ix + 3] = (pt[ix + 3][0], pt[ix][1])
                         del pt[ix + 1: ix + 3]
                         break
 
                 # Check for vertical inlets
-                if above(pt[ix], pt[ix + 1]) and left_of(pt[ix + 1], pt[ix + 2]) and below(pt[ix + 2], pt[ix + 3]):
+                if above(pt[ix], pt[ix + 1]) and left_of(pt[ix + 1],
+                                                         pt[ix + 2]) and below(pt[ix + 2], pt[ix + 3]):
                     # Make sure minSize requirement is met
                     if pt[ix + 3][0] - pt[ix][0] < minSize:
                         # Is right side lower or higher?
                         if pt[ix + 3][1] >= pt[ix][1]:   # higher?
-                            pt[ix] = (pt[ix + 3][0], pt[ix][1])  # Move first point to the right
+                            # Move first point to the right
+                            pt[ix] = (pt[ix + 3][0], pt[ix][1])
                         else:                        # lower?
-                            pt[ix + 3] = (pt[ix][0], pt[ix + 3][1])  # Move last point to the left
+                            # Move last point to the left
+                            pt[ix + 3] = (pt[ix][0], pt[ix + 3][1])
                         del pt[ix + 1: ix + 3]
                         break
 
@@ -338,7 +352,8 @@ mirrored-L corner __  |      |
             minY = min(minY, bl[1])
             maxY = max(maxY, tr[1])
 
-        return ((minX, minY), (maxX - config.Config['xspacing'], maxY - config.Config['yspacing']))
+        return ((minX, minY), (maxX -
+                               config.Config['xspacing'], maxY - config.Config['yspacing']))
 
     def area(self):
         """Return area of rectangular region defined by all jobs."""
@@ -367,7 +382,8 @@ def maxUtilization(Jobs):
     for Xdim, Ydim, job, rjob in Jobs:
         usedArea += job.jobarea()
         totalArea += job.jobarea()
-        totalArea += job.width_in() * xspacing + job.height_in() * yspacing + xspacing * yspacing
+        totalArea += job.width_in() * xspacing + job.height_in() * \
+            yspacing + xspacing * yspacing
 
     # Reduce total area by strip of unused spacing around top and side. Assume
     # final result will be approximately square.

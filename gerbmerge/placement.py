@@ -80,7 +80,9 @@ class Placement(object):
 
             match = pat.match(line)
             if not match:
-                print('Cannot interpret placement line in placement file:\n  %s' % line)
+                print(
+                    'Cannot interpret placement line in placement file:\n  %s' %
+                    line)
                 sys.exit(1)
 
             jobname, X, Y = match.groups()
@@ -88,7 +90,9 @@ class Placement(object):
                 X = float(X)
                 Y = float(Y)
             except Exception:
-                print('Illegal (X,Y) co-ordinates in placement file:\n  %s' % line)
+                print(
+                    'Illegal (X,Y) co-ordinates in placement file:\n  %s' %
+                    line)
                 sys.exit(1)
 
             rotated = 0

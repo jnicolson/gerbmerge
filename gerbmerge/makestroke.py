@@ -39,7 +39,8 @@ RotatedGlyphs = {}
 
 # Default arrow glyph is at 0 degrees rotation, facing left
 ArrowGlyph = [[(0, -BarLength / 2), (0, BarLength / 2)],
-              [(ArrowLength, ArrowWidth / 2), (0, 0), (ArrowLength, -ArrowWidth / 2)],
+              [(ArrowLength, ArrowWidth / 2), (0, 0),
+               (ArrowLength, -ArrowWidth / 2)],
               [(0, 0), (ArrowStemLength, 0)]
               ]
 

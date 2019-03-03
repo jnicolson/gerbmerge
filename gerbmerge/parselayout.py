@@ -45,11 +45,13 @@ int := [0-9]+
 '''
 
 
-class Panel(object):                 # Meant to be subclassed as either a Row() or Col()
+class Panel(
+        object):                 # Meant to be subclassed as either a Row() or Col()
     def __init__(self):
         self.x = None
         self.y = None
-        # List (left-to-right or bottom-to-top) of JobLayout() or Row()/Col() objects
+        # List (left-to-right or bottom-to-top) of JobLayout() or Row()/Col()
+        # objects
         self.jobs = []
 
     def canonicalize(self):    # Return plain list of JobLayout objects at the roots of all trees

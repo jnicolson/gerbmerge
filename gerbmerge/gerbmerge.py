@@ -68,7 +68,7 @@ Options:
     --place-file=fn     -- Read placement from file
     --rs-fsjobs=N       -- When using random search, exhaustively search N jobs
                            for each random placement (default: N=2)
-    --search-timeout=T  -- When using random search, search for T seconds for best 
+    --search-timeout=T  -- When using random search, search for T seconds for best
                            random placement (default: T=0, search until stopped)
     --no-trim-gerber    -- Do not attempt to trim Gerber data to extents of board
     --no-trim-excellon  -- Do not attempt to trim Excellon data to extents of board
@@ -87,7 +87,8 @@ the board outline layer for each job.
 """)
     sys.exit(1)
 
-# changed these two writeGerberHeader files to take metric units (mm) into account:
+# changed these two writeGerberHeader files to take metric units (mm) into
+# account:
 
 
 def writeGerberHeader22degrees(fid):
@@ -200,7 +201,8 @@ def writeFiducials(fid, drawcode, OriginX, OriginY, MaxXExtent, MaxYExtent):
         fid.write('X%07dY%07dD03*\n' % (util.in2gerb(x), util.in2gerb(y)))
 
 
-def writeCropMarks(fid, drawing_code, OriginX, OriginY, MaxXExtent, MaxYExtent):
+def writeCropMarks(fid, drawing_code, OriginX,
+                   OriginY, MaxXExtent, MaxYExtent):
     """Add corner crop marks on the given layer"""
 
     # Draw 125mil lines at each corner, with line edge right up against
@@ -315,7 +317,8 @@ def tile_jobs(Jobs):
     for job in sortJobs:
         Xdim = job.width_in()
         Ydim = job.height_in()
-        # NOTE: This will only try 90 degree rotations though 180 & 270 are available
+        # NOTE: This will only try 90 degree rotations though 180 & 270 are
+        # available
         rjob = jobs.rotateJob(job, 90)
 
         for count in range(job.Repeat):
@@ -386,7 +389,8 @@ def merge(opts, args, gui=None):
     updateGUI("Reading job files...")
     config.parseConfigFile(args[0])
 
-    # Force all X and Y coordinates positive by adding absolute value of minimum X and Y
+    # Force all X and Y coordinates positive by adding absolute value of
+    # minimum X and Y
     for name, job in config.Jobs.items():
         min_x, min_y = job.mincoordinates()
         shift_x = shift_y = 0
@@ -429,7 +433,8 @@ def merge(opts, args, gui=None):
 
     # We start origin at (0.1", 0.1") just so we don't get numbers close to 0
     # which could trip up Excellon leading-0 elimination.
-    # I don't want to change the origin. If this a code bug, then it should be fixed (SDD)
+    # I don't want to change the origin. If this a code bug, then it should be
+    # fixed (SDD)
     OriginX = OriginY = 0  # 0.1
 
     # Read the layout file and construct the nested list of jobs. If there
@@ -557,7 +562,8 @@ def merge(opts, args, gui=None):
                     # the new aperture will be used in this layer
                     apUsedDict[new_code] = None
 
-                    # Replace all references to the old aperture with the new one
+                    # Replace all references to the old aperture with the new
+                    # one
                     for joblayout in Place.jobs:
                         job = joblayout.job  # access job inside job layout
                         temp = []
@@ -570,10 +576,12 @@ def merge(opts, args, gui=None):
                                     temp.append(x)  # keep old command
                             job.commands[layername] = temp
 
-        if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
+        if config.Config['cutlinelayers'] and (
+                layername in config.Config['cutlinelayers']):
             apUsedDict[drawing_code_cut] = None
 
-        if config.Config['cropmarklayers'] and (layername in config.Config['cropmarklayers']):
+        if config.Config['cropmarklayers'] and (
+                layername in config.Config['cropmarklayers']):
             apUsedDict[drawing_code_crop] = None
 
         if config.Config['fiducialpoints']:
@@ -600,7 +608,8 @@ def merge(opts, args, gui=None):
             updateGUI("Writing merged output files...")
             job.writeGerber(fid, layername)
 
-            if config.Config['cutlinelayers'] and (layername in config.Config['cutlinelayers']):
+            if config.Config['cutlinelayers'] and (
+                    layername in config.Config['cutlinelayers']):
                 # Choose drawing aperture
                 fid.write('%s*\n' % drawing_code_cut)
                 # print("writing drawcode_cut: %s" % drawing_code_cut)
@@ -688,8 +697,7 @@ def merge(opts, args, gui=None):
             for key in job.xcommands.keys():
                 Tools[key] = 1
 
-        Tools = Tools.keys()
-        Tools.sort()
+        Tools = sorted(Tools.keys())
     else:
         toolNum = 0
 
@@ -839,7 +847,8 @@ def merge(opts, args, gui=None):
     for f in OutputFiles:
         print('  ', f)
 
-    if (MaxXExtent - OriginX) > config.Config['panelwidth'] or (MaxYExtent - OriginY) > config.Config['panelheight']:
+    if (MaxXExtent - OriginX) > config.Config['panelwidth'] or (
+            MaxYExtent - OriginY) > config.Config['panelheight']:
         print('*' * 75)
         print('*')
         # add metric support (1/1000 mm vs. 1/100,000 inch)
@@ -859,7 +868,7 @@ def merge(opts, args, gui=None):
 
 def updateGUI(text=None):
     global GUI
-    if GUI != None:
+    if GUI is not None:
         GUI.updateProgress(text)
 
 

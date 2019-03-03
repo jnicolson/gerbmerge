@@ -165,7 +165,8 @@ class ApertureMacroPrimitive(object):
                     'Aperture macro primitive parameter %d has incorrect type' % (parmix + 1))
 
     def setFromLine(self, line):
-        # Account for DOS line endings and get rid of line ending and '*' at the end
+        # Account for DOS line endings and get rid of line ending and '*' at
+        # the end
         line = line.replace('\x0D', '')
         line = line.rstrip()
         line = line.rstrip('*')
@@ -193,15 +194,18 @@ class ApertureMacroPrimitive(object):
             # rotate field 6
             rotatexypair(self.parms, 2)
             rotatexypair(self.parms, 4)
-        # Line (center): fields (3,4) must be rotated, and field 5 incremented by +90
+        # Line (center): fields (3,4) must be rotated, and field 5 incremented
+        # by +90
         elif self.code == 21:
             rotatexypair(self.parms, 3)
             rotatethelem(self.parms, 5)
-        # Line (lower-left): fields (3,4) must be rotated, and field 5 incremented by +90
+        # Line (lower-left): fields (3,4) must be rotated, and field 5
+        # incremented by +90
         elif self.code == 22:
             rotatexypair(self.parms, 3)
             rotatethelem(self.parms, 5)
-        # Outline: fields (2,3), (4,5), etc. must be rotated, the last field need not be incremented
+        # Outline: fields (2,3), (4,5), etc. must be rotated, the last field
+        # need not be incremented
         elif self.code == 4:
             ix = 2
             # parms[1] is the number of points
@@ -343,14 +347,23 @@ if __name__ == "__main__":
 
     # A circle in the top-right quadrant, touching the axes
     M.add(ApertureMacroPrimitive(1, ('1', '0.02', '0.01', '0.01')))
-    # A line of slope -1 centered on the above circle, of thickness 5mil, length 0.05
+    # A line of slope -1 centered on the above circle, of thickness 5mil,
+    # length 0.05
     M.add(ApertureMacroPrimitive(
         2, ('1', '0.005', '0.0', '0.02', '0.02', '0.0', '0.0')))
     # A narrow vertical rectangle centered on the circle of width 2.5mil
     M.add(ApertureMacroPrimitive(
         21, ('1', '0.0025', '0.03', '0.01', '0.01', '0.0')))
     # A 45-degree line in the third quadrant, not quite touching the origin
-    M.add(ApertureMacroPrimitive(22, ('1', '0.02', '0.01', '-0.03', '-0.03', '45')))
+    M.add(
+        ApertureMacroPrimitive(
+            22,
+            ('1',
+             '0.02',
+             '0.01',
+             '-0.03',
+             '-0.03',
+             '45')))
     # A right triangle in the second quadrant
     M.add(ApertureMacroPrimitive(4, ('1', '4', '-0.03', '0.01',
                                      '-0.03', '0.03', '-0.01', '0.01', '-0.03', '0.01', '0.0')))

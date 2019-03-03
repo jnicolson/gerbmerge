@@ -116,7 +116,8 @@ def mergeVLines(Lines):
 
     # First, make sure lines are sorted by starting Y ordinate and that all lines
     # proceed up.
-    # TODO: Check if this is correct (used to use sortByY helper function above)
+    # TODO: Check if this is correct (used to use sortByY helper function
+    # above)
     Lines = sorted(Lines, key=lambda line: line[1])
     for line in Lines:
         assert line[1] < line[3]
@@ -187,7 +188,8 @@ def mergeLines(Lines):
         # lines with this Y ordinate.
         NewHLines[yval] = []
 
-        # Try to extend the first element of this list, which will be the leftmost.
+        # Try to extend the first element of this list, which will be the
+        # leftmost.
         xline = lines[0]
         for line in lines[1:]:
             # If this line's left edge is within 2 mil of the right edge of the line
@@ -209,7 +211,8 @@ def mergeLines(Lines):
         # lines with this X ordinate.
         NewVLines[xval] = []
 
-        # Try to extend the first element of this list, which will be the bottom-most.
+        # Try to extend the first element of this list, which will be the
+        # bottom-most.
         xline = lines[0]
         for line in lines[1:]:
             # If this line's bottom edge is within 2 mil of the top edge of the line
