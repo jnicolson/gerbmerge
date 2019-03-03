@@ -3,10 +3,10 @@
 Parse the job layout specification file.
 
 Requires:
-  
+
   - SimpleParse 2.1 or higher
               http://simpleparse.sourceforge.net
-              
+
 
 --------------------------------------------------------------------
 
@@ -17,7 +17,6 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 import sys
-import string
 
 from simpleparse.parser import Parser
 
@@ -45,294 +44,313 @@ id := [a-zA-Z0-9], [a-zA-Z0-9_-]*
 int := [0-9]+
 '''
 
+
 class Panel(object):                 # Meant to be subclassed as either a Row() or Col()
-  def __init__(self):
-    self.x = None
-    self.y = None
-    self.jobs = []           # List (left-to-right or bottom-to-top) of JobLayout() or Row()/Col() objects
+    def __init__(self):
+        self.x = None
+        self.y = None
+        # List (left-to-right or bottom-to-top) of JobLayout() or Row()/Col() objects
+        self.jobs = []
 
-  def canonicalize(self):    # Return plain list of JobLayout objects at the roots of all trees
-    L = []
-    for job in self.jobs:
-      L = L + job.canonicalize()
-    return L
+    def canonicalize(self):    # Return plain list of JobLayout objects at the roots of all trees
+        L = []
+        for job in self.jobs:
+            L = L + job.canonicalize()
+        return L
 
-  def addjob(self, job):     # Either a JobLayout class or Panel (sub)class
-    assert isinstance(job, Panel) or isinstance(job, jobs.JobLayout)
-    self.jobs.append(job)
+    def addjob(self, job):     # Either a JobLayout class or Panel (sub)class
+        assert isinstance(job, Panel) or isinstance(job, jobs.JobLayout)
+        self.jobs.append(job)
 
-  def addwidths(self):
-    "Return width in inches"
-    width = 0.0
-    for job in self.jobs:
-      width += job.width_in() + config.Config['xspacing']
-    width -= config.Config['xspacing']
-    return width
+    def addwidths(self):
+        "Return width in inches"
+        width = 0.0
+        for job in self.jobs:
+            width += job.width_in() + config.Config['xspacing']
+        width -= config.Config['xspacing']
+        return width
 
-  def maxwidths(self):
-    "Return maximum width in inches of any one subpanel"
-    width = 0.0
-    for job in self.jobs:
-      width = max(width,job.width_in())
-    return width
+    def maxwidths(self):
+        "Return maximum width in inches of any one subpanel"
+        width = 0.0
+        for job in self.jobs:
+            width = max(width, job.width_in())
+        return width
 
-  def addheights(self):
-    "Return height in inches"
-    height = 0.0
-    for job in self.jobs:
-      height += job.height_in() + config.Config['yspacing']
-    height -= config.Config['yspacing']
-    return height
+    def addheights(self):
+        "Return height in inches"
+        height = 0.0
+        for job in self.jobs:
+            height += job.height_in() + config.Config['yspacing']
+        height -= config.Config['yspacing']
+        return height
 
-  def maxheights(self):
-    "Return maximum height in inches of any one subpanel"
-    height = 0.0
-    for job in self.jobs:
-      height = max(height,job.height_in())
-    return height
+    def maxheights(self):
+        "Return maximum height in inches of any one subpanel"
+        height = 0.0
+        for job in self.jobs:
+            height = max(height, job.height_in())
+        return height
 
-  def writeGerber(self, fid, layername):
-    for job in self.jobs:
-      job.writeGerber(fid, layername)
-    
-  def writeExcellon(self, fid, tool):
-    for job in self.jobs:
-      job.writeExcellon(fid, tool)
+    def writeGerber(self, fid, layername):
+        for job in self.jobs:
+            job.writeGerber(fid, layername)
 
-  def writeDrillHits(self, fid, tool, toolNum):
-    for job in self.jobs:
-      job.writeDrillHits(fid, tool, toolNum)
+    def writeExcellon(self, fid, tool):
+        for job in self.jobs:
+            job.writeExcellon(fid, tool)
 
-  def writeCutLines(self, fid, drawing_code, X1, Y1, X2, Y2):
-    for job in self.jobs:
-      job.writeCutLines(fid, drawing_code, X1, Y1, X2, Y2)
-    
-  def drillhits(self, tool):
-    hits = 0
-    for job in self.jobs:
-      hits += job.drillhits(tool)
+    def writeDrillHits(self, fid, tool, toolNum):
+        for job in self.jobs:
+            job.writeDrillHits(fid, tool, toolNum)
 
-    return hits
+    def writeCutLines(self, fid, drawing_code, X1, Y1, X2, Y2):
+        for job in self.jobs:
+            job.writeCutLines(fid, drawing_code, X1, Y1, X2, Y2)
 
-  def jobarea(self):
-    area = 0.0
-    for job in self.jobs:
-      area += job.jobarea()
+    def drillhits(self, tool):
+        hits = 0
+        for job in self.jobs:
+            hits += job.drillhits(tool)
 
-    return area
+        return hits
+
+    def jobarea(self):
+        area = 0.0
+        for job in self.jobs:
+            area += job.jobarea()
+
+        return area
+
 
 class Row(Panel):
-  def __init__(self):
-    Panel.__init__(self)
-    self.LR = 1   # Horizontal arrangement
+    def __init__(self):
+        Panel.__init__(self)
+        self.LR = 1   # Horizontal arrangement
 
-  def width_in(self):
-    return self.addwidths()
+    def width_in(self):
+        return self.addwidths()
 
-  def height_in(self):
-    return self.maxheights()
+    def height_in(self):
+        return self.maxheights()
 
-  def setPosition(self, x, y):   # In inches
-    self.x = x
-    self.y = y
-    for job in self.jobs:
-      job.setPosition(x,y)
-      x += job.width_in() + config.Config['xspacing']
+    def setPosition(self, x, y):   # In inches
+        self.x = x
+        self.y = y
+        for job in self.jobs:
+            job.setPosition(x, y)
+            x += job.width_in() + config.Config['xspacing']
+
 
 class Col(Panel):
-  def __init__(self):
-    Panel.__init__(self)
-    self.LR = 0   # Vertical arrangement
+    def __init__(self):
+        Panel.__init__(self)
+        self.LR = 0   # Vertical arrangement
 
-  def width_in(self):
-    return self.maxwidths()
+    def width_in(self):
+        return self.maxwidths()
 
-  def height_in(self):
-    return self.addheights()
+    def height_in(self):
+        return self.addheights()
 
-  def setPosition(self, x, y):   # In inches
-    self.x = x
-    self.y = y
-    for job in self.jobs:
-      job.setPosition(x,y)
-      y += job.height_in() + config.Config['yspacing']
+    def setPosition(self, x, y):   # In inches
+        self.x = x
+        self.y = y
+        for job in self.jobs:
+            job.setPosition(x, y)
+            y += job.height_in() + config.Config['yspacing']
+
 
 def canonicalizePanel(panel):
-  L = []
-  for job in panel:
-    L = L + job.canonicalize()
-  return L
-  
+    L = []
+    for job in panel:
+        L = L + job.canonicalize()
+    return L
+
+
 def findJob(jobname, rotated, Jobs=config.Jobs):
-  """
-    Find a job in config.Jobs, possibly rotating it
-    If job not in config.Jobs add it for future reference
-    Return found job
-  """
-                                                                                    
-  if rotated == 90:
-    fullname = jobname + '*rotated90'
-  elif rotated == 180:
-    fullname = jobname + '*rotated180'
-  elif rotated == 270:
-    fullname = jobname + '*rotated270'
-  else:
-    fullname = jobname
-                         
-  try:
-    for existingjob in Jobs.keys():
-      if existingjob.lower() == fullname.lower(): ## job names are case insensitive
-        job = Jobs[existingjob]                 
-        return jobs.JobLayout(job)
-  except:
-    pass
+    """
+      Find a job in config.Jobs, possibly rotating it
+      If job not in config.Jobs add it for future reference
+      Return found job
+    """
 
-  # Perhaps we just don't have a rotated job yet
-  if rotated:
-    try:      
-      for existingjob in Jobs.keys():
-        if existingjob.lower() == jobname.lower(): ## job names are case insensitive
-          job = Jobs[existingjob]
+    if rotated == 90:
+        fullname = jobname + '*rotated90'
+    elif rotated == 180:
+        fullname = jobname + '*rotated180'
+    elif rotated == 270:
+        fullname = jobname + '*rotated270'
+    else:
+        fullname = jobname
+
+    try:
+        for existingjob in Jobs.keys():
+            if existingjob.lower() == fullname.lower():  # job names are case insensitive
+                job = Jobs[existingjob]
+                return jobs.JobLayout(job)
     except:
-      raise RuntimeError("Job name '%s' not found" % jobname)
-  else:
-    raise RuntimeError("Job name '%s' not found" % jobname)
+        pass
 
-  # Make a rotated job
-  job = jobs.rotateJob(job, rotated)
-  Jobs[fullname] = job
+    # Perhaps we just don't have a rotated job yet
+    if rotated:
+        try:
+            for existingjob in Jobs.keys():
+                if existingjob.lower() == jobname.lower():  # job names are case insensitive
+                    job = Jobs[existingjob]
+        except:
+            raise RuntimeError("Job name '%s' not found" % jobname)
+    else:
+        raise RuntimeError("Job name '%s' not found" % jobname)
 
-  return jobs.JobLayout(job)
+    # Make a rotated job
+    job = jobs.rotateJob(job, rotated)
+    Jobs[fullname] = job
+
+    return jobs.JobLayout(job)
+
 
 def parseJobSpec(spec, data):
-  for jobspec in spec:
-    if jobspec[0] in ('ts','comment'): continue
+    for jobspec in spec:
+        if jobspec[0] in ('ts', 'comment'):
+            continue
 
-    assert jobspec[0] in ('paneljobspec','basicjobspec')
-    if jobspec[0] == 'basicjobspec':
-      namefield = jobspec[3][0]
-      jobname = data[namefield[1]:namefield[2]]
+        assert jobspec[0] in ('paneljobspec', 'basicjobspec')
+        if jobspec[0] == 'basicjobspec':
+            namefield = jobspec[3][0]
+            jobname = data[namefield[1]:namefield[2]]
 
-      if len(jobspec[3]) > 1:
-        rotationfield = jobspec[3][1]
-        rotation = data[ rotationfield[1] + 1: rotationfield[2] ]
-                
-        if (rotation == "Rotate") or (rotation == "Rotate90"):
-            rotated = 90
-        elif rotation == "Rotate180":
-            rotated = 180
-        elif rotation == "Rotate270":
-            rotated = 270
+            if len(jobspec[3]) > 1:
+                rotationfield = jobspec[3][1]
+                rotation = data[rotationfield[1] + 1: rotationfield[2]]
+
+                if (rotation == "Rotate") or (rotation == "Rotate90"):
+                    rotated = 90
+                elif rotation == "Rotate180":
+                    rotated = 180
+                elif rotation == "Rotate270":
+                    rotated = 270
+                else:
+                    raise RuntimeError("Unsupported rotation: %s" % rotation)
+
+            else:
+                rotated = 0
+
+            return findJob(jobname, rotated)
         else:
-            raise RuntimeError("Unsupported rotation: %s" % rotation)
+            raise RuntimeError("Matrix panels not yet supported")
 
-      else:
-        rotated = 0
-
-      return findJob(jobname, rotated)
-    else:
-      raise RuntimeError("Matrix panels not yet supported")
 
 def parseColSpec(spec, data):
-  jobs = Col()
+    jobs = Col()
 
-  for coljob in spec:
-    if coljob[0] in ('ts','ws','comment'): continue
+    for coljob in spec:
+        if coljob[0] in ('ts', 'ws', 'comment'):
+            continue
 
-    assert coljob[0] == 'coljob'
-    job = coljob[3][0]
-    if job[0] in ('commentline','nullline'): continue
-    
-    assert job[0] in ('jobspec','rowspec')
-    if job[0] == 'jobspec':
-      jobs.addjob(parseJobSpec(job[3],data))
-    else:
-      jobs.addjob(parseRowSpec(job[3],data))
+        assert coljob[0] == 'coljob'
+        job = coljob[3][0]
+        if job[0] in ('commentline', 'nullline'):
+            continue
 
-  return jobs
+        assert job[0] in ('jobspec', 'rowspec')
+        if job[0] == 'jobspec':
+            jobs.addjob(parseJobSpec(job[3], data))
+        else:
+            jobs.addjob(parseRowSpec(job[3], data))
+
+    return jobs
+
 
 def parseRowSpec(spec, data):
-  jobs = Row()
+    jobs = Row()
 
-  for rowjob in spec:
-    if rowjob[0] in ('ts','ws','comment'): continue
+    for rowjob in spec:
+        if rowjob[0] in ('ts', 'ws', 'comment'):
+            continue
 
-    assert rowjob[0] == 'rowjob'
-    job = rowjob[3][0]
-    if job[0] in ('commentline','nullline'): continue
-    
-    assert job[0] in ('jobspec','colspec')
-    if job[0] == 'jobspec':
-      jobs.addjob(parseJobSpec(job[3],data))
-    else:
-      jobs.addjob(parseColSpec(job[3],data))
+        assert rowjob[0] == 'rowjob'
+        job = rowjob[3][0]
+        if job[0] in ('commentline', 'nullline'):
+            continue
 
-  return jobs
+        assert job[0] in ('jobspec', 'colspec')
+        if job[0] == 'jobspec':
+            jobs.addjob(parseJobSpec(job[3], data))
+        else:
+            jobs.addjob(parseColSpec(job[3], data))
+
+    return jobs
+
 
 def parseLayoutFile(fname):
-  """config.Jobs is a dictionary of ('jobname', Job Object).
+    """config.Jobs is a dictionary of ('jobname', Job Object).
 
-     The return value is a nested array. The primary dimension
-     of the array is one row:
+       The return value is a nested array. The primary dimension
+       of the array is one row:
 
-         [ Row1, Row2, Row3 ]
+           [ Row1, Row2, Row3 ]
 
-     Each row element consists of a list of jobs or columns (i.e.,
-     JobLayout or Col objects).
+       Each row element consists of a list of jobs or columns (i.e.,
+       JobLayout or Col objects).
 
-     Each column consists of a list of either jobs or rows.
-     These are recursive, so it can look like:
+       Each column consists of a list of either jobs or rows.
+       These are recursive, so it can look like:
 
-        [ 
-          Row([JobLayout(), Col([ Row([JobLayout(), JobLayout()]),
-                                     JobLayout()       ]),         JobLayout() ]),   # That was row 0
-          Row([JobLayout(), JobLayout()])                                            # That was row 1
-        ]
+          [ 
+            Row([JobLayout(), Col([ Row([JobLayout(), JobLayout()]),
+                                       JobLayout()       ]),         JobLayout() ]),   # That was row 0
+            Row([JobLayout(), JobLayout()])                                            # That was row 1
+          ]
 
-     This is a panel with two rows. In the first row there is
-     a job, a column, and another job, from left to right. In the 
-     second row there are two jobs, from left to right.
+       This is a panel with two rows. In the first row there is
+       a job, a column, and another job, from left to right. In the 
+       second row there are two jobs, from left to right.
 
-     The column in the first row has two jobs side by side, then
-     another one above them.
-  """
+       The column in the first row has two jobs side by side, then
+       another one above them.
+    """
 
-  try:
-    fid = open(fname, 'rt')
-  except Exception as e:
-    raise RuntimeError("Unable to open layout file: %s\n  %s" % (fname, str(e)))
+    try:
+        fid = open(fname, 'rt')
+    except Exception as e:
+        raise RuntimeError(
+            "Unable to open layout file: %s\n  %s" % (fname, str(e)))
 
-  data = fid.read()
-  fid.close()
-  parser = Parser(declaration, "file")
+    data = fid.read()
+    fid.close()
+    parser = Parser(declaration, "file")
 
-  # Replace all CR's in data with nothing, to convert DOS line endings
-  # to unix format (all LF's).
-  data = data.replace('\x0D', '')
+    # Replace all CR's in data with nothing, to convert DOS line endings
+    # to unix format (all LF's).
+    data = data.replace('\x0D', '')
 
-  tree = parser.parse(data)
+    tree = parser.parse(data)
 
-  # Last element of tree is number of characters parsed
-  if not tree[0]:
-    raise RuntimeError("Layout file cannot be parsed")
+    # Last element of tree is number of characters parsed
+    if not tree[0]:
+        raise RuntimeError("Layout file cannot be parsed")
 
-  if tree[2] != len(data):
-    raise RuntimeError("Parse error at character %d in layout file" % tree[2])
+    if tree[2] != len(data):
+        raise RuntimeError(
+            "Parse error at character %d in layout file" % tree[2])
 
-  Rows = []
-  for rowspec in tree[1]:
-    if rowspec[0] in ('nullline', 'commentline'): continue
-    assert rowspec[0]=='rowspec'
+    Rows = []
+    for rowspec in tree[1]:
+        if rowspec[0] in ('nullline', 'commentline'):
+            continue
+        assert rowspec[0] == 'rowspec'
 
-    Rows.append(parseRowSpec(rowspec[3], data))
+        Rows.append(parseRowSpec(rowspec[3], data))
 
-  return Rows
+    return Rows
 
-if __name__=="__main__":
-  fid = open(sys.argv[1])
-  testdata = fid.read()
-  fid.close()
 
-  parser = Parser(declaration, "file")
-  import pprint
-  pprint.pprint(parser.parse(testdata))
+if __name__ == "__main__":
+    fid = open(sys.argv[1])
+    testdata = fid.read()
+    fid.close()
+
+    parser = Parser(declaration, "file")
+    import pprint
+    pprint.pprint(parser.parse(testdata))
