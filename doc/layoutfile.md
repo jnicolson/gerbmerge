@@ -12,7 +12,7 @@ The panel layout is specified in terms of cells. Each cell is part of either a r
 
 At the top level, you specify the layout of the final panel by specifying the contents of each row, from left to right. Let's begin with an example. The input job, named `example` is as follows:
 
-![ex1](ex1.png)
+![ex1](img/ex1.png)
 
 We will place three copies of this job, all in a row, using the following layout:
 ```
@@ -24,7 +24,7 @@ We will place three copies of this job, all in a row, using the following layout
 ```
 The above layout file leads to the following panel:
 
-![ex1a](ex1a.png)
+![ex1a](img/ex1a.png)
 
 The `Row { .... }` construct indicates a single row of the layout. While you can add spaces and comments as you please, the word `Row` and its associated open-bracket must appear on one line, each job name on a separate line, and the closing bracket on its own line. Thus, the following is illegal:
 
@@ -44,7 +44,7 @@ The word `Rotate` following a job indicates that the given instance of the job i
 
 The above layout file leads to the following panel:
 
-![ex1b](ex1b.png)
+![ex1b](img/ex1b.png)
 
 Rows stack vertically beginning at the bottom of the panel and moving up. For example:
 
@@ -63,7 +63,7 @@ Rows stack vertically beginning at the bottom of the panel and moving up. For ex
 
 The above layout file leads to the following panel:
 
-![ex1c](ex1c.png)
+![ex1c](img/ex1c.png)
 
 Suppose now that we want the two jobs on the right to be rotated so the final panel has a smaller width, but larger height. We can try the following:
 
@@ -82,7 +82,7 @@ Suppose now that we want the two jobs on the right to be rotated so the final pa
 
 The above layout file leads to the following panel:
 
-![ex1d](ex1d.png)
+![ex1d](img/ex1d.png)
 
 This layout is quite wasteful and not quite what we intended. The problem is that GerbMerge stacks rows on top of each other based upon the highest job within a row. The height of the first (bottom-most) row, then, is the height of the rotated job.
 
@@ -107,7 +107,7 @@ For example:
 
 The above layout file leads to the following panel:
 
-![ex1e](ex1e.png)
+![ex1e](img/ex1e.png)
 
 Study that layout file carefully. The panel has only a single row with 4 elements. The first element is a column with two jobs. The second element (immediately to the right of the first element) is also a column with two jobs. The third element is a rotated job. The fourth and right-most element is a rotated job.
 
@@ -131,7 +131,7 @@ Now, let's get fancy and embed a row within a column, like this:
 
 The above layout file leads to the following panel:
 
-![ex1f](ex1f.png)
+![ex1f](img/ex1f.png)
 
 In words, the job consists of a single row. The first cell in the row is a column. The first cell in the column is a job. Above this cell is another row, which has two cells (rotated jobs) laid out left-to-right.
 
@@ -162,7 +162,7 @@ To add a job on top of the two rotated jobs at the right of the panel, we must c
 
 The above layout file leads to the following panel:
 
-![ex1g](ex1g.png)
+![ex1g](img/ex1g.png)
 
 Once you get the hang of thinking in terms of recursive rows and columns, the process is not all that difficult. There is one important rule to remember, however: *Columns can only be defined within a row, and rows can only be defined within a column.*
 

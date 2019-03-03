@@ -1,6 +1,8 @@
-<A HREF="#Parameters">Operating Parameters</A>
-<A HREF="#Jobs">Job Descriptions</A>
-<A HREF="#Syntax">Syntax Notes</A>
+[Operating Parameters](#operating-parameters)
+
+[Job Descriptions](#job-descriptions)
+
+[Syntax Notes](#syntax-notes)
 
 ## Introduction
 
@@ -45,7 +47,8 @@ Prefix = /home/user/eagle/cpuboard
 # Even though we said 'Prefix = ...' we use LOWERCASE 'prefix' in the actual substitution!
 BoardOutline = %(prefix)s/cpu.bor
 Drills       = %(prefix)s/cpu.xln
-```  
+```
+
 ---
 *NOTE:* the parser converts all names you assign to into *lowercase letters only*.
 ---
@@ -308,10 +311,10 @@ The <A HREF="#FiducialCopperDiameter"><TT>FiducialCopperDiameter</TT></A> and <A
 ## Job Descriptions
 Each input job is described in its own section. The job is described by providing file names for each layer. Layer names are up to you, but note the following:
 
-    * Layer names may be specified with lowercase and uppercase letters, but are converted to all-lowercase by GerbMerge. Note that this applies to layer names, not filenames.
-    * Each job must have at least a 'boardoutline' and 'drills' layer, specifying the Gerber board outline and Excellon drills layer, respectively.
-    * Each job may have an optional 'toollist' file specifying the tool list (or &quot;drill rack&quot;) in effect for this job only. This setting overrides the global `ToolList` option, described above. If the Excellon file for the job has embedded tool sizes, this option is ignored.
-    * All layer names other than 'boardoutline' and 'drills' must begin with an asterisk '*' character.
+* Layer names may be specified with lowercase and uppercase letters, but are converted to all-lowercase by GerbMerge. Note that this applies to layer names, not filenames.
+* Each job must have at least a 'boardoutline' and 'drills' layer, specifying the Gerber board outline and Excellon drills layer, respectively.
+* Each job may have an optional 'toollist' file specifying the tool list (or &quot;drill rack&quot;) in effect for this job only. This setting overrides the global `ToolList` option, described above. If the Excellon file for the job has embedded tool sizes, this option is ignored.
+* All layer names other than 'boardoutline' and 'drills' must begin with an asterisk '*' character.
 
 Consider the following example:
 
@@ -351,7 +354,7 @@ In addition to specifying board layers, each job description can also have job-s
 ## Merge Output Files
 GerbMerge combines data from multiple jobs grouped by layer. All of the "bottom copper" layers from all jobs, for example, will be combined into a single "bottom copper" file. The names of these combined output files can be set in the `[MergeOutputFiles]` section of the configuration file.
 
-This section contains assignments of file names to layer names. The layer names must be the same as the ones specified in the <A HREF="#Jobs"><TT>[Jobs]</TT></A> section of the configuration file. All layer names must begin with an asterisk '<B>*</B>' except for the following four reserved layer names:
+This section contains assignments of file names to layer names. The layer names must be the same as the ones specified in the [`[Jobs]`](#job-descriptions) section of the configuration file. All layer names must begin with an asterisk '<B>*</B>' except for the following four reserved layer names:
 
 * `BoardOutline`
 * `Drills`

@@ -28,7 +28,7 @@ GerbMerge currently works with:
   * Artwork in Gerber RS274-X format</LI>
   * Drill files in Excellon format</LI>
 
-Here is [one sample](./doc/sample.jpg) and [another sample](./doc/sample2.jpg) of the program's output. These samples demonstrate panelizing multiple, different jobs, and also demonstrate board rotation.
+Here is [one sample](./doc/img/sample.jpg) and [another sample](./doc/img/sample2.jpg) of the program's output. These samples demonstrate panelizing multiple, different jobs, and also demonstrate board rotation.
 
 ## Requirements
 GerbMerge is written in pure Python. It depends upon the following packages for operation:
@@ -124,7 +124,7 @@ cpu 0.756 0.100
 cpu*rotated 1.35 1.50
 ```
 
-This method of placement is not meant for normal use. It can be used to recreate a previous invocation of GerbMerge, since GerbMerge saves its results in a text file (whose name is set in the [MergeOutputFiles](./doc/cfgfile.md#MergeOutputFiles) section of the configuration file) after every run. Thus, you can experiment with different parameters, save a placement you like, do some more experimentation, then return to the saved placement if necessary.
+This method of placement is not meant for normal use. It can be used to recreate a previous invocation of GerbMerge, since GerbMerge saves its results in a text file (whose name is set in the [MergeOutputFiles](./doc/cfgfile.md#merge-output-files) section of the configuration file) after every run. Thus, you can experiment with different parameters, save a placement you like, do some more experimentation, then return to the saved placement if necessary.
 
 Alternatively, this method of placement can be used with third-party back ends that implement intelligent auto-placement algorithms, using GerbMerge only for doing the actual panelization.
 
@@ -220,8 +220,7 @@ Copyright &copy; 2013 [ProvideYourOwn.com](http://provideyourown.com). All Right
 
 This repo is a fork of gerbmerge, version 1.8 from Rugged Circuits LLC:
 
-Copyright &copy; 2011 [Rugged Circuits LLC](http://ruggedcircuits.com). All Rights Reserved.
-  mailto: [support@ruggedcircuits.com](mailto:support@ruggedcircuits.com?subject=GerbMerge)
+Copyright &copy; 2011 [Rugged Circuits LLC](http://ruggedcircuits.com). All Rights Reserved. [mailto:support@ruggedcircuits.com](mailto:support@ruggedcircuits.com?subject=GerbMerge)
 
 GerbMerge comes with ABSOLUTELY NO WARRANTY. This is free software licensed under the terms of the GNU General Public License Version 3. You are welcome to copy, modify and redistribute this software under certain conditions. For more details, see the LICENSE file or visit [The Free Software Foundation](http://www.fsf.org).
 
@@ -234,7 +233,7 @@ GerbMerge comes with ABSOLUTELY NO WARRANTY. This is free software licensed unde
   6. Accept aperture macro parameters and operators
 
 ## Credits
-Thanks to Jace Browning for major contributions to this code. This help file is based on a template for the help file for mxTools by [M.A. Lemburg](http://starship.python.net/crew/lemburg). This software was created with <A HREF="http://www.vim.org/">VIM</A>; thanks to the authors of this program and special thanks for the Python syntax support. Thanks to M.A. Lemburg for his <A HREF="http://www.egenix.com/files/python/eGenix-mx-Extensions.html">mxBase</A> package, Mike Fletcher for his <A HREF="http://simpleparse.sourceforge.net">SimpleParse</A> package, and the authors of <A HREF="http://gerbv.sourceforge.net">gerbv</A>, a great Gerber file viewer for Linux/Mac OS X, and, of course, to the <A HREF="http://www.python.org">Python</A> developers and support community.
+Thanks to Jace Browning for major contributions to this code. This help file is based on a template for the help file for mxTools by [M.A. Lemburg](http://starship.python.net/crew/lemburg). This software was created with [VIM](http://www.vim.org/); thanks to the authors of this program and special thanks for the Python syntax support. Thanks to M.A. Lemburg for his [mxBase](http://www.egenix.com/files/python/eGenix-mx-Extensions.html) package, Mike Fletcher for his [SimpleParse](http://simpleparse.sourceforge.net) package, and the authors of [gerbv](http://gerbv.sourceforge.net), a great Gerber file viewer for Linux/Mac OS X, and, of course, to the [Python](http://www.python.org) developers and support community.
 
 Thanks to Joe Pighetti for making me start writing this program, and to the Grand Valley State University Firefighting Robot Team for making me finish it.
 
