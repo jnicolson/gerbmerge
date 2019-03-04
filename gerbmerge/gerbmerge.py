@@ -333,7 +333,7 @@ def tile_jobs(Jobs):
     return tile
 
 
-def merge(opts, args, gui=None):
+def merge(args, gui=None):
     writeGerberHeader = writeGerberHeader22degrees
 
     global GUI
@@ -341,36 +341,33 @@ def merge(opts, args, gui=None):
 
     skipDisclaimer = 0
 
-    for opt, arg in opts:
-        if opt in ('--octagons',):
-            if arg == 'rotate':
-                writeGerberHeader = writeGerberHeader0degrees
-            elif arg == 'normal':
-                writeGerberHeader = writeGerberHeader22degrees
-            else:
-                raise RuntimeError('Unknown octagon format')
-        elif opt in ('--random-search',):
-            config.AutoSearchType = RANDOM_SEARCH
-        elif opt in ('--full-search',):
-            config.AutoSearchType = EXHAUSTIVE_SEARCH
-        elif opt in ('--rs-fsjobs',):
-            config.RandomSearchExhaustiveJobs = int(arg)
-        elif opt in ('--search-timeout',):
-            config.SearchTimeout = int(arg)
-        elif opt in ('--place-file',):
-            config.AutoSearchType = FROM_FILE
-            config.PlacementFile = arg
-        elif opt in ('--no-trim-gerber',):
-            config.TrimGerber = 0
-        elif opt in ('--no-trim-excellon',):
-            config.TrimExcellon = 0
-        elif opt in ('-s', '--skipdisclaimer'):
-            skipDisclaimer = 1
-        else:
-            raise RuntimeError("Unknown option: %s" % opt)
+    if args.octagons == 'rotate':
+        writeGerberHeader = writeGerberHeader0degrees
+    elif args.octagons == 'normal':
+        writeGerberHeader = writeGerberHeader22degrees
 
-    if len(args) > 2 or len(args) < 1:
-        raise RuntimeError('Invalid number of arguments')
+    if args.random_search:
+        config.AutoSearchType = RANDOM_SEARCH
+    elif args.full_search:
+        config.AutoSearchType = EXHAUSTIVE_SEARCH
+
+    config.RandomSearchExhaustiveJobs = args.rs_fsjobs
+    config.SearchTimeout = args.search_timeout
+
+    if args.place_file:
+        config.AutoSearchType = FROM_FILE
+        config.PlacementFile = args.place_file
+    
+    if args.no_trim_gerber:
+        config.TrimGerber = 0
+
+    if args.no_trim_excellon:
+        config.TrimExcellon = 0
+
+    if args.skipdisclaimer:
+        skipDisclaimer = 1
+
+
 
     if (skipDisclaimer == 0):
         disclaimer()
@@ -432,8 +429,11 @@ def merge(opts, args, gui=None):
     # is no layout file, do auto-layout.
     updateGUI("Performing layout...")
     print('Performing layout ...')
-    if len(args) > 1:
-        Layout = parselayout.parseLayoutFile(args[1])
+
+    Place = placement.Placement()
+
+    if args.layoutfile:
+        Layout = parselayout.parseLayoutFile(args.layoutfile)
 
         # Do the layout, updating offsets for each component job.
         X = OriginX + config.Config['leftmargin']
@@ -444,19 +444,16 @@ def merge(opts, args, gui=None):
             Y += row.height_in() + config.Config['yspacing']
 
         # Construct a canonical placement from the layout
-        Place = placement.Placement()
         Place.addFromLayout(Layout)
 
         del Layout
 
     elif config.AutoSearchType == FROM_FILE:
-        Place = placement.Placement()
         Place.addFromFile(config.PlacementFile, config.Jobs)
     else:
         # Do an automatic layout based on our tiling algorithm.
         tile = tile_jobs(config.Jobs.values())
 
-        Place = placement.Placement()
         Place.addFromTiling(
             tile, OriginX + config.Config['leftmargin'], OriginY + config.Config['bottommargin'])
 
@@ -864,31 +861,6 @@ def updateGUI(text=None):
 
 
 def main():
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvs', ['help', 'version', 'octagons=', 'random-search', 'full-search',
-                                                         'rs-fsjobs=', 'search-timeout=', 'place-file=', 'no-trim-gerber', 'no-trim-excellon', 'skipdisclaimer'])
-    except getopt.GetoptError:
-        usage()
-
-    for opt, arg in opts:
-        if opt in ('-h', '--help'):
-            usage()
-        elif opt in ('-v', '--version'):
-            print("""
-GerbMerge Version %d.%s  --  Combine multiple Gerber/Excellon files
-
-This program is licensed under the GNU General Public License (GPL)
-Version 3. See LICENSE file or http://www.fsf.org for details of this license.
-
-ProvideYourOwn - http://provideyourown.com
-""" % (VERSION_MAJOR, VERSION_MINOR))
-            sys.exit(0)
-        elif opt in ('--octagons', '--random-search', '--full-search', '--rs-fsjobs', '--place-file', '--no-trim-gerber', '--no-trim-excellon', '--search-timeout', '-s', '--skipdisclaimer'):
-            pass  # arguments are valid
-        else:
-            raise RuntimeError("Unknown option: %s" % opt)
-
-    if len(args) > 2 or len(args) < 1:
-        usage()
-
-    sys.exit(merge(opts, args))  # run germberge
+    import cli
+    args = cli.get_args()
+    sys.exit(merge(args))  # run germberge
