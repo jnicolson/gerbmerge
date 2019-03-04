@@ -367,15 +367,13 @@ def merge(args, gui=None):
     if args.skipdisclaimer:
         skipDisclaimer = 1
 
-
-
     if (skipDisclaimer == 0):
         disclaimer()
 
     # Load up the Jobs global dictionary, also filling out GAT, the
     # global aperture table and GAMT, the global aperture macro table.
     updateGUI("Reading job files...")
-    config.parseConfigFile(args[0])
+    config.parseConfigFile(args.configfile)
 
     # Force all X and Y coordinates positive by adding absolute value of
     # minimum X and Y
@@ -861,6 +859,6 @@ def updateGUI(text=None):
 
 
 def main():
-    import cli
+    from . import cli
     args = cli.get_args()
     sys.exit(merge(args))  # run germberge
