@@ -486,13 +486,13 @@ def merge(opts, args, gui=None):
     OutputFiles.append(fullname)
 
     # For cut lines
-    AP = aptable.Aperture(aptable.Circle, 'D??', config.Config['cutlinewidth'])
+    AP = aptable.Aperture('Circle', 'D??', config.Config['cutlinewidth'])
     drawing_code_cut = aptable.findInApertureTable(AP)
     if drawing_code_cut is None:
         drawing_code_cut = aptable.addToApertureTable(AP)
 
     # For crop marks
-    AP = aptable.Aperture(aptable.Circle, 'D??',
+    AP = aptable.Aperture('Circle', 'D??',
                           config.Config['cropmarkwidth'])
     drawing_code_crop = aptable.findInApertureTable(AP)
     if drawing_code_crop is None:
@@ -501,19 +501,19 @@ def merge(opts, args, gui=None):
     # For fiducials
     drawing_code_fiducial_copper = drawing_code_fiducial_soldermask = None
     if config.Config['fiducialpoints']:
-        AP = aptable.Aperture(aptable.Circle, 'D??',
+        AP = aptable.Aperture('Circle', 'D??',
                               config.Config['fiducialcopperdiameter'])
         drawing_code_fiducial_copper = aptable.findInApertureTable(AP)
         if drawing_code_fiducial_copper is None:
             drawing_code_fiducial_copper = aptable.addToApertureTable(AP)
-        AP = aptable.Aperture(aptable.Circle, 'D??',
+        AP = aptable.Aperture('Circle', 'D??',
                               config.Config['fiducialmaskdiameter'])
         drawing_code_fiducial_soldermask = aptable.findInApertureTable(AP)
         if drawing_code_fiducial_soldermask is None:
             drawing_code_fiducial_soldermask = aptable.addToApertureTable(AP)
 
     # For fabrication drawing.
-    AP = aptable.Aperture(aptable.Circle, 'D??', 0.001)
+    AP = aptable.Aperture('Circle', 'D??', 0.001)
     drawing_code1 = aptable.findInApertureTable(AP)
     if drawing_code1 is None:
         drawing_code1 = aptable.addToApertureTable(AP)
@@ -643,10 +643,10 @@ def merge(opts, args, gui=None):
         # Write width-1 aperture to file
         # add metric support
         if config.Config['measurementunits'] == 'inch':
-            AP = aptable.Aperture(aptable.Circle, 'D10', 0.001)
+            AP = aptable.Aperture('Circle', 'D10', 0.001)
         else:
             # we'll use 0.25 mm - same as Diptrace
-            AP = aptable.Aperture(aptable.Circle, 'D10', 0.25)
+            AP = aptable.Aperture('Circle', 'D10', 0.25)
         AP.writeDef(fid)
 
         # Choose drawing aperture D10
@@ -676,7 +676,7 @@ def merge(opts, args, gui=None):
         writeGerberHeader(fid)
 
         # Write width-1 aperture to file
-        AP = aptable.Aperture(aptable.Circle, 'D10', 0.001)
+        AP = aptable.Aperture('Circle', 'D10', 0.001)
         AP.writeDef(fid)
 
         # Choose drawing aperture D10

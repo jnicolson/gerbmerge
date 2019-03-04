@@ -77,7 +77,7 @@ def mergeHLines(Lines):
 
     # First, make sure lines are sorted by starting X ordinate and that all lines
     # proceed to the right.
-    Lines.sort()
+    Lines = sorted(Lines)
     for line in Lines:
         assert line[0] < line[2]
 

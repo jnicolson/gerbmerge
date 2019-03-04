@@ -1060,7 +1060,7 @@ class Job(object):
                                     # Construct an Aperture that is a Rectangle
                                     # of dimensions
                                     # (newRectWidth,newRectHeight)
-                                    newAP = aptable.Aperture(aptable.Rectangle, 'D??',
+                                    newAP = aptable.Aperture('Rectangle', 'D??',
                                                              util.gerb2in(newRectWidth), util.gerb2in(newRectHeight))
                                     global_code = aptable.findOrAddAperture(
                                         newAP)

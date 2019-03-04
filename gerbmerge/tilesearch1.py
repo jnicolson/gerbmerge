@@ -119,7 +119,7 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
         remaining_jobs = Jobs[:job_ix] + Jobs[job_ix + 1:]
 
         if 0:
-            print("Level %d (%s)" % (level, job.name))
+            print("Job: {}".format(job.name))
             TSoFar.joblist()
             for J in remaining_jobs:
                 print(J[2].name, ", ", "\n")
