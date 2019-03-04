@@ -13,17 +13,13 @@ import sys
 import time
 import random
 
-import config
-import tiling
-import tilesearch1
-
-import gerbmerge
+from . import config, gerbmerge, tiling, tilesearch1
 
 _StartTime = 0.0           # Start time of tiling
 _CkpointTime = 0.0         # Next time to print stats
 _Placements = 0            # Number of placements attempted
 _TBestTiling = None        # Best tiling so far
-_TBestScore = float(sys.maxsize)  # Smallest area so far
+_TBestScore = float()  # Smallest area so far
 
 
 def printTilingStats():

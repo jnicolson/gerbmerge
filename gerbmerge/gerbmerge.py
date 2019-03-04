@@ -27,19 +27,10 @@ http://ruggedcircuits.com/gerbmerge
 import sys
 import getopt
 
-import aptable
-import jobs
-import config
-import parselayout
-import fabdrawing
-import strokes
-import tilesearch1
-import tilesearch2
-import placement
-import schwartz
-import util
-import scoring
-import drillcluster
+from . import (aptable, config, drillcluster, fabdrawing, jobs, parselayout,
+               placement, schwartz, scoring, strokes, tilesearch1, tilesearch2,
+               util)
+
 
 VERSION_MAJOR = 1
 VERSION_MINOR = '9b'

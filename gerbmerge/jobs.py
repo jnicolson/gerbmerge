@@ -15,12 +15,8 @@ http://ruggedcircuits.com/gerbmerge
 import re
 import builtins
 
-import aptable
-import config
-import makestroke
-import amacro
-import geometry
-import util
+from . import (amacro, aptable, config, geometry, makestroke, util)
+
 
 # Parsing Gerber/Excellon files is currently very brittle. A more robust
 # RS274X/Excellon parser would be a good idea and allow this program to work
@@ -540,7 +536,7 @@ class Job(object):
                         continue
 
                     # Map it using our translation table
-                    if not currtool in self.apxlat[layername]:
+                    if currtool not in self.apxlat[layername]:
                         raise RuntimeError(
                             'File %s has tool change command "%s" with no corresponding translation' % (fullname, currtool))
 

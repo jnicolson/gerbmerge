@@ -13,11 +13,8 @@ http://ruggedcircuits.com/gerbmerge
 
 import sys
 import re
-import string
 
-import config
-import amacro
-import util
+from . import amacro, config, util
 
 # Recognized apertures and re pattern that matches its definition Thermals and
 # annuli are generated using macros (see the eagle.def file) but only on inner
@@ -221,7 +218,7 @@ def constructApertureTable(fileList):
 
     AT = {}               # Aperture Table for this file
     for fname in fileList:
-        #print('Reading apertures from %s ...' % fname)
+        # print('Reading apertures from %s ...' % fname)
 
         knownMacroNames = {}
 

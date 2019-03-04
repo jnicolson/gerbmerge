@@ -21,8 +21,7 @@ http://ruggedcircuits.com/gerbmerge
 import sys
 import math
 
-import config
-import jobs
+from . import config, jobs
 
 
 def left_of(p1, p2):
@@ -81,10 +80,8 @@ class Tiling(object):
 
     def clone(self):
         T = Tiling(
-            self.xmax -
-            config.Config['xspacing'],
-            self.ymax -
-            config.Config['yspacing'])
+            self.xmax - config.Config['xspacing'],
+            self.ymax - config.Config['yspacing'])
         T.points = self.points[:]
         T.jobs = self.jobs[:]
         return T
@@ -352,8 +349,8 @@ mirrored-L corner __  |      |
             minY = min(minY, bl[1])
             maxY = max(maxY, tr[1])
 
-        return ((minX, minY), (maxX -
-                               config.Config['xspacing'], maxY - config.Config['yspacing']))
+        return ((minX, minY), (maxX - config.Config['xspacing'], 
+                maxY - config.Config['yspacing']))
 
     def area(self):
         """Return area of rectangular region defined by all jobs."""
