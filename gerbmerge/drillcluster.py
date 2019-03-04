@@ -17,7 +17,7 @@ _STATUS = True  # indicates status messages should be shown
 _DEBUG = False  # indicates debug and status messages should be shown
 
 
-def cluster(drills, tolerance, debug=_DEBUG):
+def cluster(drills, tolerance, debug=None):
     """
         Take a dictionary of drill names and sizes and cluster them
         A tolerance of 0 will effectively disable clustering
@@ -26,7 +26,8 @@ def cluster(drills, tolerance, debug=_DEBUG):
     """
 
     global _DEBUG
-    _DEBUG = debug
+    if debug is not None:
+        _DEBUG = debug
 
     clusters = []
 
@@ -87,7 +88,7 @@ def cluster(drills, tolerance, debug=_DEBUG):
     return new_drills
 
 
-def remap(jobs, globalToolMap, debug=_DEBUG):
+def remap(jobs, globalToolMap, debug=None):
     """
         Remap tools and commands in all jobs to match new tool map
 
@@ -96,7 +97,8 @@ def remap(jobs, globalToolMap, debug=_DEBUG):
 
     # Set global variables from parameters
     global _DEBUG
-    _DEBUG = debug
+    if debug is not None:
+        _DEBUG = debug
 
     debug_print("Remapping tools and commands ...", True)
 

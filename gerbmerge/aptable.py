@@ -25,34 +25,21 @@ import util
 # specially as the Eagle macro uses a replaceable macro parameter ($1) and
 # GerbMerge doesn't handle these yet...only fixed macros (no parameters) are
 # currently supported.
-Apertures = (
-    ('Rectangle', re.compile(
-        r'^%AD(D\d+)R,([^X]+)X([^*]+)\*%$'), '%%AD%sR,%.5fX%.5f*%%\n'),
-    ('Circle', re.compile(
-        r'^%AD(D\d+)C,([^*]+)\*%$'), '%%AD%sC,%.5f*%%\n'),
-    ('Oval', re.compile(
-        r'^%AD(D\d+)O,([^X]+)X([^*]+)\*%$'), '%%AD%sO,%.5fX%.5f*%%\n'),
+Apertures = {
+    'Rectangle': (re.compile(r'^%AD(D\d+)R,([^X]+)X([^*]+)\*%$'), r'%%AD%sR,%.5fX%.5f*%%\n'),
+    'Circle': (re.compile(r'^%AD(D\d+)C,([^*]+)\*%$'), r'%%AD%sC,%.5f*%%\n'),
+    'Oval': (re.compile(r'^%AD(D\d+)O,([^X]+)X([^*]+)\*%$'), r'%%AD%sO,%.5fX%.5f*%%\n'),
     # Specific to Eagle
-    ('Octagon', re.compile(
-        r'^%AD(D\d+)OC8,([^*]+)\*%$'), '%%AD%sOC8,%.5f*%%\n'),
-    ('Macro', re.compile(
-        r'^%AD(D\d+)([^*]+)\*%$'), '%%AD%s%s*%%\n')
-)
-
-# This loop defines names in this module like 'Rectangle',
-# which are element 0 of the Apertures list above. So code
-# will be like:
-#       import aptable
-#       A = aptable.Aperture(aptable.Rectangle, ......)
-
-for ap in Apertures:
-    globals()[ap[0]] = ap
+    'Octagon': (re.compile(r'^%AD(D\d+)OC8,([^*]+)\*%$'), r'%%AD%sOC8,%.5f*%%\n'),
+    'Macro': (re.compile(r'^%AD(D\d+)([^*]+)\*%$'), r'%%AD%s%s*%%\n')
+}
 
 
 class Aperture(object):
     def __init__(self, aptype, code, dimx, dimy=None):
         assert aptype in Apertures
-        self.apname, self.pat, self.format = aptype
+        self.apname = aptype
+        self.pat, self.format = Apertures[aptype]
         self.code = code
         self.dimx = dimx      # Macro name for Macro apertures
         self.dimy = dimy      # None for Macro apertures
@@ -105,8 +92,7 @@ class Aperture(object):
                 dimx = self.dimx
             if dimy is None:
                 dimy = self.dimy
-            return Aperture((self.apname, self.pat, self.format),
-                            self.code, dimx, dimy)
+            return Aperture(self.apname, self.code, dimx, dimy)
         else:
             return False  # no new aperture needs to be created
 
@@ -134,8 +120,7 @@ class Aperture(object):
     def rotated(self, RevGAMT):
         # deepcopy doesn't work on re patterns for some reason so we copy
         # ourselves manually
-        APR = Aperture((self.apname, self.pat, self.format),
-                       self.code, self.dimx, self.dimy)
+        APR = Aperture(self.apname, self.code, self.dimx, self.dimy)
         APR.rotate(RevGAMT)
         return APR
 
@@ -175,16 +160,16 @@ class Aperture(object):
 
 
 def parseAperture(s, knownMacroNames):
-    for ap in Apertures:
-        match = ap[1].match(s)
+    for key in Apertures:
+        match = Apertures[key][0].match(s)
         if match:
             dimy = None
-            if ap[0] in ('Circle', 'Octagon', 'Macro'):
+            if key in ('Circle', 'Octagon', 'Macro'):
                 code, dimx = match.groups()
             else:
                 code, dimx, dimy = match.groups()
 
-            if ap[0] in ('Macro',):
+            if key in ('Macro',):
                 if dimx in knownMacroNames:
                     # dimx is now GLOBAL, permanent macro name (e.g., 'M2')
                     dimx = knownMacroNames[dimx]
@@ -199,7 +184,7 @@ def parseAperture(s, knownMacroNames):
                 except Exception:
                     raise RuntimeError("Illegal floating point aperture size")
 
-            return Aperture(ap, code, dimx, dimy)
+            return Aperture(key, code, dimx, dimy)
 
     return None
 
