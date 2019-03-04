@@ -15,12 +15,8 @@ http://ruggedcircuits.com/gerbmerge
 import re
 import builtins
 
-import aptable
-import config
-import makestroke
-import amacro
-import geometry
-import util
+from . import (amacro, aptable, config, geometry, makestroke, util)
+
 
 # Parsing Gerber/Excellon files is currently very brittle. A more robust
 # RS274X/Excellon parser would be a good idea and allow this program to work
@@ -35,7 +31,8 @@ import util
 # TODO:
 #
 # Need to add error checking for metric/imperial units matching those of the files input
-# Check fabdrawing.py to see if writeDrillHits is scaling properly (the only place it is used)
+# Check fabdrawing.py to see if writeDrillHits is scaling properly (the
+# only place it is used)
 
 # Patterns for Gerber RS274X file interpretation
 apdef_pat = re.compile(r'^%AD(D\d+)([^*$]+)\*%$')     # Aperture definition
@@ -127,7 +124,8 @@ class Job(object):
         # in GERBER data only (not Excellon). Note that coordinates
         # are stored in hundred-thousandsths of an inch so 9999999 is 99.99999
         # inches.
-        # in the case all coordinates are < 0, this will prevent maxx and maxy from defaulting to 0
+        # in the case all coordinates are < 0, this will prevent maxx and maxy
+        # from defaulting to 0
         self.maxx = self.maxy = -9999999
         self.minx = self.miny = 9999999
 
@@ -204,9 +202,9 @@ class Job(object):
         # add metric support (1/1000 mm vs. 1/100,000 inch)
         if config.Config['measurementunits'] == 'inch':
             "Return width in INCHES"
-            return float(self.maxx-self.minx)*0.00001
+            return float(self.maxx - self.minx) * 0.00001
         else:
-            return float(self.maxx-self.minx)*0.001
+            return float(self.maxx - self.minx) * 0.001
 
     def height_in(self):
         # add metric support (1/1000 mm vs. 1/100,000 inch)
@@ -244,7 +242,8 @@ class Job(object):
                 c = command[index]
 
                 # Shift X and Y coordinate of command
-                if isinstance(c, tuple):  # ensure that command is of type tuple
+                if isinstance(
+                        c, tuple):  # ensure that command is of type tuple
                     command_list = list(c)  # convert tuple to list
                     if isinstance(command_list[0], int) \
                             and isinstance(command_list[1], int):  # ensure that first two elemenst are integers
@@ -284,7 +283,7 @@ class Job(object):
         # RevGAMT[hash] = aperturemacroname
         RevGAMT = config.buildRevDict(GAMT)
 
-        #print('Reading data from %s ...' % fullname)
+        # print('Reading data from %s ...' % fullname)
 
         fid = open(fullname, 'rt')
         currtool = None
@@ -334,11 +333,13 @@ class Job(object):
             # Get rid of CR characters (0x0D) and leading/trailing blanks
             line = line.replace('\x0D', '').strip()
 
-            # Old location of format_pat search. Now moved down into the sub-line parse loop below.
+            # Old location of format_pat search. Now moved down into the
+            # sub-line parse loop below.
 
             # RS-274X statement? If so, echo it. Currently, only the "LP" statement is expected
             # (from Protel, of course). These will be distinguished from D-code and G-code
-            # commands by the fact that the first character of the string is '%'.
+            # commands by the fact that the first character of the string is
+            # '%'.
             match = layerpol_pat.match(line)
             if match:
                 self.commands[layername].append(line)
@@ -374,21 +375,22 @@ class Job(object):
             if line[:7] == '%AMOC8*':
                 continue
 
-# DipTrace specific fixes, but could be emitted by any CAD program. They are Standard Gerber RS-274X
-            # a hack to fix lack of recognition for metric direction from DipTrace - %MOMM*%
+            # DipTrace specific fixes, but could be emitted by any CAD program. They are Standard Gerber RS-274X
+            # a hack to fix lack of recognition for metric direction from
+            # DipTrace - %MOMM*%
             if (line[:7] == '%MOMM*%'):
                 if (config.Config['measurementunits'] == 'inch'):
                     raise RuntimeError(
                         "File %s units do match config file" % fullname)
                 else:
-                    #print("ignoring metric directive: " + line)
+                    # print("ignoring metric directive: " + line)
                     continue  # ignore it so func doesn't choke on it
 
             if line[:3] == '%SF':  # scale factor - we will ignore it
                 print('Scale factor parameter ignored: ' + line)
                 continue
 
-# end basic diptrace fixes
+            # end basic diptrace fixes
 
             # See if this is an aperture macro definition, and if so, map it.
             M = amacro.parseApertureMacro(line, fid)
@@ -398,12 +400,13 @@ class Job(object):
                         "File %s has an aperture macro definition that comes after drawing commands." % fullname)
 
                 hash = M.hash()
-                if not hash in RevGAMT:
+                if hash not in RevGAMT:
                     raise RuntimeError(
                         'File %s has aperture macro definition not in global aperture macro table:\n%s' % (fullname, hash))
 
                 # This says that all aperture definition commands that reference this macro name
-                # will be replaced by aperture macro name self.apmxlat[layername][macroname].
+                # will be replaced by aperture macro name
+                # self.apmxlat[layername][macroname].
                 self.apmxlat[layername][M.name] = RevGAMT[hash]
                 continue
 
@@ -446,21 +449,21 @@ class Job(object):
                             # M.N specification for X-axis.
                             if item[0] == 'X':
                                 fracpart = int(item[2])
-                                x_div = 10.0**(5-fracpart)
+                                x_div = 10.0**(5 - fracpart)
                             # M.N specification for Y-axis.
                             if item[0] == 'Y':
                                 fracpart = int(item[2])
-                                y_div = 10.0**(5-fracpart)
+                                y_div = 10.0**(5 - fracpart)
                         else:
                             # M.N specification for X-axis.
                             if item[0] == 'X':
                                 fracpart = int(item[2])
-                                x_div = 10.0**(3-fracpart)
+                                x_div = 10.0**(3 - fracpart)
                                 # print("x_div= %5.3f." % x_div)
                             # M.N specification for Y-axis.
                             if item[0] == 'Y':
                                 fracpart = int(item[2])
-                                y_div = 10.0**(3-fracpart)
+                                y_div = 10.0**(3 - fracpart)
                                 # print("y_div= %5.3f." % y_div)
 
                     continue
@@ -477,7 +480,8 @@ class Job(object):
                     if gcode in [54, 70, 90, 71]:
                         continue
 
-                    # Determine if this is a G-Code that we have to emit because it matters.
+                    # Determine if this is a G-Code that we have to emit
+                    # because it matters.
                     if gcode in [1, 2, 3, 36, 37, 74, 75]:
                         self.commands[layername].append("G%02d" % gcode)
 
@@ -503,7 +507,7 @@ class Job(object):
                     currtool = match.group(1)
 
                     # Diptrace hack
-                    # There is a D2* command in board outlines. I believe this should be D02. 
+                    # There is a D2* command in board outlines. I believe this should be D02.
                     # Let's change it then when it occurs:
                     if (currtool == 'D1'):
                         currtool = 'D01'
@@ -518,18 +522,21 @@ class Job(object):
                     # to move to the current location without drawing. Truly pointless. We do NOT want
                     # to ignore D03 because it implies a flash. Protel very inefficiently issues a D02
                     # move to a location without drawing, then a single-line D03 to flash. However, a D02
-                    # terminates a polygon in G36 mode, so keep D02's in this case.
-                    if currtool == 'D01' or (currtool == 'D02' and (last_gmode != 36)):
+                    # terminates a polygon in G36 mode, so keep D02's in this
+                    # case.
+                    if currtool == 'D01' or (
+                            currtool == 'D02' and (last_gmode != 36)):
                         sub_line = sub_line[match.end():]
                         continue
 
-                    if (currtool == 'D03') or (currtool == 'D02' and (last_gmode == 36)):
+                    if (currtool == 'D03') or (
+                            currtool == 'D02' and (last_gmode == 36)):
                         self.commands[layername].append(currtool)
                         sub_line = sub_line[match.end():]
                         continue
 
                     # Map it using our translation table
-                    if not currtool in self.apxlat[layername]:
+                    if currtool not in self.apxlat[layername]:
                         raise RuntimeError(
                             'File %s has tool change command "%s" with no corresponding translation' % (fullname, currtool))
 
@@ -564,7 +571,8 @@ class Job(object):
                             x = last_x
                             isLastShorthand = True  # Indicate we're making use of last_x/last_y
 
-                # Maybe it's a circular interpolation draw command with IJ components
+                # Maybe it's a circular interpolation draw command with IJ
+                # components
                 if match is None:
                     match = cdrawXY_pat.match(sub_line)
                     if match:
@@ -598,7 +606,8 @@ class Job(object):
 
                     # Corner case: if this is the first flash/draw and we are using shorthand (i.e., missing Xxxx
                     # or Yxxxxx) then prepend the point X0000Y0000 into the commands as it is actually the starting
-                    # point of our layer. We prepend the command X0000Y0000D02, i.e., a move to (0,0) without drawing.
+                    # point of our layer. We prepend the command X0000Y0000D02,
+                    # i.e., a move to (0,0) without drawing.
                     if (isLastShorthand and firstFlash):
                         self.commands[layername].append((0, 0, 2))
                         if updateExtents:
@@ -607,11 +616,11 @@ class Job(object):
                             self.miny = min(self.miny, 0)
                             self.maxy = max(self.maxy, 0)
 
-                    x = int(round(x*x_div))
-                    y = int(round(y*y_div))
+                    x = int(round(x * x_div))
+                    y = int(round(y * y_div))
                     if I is not None:
-                        I = int(round(I*x_div))
-                        J = int(round(J*y_div))
+                        I = int(round(I * x_div))
+                        J = int(round(J * y_div))
                         self.commands[layername].append(
                             (x, y, I, J, d, circ_signed))
                     else:
@@ -635,7 +644,8 @@ class Job(object):
                     sub_line = sub_line[match.end():]
                     continue
 
-                # If it's none of the above, it had better be on our ignore list.
+                # If it's none of the above, it had better be on our ignore
+                # list.
                 for pat in IgnoreList:
                     match = pat.match(sub_line)
                     if match:
@@ -654,7 +664,7 @@ class Job(object):
             print(self.commands[layername])
 
     def parseExcellon(self, fullname):
-        #print('Reading data from %s ...' % fullname)
+        # print('Reading data from %s ...' % fullname)
 
         fid = open(fullname, 'rt')
         currtool = None
@@ -668,46 +678,48 @@ class Job(object):
         # specified by the 'zeropadto' variable.
         if self.ExcellonDecimals > 0:
             divisor = 10.0**(4 - self.ExcellonDecimals)
-            zeropadto = 2+self.ExcellonDecimals
+            zeropadto = 2 + self.ExcellonDecimals
         else:
             divisor = 10.0**(4 - config.Config['excellondecimals'])
-            zeropadto = 2+config.Config['excellondecimals']
+            zeropadto = 2 + config.Config['excellondecimals']
 
         # Protel takes advantage of optional X/Y components when the previous one is the same,
         # so we have to remember them.
         last_x = last_y = 0
 
-        # Helper function to convert X/Y strings into integers in units of ten-thousandth of an inch.
+        # Helper function to convert X/Y strings into integers in units of
+        # ten-thousandth of an inch.
         def xln2tenthou(L, divisor=divisor, zeropadto=zeropadto):
             V = []
             for s in L:
                 if not suppress_leading:
-                    s = s + '0'*(zeropadto-len(s))
-                V.append(int(round(int(s)*divisor)))
+                    s = s + '0' * (zeropadto - len(s))
+                V.append(int(round(int(s) * divisor)))
             return tuple(V)
 
         for line in fid:
             # Get rid of CR characters
             line = line.replace('\x0D', '')
 
-# add support for DipTrace
+            # add support for DipTrace
             if line[:6] == 'METRIC':
                 if (config.Config['measurementunits'] == 'inch'):
                     raise RuntimeError(
                         "File %s units do match config file" % fullname)
                 else:
-                    #print("ignoring METRIC directive: " + line)
+                    # rint("ignoring METRIC directive: " + line)
                     continue  # ignore it so func doesn't choke on it
 
             if line[:3] == 'T00':  # a tidying up that we can ignore
                 continue
-# end metric/diptrace support
+            # end metric/diptrace support
 
             # Protel likes to embed comment lines beginning with ';'
             if line[0] == ';':
                 continue
 
-            # Check for leading/trailing zeros included ("INCH,LZ" or "INCH,TZ")
+            # Check for leading/trailing zeros included ("INCH,LZ" or
+            # "INCH,TZ")
             match = xzsup_pat.match(line)
             if match:
                 if match.group(1) == 'L':
@@ -728,7 +740,7 @@ class Job(object):
                 currtool, diam = match.groups()
                 try:
                     diam = float(diam)
-                except:
+                except Exception:
                     raise RuntimeError(
                         "File %s has illegal tool diameter '%s'" % (fullname, diam))
 
@@ -751,20 +763,21 @@ class Job(object):
                 # as T01 and sometimes as T1. We canonicalize to T01.
                 currtool = 'T%02d' % int(currtool[1:])
 
-                # Diameter will be obtained from embedded tool definition, local tool list or if not found, the global tool list
+                # Diameter will be obtained from embedded tool definition,
+                # local tool list or if not found, the global tool list
                 try:
                     diam = self.xdiam[currtool]
-                except:
+                except Exception:
                     if self.ToolList:
                         try:
                             diam = self.ToolList[currtool]
-                        except:
+                        except Exception:
                             raise RuntimeError(
                                 "File %s uses tool code %s that is not defined in the job's tool list" % (fullname, currtool))
                     else:
                         try:
                             diam = config.DefaultToolList[currtool]
-                        except:
+                        except Exception:
                             # print(config.DefaultToolList)
                             raise RuntimeError(
                                 "File %s uses tool code %s that is not defined in default tool list" % (fullname, currtool))
@@ -829,7 +842,8 @@ class Job(object):
             X = int(round(Xoff / 0.001))
             Y = int(round(Yoff / 0.001))
 
-        # Now calculate displacement for each position so that we end up at specified origin
+        # Now calculate displacement for each position so that we end up at
+        # specified origin
         DX = X - self.minx
         DY = Y - self.miny
 
@@ -882,7 +896,8 @@ class Job(object):
             X = int(round(Xoff / 0.001))
             Y = int(round(Yoff / 0.001))
 
-        # Now calculate displacement for each position so that we end up at specified origin
+        # Now calculate displacement for each position so that we end up at
+        # specified origin
         DX = X - self.minx
         DY = Y - self.miny
 
@@ -903,7 +918,7 @@ class Job(object):
             if ltool in self.xcommands:
                 for cmd in self.xcommands[ltool]:
                     x, y = cmd
-                    fid.write(fmtstr % (x+DX, y+DY))
+                    fid.write(fmtstr % (x + DX, y + DY))
 
     def writeDrillHits(self, fid, diameter, toolNum, Xoff, Yoff):
         """Write a drill hit pattern. diameter is tool diameter in inches, while toolNum is
@@ -919,7 +934,8 @@ class Job(object):
             X = int(round(Xoff / 0.001))
             Y = int(round(Yoff / 0.001))
 
-        # Now calculate displacement for each position so that we end up at specified origin
+        # Now calculate displacement for each position so that we end up at
+        # specified origin
         DX = X - self.minx
         DY = Y - self.miny
 
@@ -934,7 +950,8 @@ class Job(object):
                     x, y = cmd
                     # add metric support (1/1000 mm vs. 1/100,000 inch)
 # TODO - verify metric scaling is correct???
-                    makestroke.drawDrillHit(fid, 10 * x + DX, 10 * y + DY, toolNum)
+                    makestroke.drawDrillHit(
+                        fid, 10 * x + DX, 10 * y + DY, toolNum)
 
     def aperturesAndMacros(self, layername):
         "Return dictionaries whose keys are all necessary aperture names and macro names for this layer"
@@ -960,7 +977,8 @@ class Job(object):
             self.apxlat[layername][localCode] = AP.code
 
     def inBorders(self, x, y):
-        return (x >= self.minx) and (x <= self.maxx) and (y >= self.miny) and (y <= self.maxy)
+        return (x >= self.minx) and (x <= self.maxx) and (
+            y >= self.miny) and (y <= self.maxy)
 
     def trimGerberLayer(self, layername):
         "Modify drawing commands that are outside job dimensions"
@@ -974,10 +992,12 @@ class Job(object):
 
         for cmd in self.commands[layername]:
             if isinstance(cmd, tuple):
-                # It is a data command: tuple (X, Y, D), all integers, or (X, Y, I, J, D), all integers.
+                # It is a data command: tuple (X, Y, D), all integers, or (X,
+                # Y, I, J, D), all integers.
                 if len(cmd) == 3:
                     x, y, d = cmd
-                    # I=J=None   # In case we support circular interpolation in the future
+                    # I=J=None   # In case we support circular interpolation in
+                    # the future
                 else:
                     # We don't do anything with circular interpolation for now, so just issue
                     # the command and be done with it.
@@ -1033,22 +1053,30 @@ class Job(object):
 #                  minFlash =
                                 # sdd - change for metric case at some point
                                 if min(newRectWidth, newRectHeight) >= 10:
-                                    # Construct an Aperture that is a Rectangle of dimensions (newRectWidth,newRectHeight)
-                                    newAP = aptable.Aperture(aptable.Rectangle, 'D??',
+                                    # Construct an Aperture that is a Rectangle
+                                    # of dimensions
+                                    # (newRectWidth,newRectHeight)
+                                    newAP = aptable.Aperture('Rectangle', 'D??',
                                                              util.gerb2in(newRectWidth), util.gerb2in(newRectHeight))
                                     global_code = aptable.findOrAddAperture(
                                         newAP)
 
-                                    # We need an unused local aperture code to correspond to this newly-created global one.
+                                    # We need an unused local aperture code to
+                                    # correspond to this newly-created global
+                                    # one.
                                     self.makeLocalApertureCode(
                                         layername, newAP)
 
-                                    # Make sure to indicate that the new aperture is one that is used by this layer
+                                    # Make sure to indicate that the new
+                                    # aperture is one that is used by this
+                                    # layer
                                     if global_code not in self.apertures[layername]:
                                         self.apertures[layername].append(
                                             global_code)
 
-                                    # Switch to new aperture code, flash new aperture, switch back to previous aperture code
+                                    # Switch to new aperture code, flash new
+                                    # aperture, switch back to previous
+                                    # aperture code
                                     newcmds.append(global_code)
                                     newcmds.append((newX, newY, 3))
                                     newcmds.append(lastAperture.code)
@@ -1058,7 +1086,8 @@ class Job(object):
                                 pass      # Ignore this flash...no area in common
                     elif self.inBorders(x, y):
                         # Aperture is not a rectangle and its center is somewhere within our
-                        # borders. Flash it and ignore part outside borders (for now).
+                        # borders. Flash it and ignore part outside borders
+                        # (for now).
                         newcmds.append(cmd)
                     else:
                         pass    # Ignore this flash
@@ -1111,15 +1140,18 @@ class Job(object):
                     else:
                         # segmentXbox() returns a list of 0, 1, or 2 points describing the intersection
                         # points of the segment (lastx,lasty)-(x,y) with the box defined
-                        # by lower-left corner (minx,miny) and upper-right corner (maxx,maxy).
+                        # by lower-left corner (minx,miny) and upper-right
+                        # corner (maxx,maxy).
                         pointsL = geometry.segmentXbox(
                             (lastx, lasty), (x, y), (self.minx, self.miny), (self.maxx, self.maxy))
 
                         if len(pointsL) == 0:   # Case A, no intersection
                             # Both points are outside the box and there is no overlap with box.
-                            # Command is effectively removed since newcmds wasn't extended.
+                            # Command is effectively removed since newcmds
+                            # wasn't extended.
                             d = 2
-                            # Ensure "last command" is exposure off to reflect this.
+                            # Ensure "last command" is exposure off to reflect
+                            # this.
 
                         elif len(pointsL) == 1:     # Cases B and C
                             pt1 = pointsL[0]
@@ -1169,7 +1201,8 @@ class Job(object):
         for toolname in keys:
             # Remember Excellon is 2.4 format while Gerber data is 2.5 format
             # add metric support (1/1000 mm vs. 1/100,000 inch)
-            # the normal metric scale factor isn't working right, so we'll leave it alone!!!!?
+            # the normal metric scale factor isn't working right, so we'll
+            # leave it alone!!!!?
             if config.Config['measurementunits'] == 'inch':
                 validList = [(x, y) for x, y in self.xcommands[toolname]
                              if self.inBorders(10 * x, 10 * y)]
@@ -1216,7 +1249,7 @@ class JobLayout(object):
         def notEdge(x, X):
             return round(abs(1000 * (x - X)))
 
-        #assert self.x and self.y
+        # assert self.x and self.y
 
 # if job has a boardoutline layer, write it, else calculate one
         outline_layer = 'boardoutline'
@@ -1227,7 +1260,8 @@ class JobLayout(object):
             # It is a hack in that we are assuming there is only one draw code in the
             # boardoutline file. We are just going to ignore that definition and change
             # all usages of that code to our new one. As a side effect, it will make
-            # the merged boardoutline file invalid, but we aren't using it with this method.
+            # the merged boardoutline file invalid, but we aren't using it with
+            # this method.
             temp = []
             for x in self.job.commands[outline_layer]:
                 if x[0] == 'D':
@@ -1237,11 +1271,11 @@ class JobLayout(object):
                     temp.append(x)  # keep old command
             self.job.commands[outline_layer] = temp
 
-            #self.job.writeGerber(fid, outline_layer, X1, Y1)
+            # self.job.writeGerber(fid, outline_layer, X1, Y1)
             self.writeGerber(fid, outline_layer)
 
         else:
-            radius = config.GAT[drawing_code].dimx/2.0
+            radius = config.GAT[drawing_code].dimx / 2.0
 
             # Start at lower-left, proceed clockwise
             x = self.x - radius
@@ -1254,7 +1288,8 @@ class JobLayout(object):
 
             BL = ((x), (y))
             TL = ((x), (y + self.height_in() + 2 * radius))
-            TR = ((x + self.width_in() + 2 * radius), (y + self.height_in() + 2 * radius))
+            TR = ((x + self.width_in() + 2 * radius),
+                  (y + self.height_in() + 2 * radius))
             BR = ((x + self.width_in() + 2 * radius), (y))
 
             if not left:
@@ -1321,7 +1356,7 @@ class JobLayout(object):
         for tool in tools:
             try:
                 total += len(self.job.xcommands[tool])
-            except:
+            except Exception:
                 pass
 
         return total
@@ -1334,7 +1369,7 @@ def rotateJob(job, degrees=90, firstpass=True):
     """Create a new job from an existing one, rotating by specified degrees in 90 degree passes"""
     GAT = config.GAT
     GAMT = config.GAMT
-    ##print("rotating job:", job.name, degrees, firstpass)
+    # print("rotating job:", job.name, degrees, firstpass)
     if firstpass:
         if degrees == 270:
             J = Job(job.name + '*rotated270')
@@ -1346,8 +1381,8 @@ def rotateJob(job, degrees=90, firstpass=True):
         J = Job(job.name)
 
     # Keep the origin (lower-left) in the same place
-    J.maxx = job.minx + job.maxy-job.miny
-    J.maxy = job.miny + job.maxx-job.minx
+    J.maxx = job.minx + job.maxy - job.miny
+    J.maxy = job.miny + job.maxx - job.minx
     J.minx = job.minx
     J.miny = job.miny
 
@@ -1388,7 +1423,7 @@ def rotateJob(job, degrees=90, firstpass=True):
                 newcode = aptable.addToApertureTable(APR)
 
                 # Rebuild RevGAT
-                #RevGAT = config.buildRevDict(GAT)
+                # RevGAT = config.buildRevDict(GAT)
                 RevGAT[hash] = newcode
 
             J.apxlat[layername][ap] = newcode
@@ -1421,9 +1456,11 @@ def rotateJob(job, degrees=90, firstpass=True):
                     # J is already used as Job object
                     x, y, II, JJ, d, signed = map(builtins.int, cmd)
             else:
-                # No, must be a string indicating aperture change, G-code, or RS274-X command.
+                # No, must be a string indicating aperture change, G-code, or
+                # RS274-X command.
                 if cmd[0] in ('G', '%'):
-                    # G-codes and RS274-X commands are just copied verbatim and not affected by rotation
+                    # G-codes and RS274-X commands are just copied verbatim and
+                    # not affected by rotation
                     J.commands[layername].append(cmd)
                     continue
 
@@ -1443,9 +1480,10 @@ def rotateJob(job, degrees=90, firstpass=True):
                 continue
 
             # (X,Y) --> (-Y,X) effects a 90-degree counterclockwise shift
-            # Adding 'offset' to -Y maintains the lower-left origin of (minx,miny).
+            # Adding 'offset' to -Y maintains the lower-left origin of
+            # (minx,miny).
             newx = -(y - job.miny) + job.minx + offset
-            newy = (x-job.minx) + job.miny
+            newy = (x - job.minx) + job.miny
 
             # For circular interpolation commands, (I,J) components are always relative
             # so we do not worry about offsets, just reverse their sense, i.e., I becomes J
@@ -1473,7 +1511,8 @@ def rotateJob(job, degrees=90, firstpass=True):
 
         for x, y in job.xcommands[tool]:
             # add metric support (1/1000 mm vs. 1/100,000 inch)
-            # NOTE: There don't appear to be any need for a change. The usual x10 factor seems to apply
+            # NOTE: There don't appear to be any need for a change. The usual
+            # x10 factor seems to apply
 
             newx = -(10 * y - job.miny) + job.minx + offset
             newy = (10 * x - job.minx) + job.miny
@@ -1488,5 +1527,5 @@ def rotateJob(job, degrees=90, firstpass=True):
     if degrees > 0:
         return rotateJob(J, degrees, False)
     else:
-        ##print("rotated:", J.name)
+        # print("rotated:", J.name)
         return J

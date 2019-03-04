@@ -10,11 +10,7 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 
-import string
-
-import config
-import makestroke
-import util
+from . import config, makestroke, util
 
 
 def writeDrillHits(fid, Place, Tools):
@@ -25,7 +21,7 @@ def writeDrillHits(fid, Place, Tools):
 
         try:
             size = config.GlobalToolMap[tool]
-        except:
+        except Exception:
             raise RuntimeError(
                 "INTERNAL ERROR: Tool code %s not found in global tool list" % tool)
 
@@ -83,16 +79,16 @@ def writeDrillLegend(fid, Tools, OriginY, MaxXExtent):
         # Determine string to write and midpoint of string
         s = '%.3f"' % size
         # Returns lower-left point, upper-right point
-        ll, ur = makestroke.boundingBox(s, posX+glyphspace, posY)
-        midpoint = (ur[1]+ll[1])/2
+        ll, ur = makestroke.boundingBox(s, posX + glyphspace, posY)
+        midpoint = (ur[1] + ll[1]) / 2
 
         # Keep track of maximum extent of legend
         maxX = max(maxX, ur[0])
 
         makestroke.drawDrillHit(fid, posX, midpoint, toolNum)
-        makestroke.writeString(fid, s, posX+glyphspace, posY, 0)
+        makestroke.writeString(fid, s, posX + glyphspace, posY, 0)
 
-        posY += int(round((ur[1]-ll[1])*1.5))
+        posY += int(round((ur[1] - ll[1]) * 1.5))
 
     # Return value is lower-left of user text area, without any padding.
     return maxX, util.in2gerb(OriginY)
@@ -112,24 +108,25 @@ def writeDimensionArrow(fid, OriginX, OriginY, MaxXExtent, MaxYExtent):
     dimspace = util.in2gerb(dimspace)
 
     # Draw an arrow above the board, on the left side and right side
-    makestroke.drawDimensionArrow(fid, x, Y+dimspace, makestroke.FacingLeft)
-    makestroke.drawDimensionArrow(fid, X, Y+dimspace, makestroke.FacingRight)
+    makestroke.drawDimensionArrow(fid, x, Y + dimspace, makestroke.FacingLeft)
+    makestroke.drawDimensionArrow(fid, X, Y + dimspace, makestroke.FacingRight)
 
     # Draw arrows to the right of the board, at top and bottom
-    makestroke.drawDimensionArrow(fid, X+dimspace, Y, makestroke.FacingUp)
-    makestroke.drawDimensionArrow(fid, X+dimspace, y, makestroke.FacingDown)
+    makestroke.drawDimensionArrow(fid, X + dimspace, Y, makestroke.FacingUp)
+    makestroke.drawDimensionArrow(fid, X + dimspace, y, makestroke.FacingDown)
 
     # Now draw the text. First, horizontal text above the board.
     s = '%.3f"' % (MaxXExtent - OriginX)
     ll, ur = makestroke.boundingBox(s, 0, 0)
-    s_width = ur[0]-ll[0]   # Width in 2.5 units
-    s_height = ur[1]-ll[1]  # Height in 2.5 units
+    s_width = ur[0] - ll[0]   # Width in 2.5 units
+    s_height = ur[1] - ll[1]  # Height in 2.5 units
 
     # Compute the position in 2.5 units where we should draw this. It should be
-    # centered horizontally and also vertically about the dimension arrow centerline.
-    posX = x + (x+X)/2
-    posX -= s_width/2
-    posY = Y + dimspace - s_height/2
+    # centered horizontally and also vertically about the dimension arrow
+    # centerline.
+    posX = x + (x + X) / 2
+    posX -= s_width / 2
+    posY = Y + dimspace - s_height / 2
     makestroke.writeString(fid, s, posX, posY, 0)
 
     # Finally, draw the extending lines from the text to the arrows.
@@ -142,14 +139,14 @@ def writeDimensionArrow(fid, OriginX, OriginY, MaxXExtent, MaxYExtent):
     # Now do the vertical text
     s = '%.3f"' % (MaxYExtent - OriginY)
     ll, ur = makestroke.boundingBox(s, 0, 0)
-    s_width = ur[0]-ll[0]
-    s_height = ur[1]-ll[1]
+    s_width = ur[0] - ll[0]
+    s_height = ur[1] - ll[1]
 
     # As above, figure out where to draw this. Rotation will be -90 degrees
     # so new origin will be top-left of bounding box after rotation.
-    posX = X + dimspace - s_height/2
-    posY = y + (y+Y)/2
-    posY += s_width/2
+    posX = X + dimspace - s_height / 2
+    posY = y + (y + Y) / 2
+    posY += s_width / 2
     makestroke.writeString(fid, s, posX, posY, -90)
 
     # Draw extending lines
@@ -196,13 +193,14 @@ def writeUserText(fid, X, Y):
         ll, ur = makestroke.boundingBox(line, X, Y)
         makestroke.writeString(fid, line, X, Y, 0)
 
-        Y += int(round((ur[1]-ll[1])*1.5))
+        Y += int(round((ur[1] - ll[1]) * 1.5))
 
 # Main entry point. Gerber file has already been opened, header written
 # out, 1mil tool selected.
 
 
-def writeFabDrawing(fid, Place, Tools, OriginX, OriginY, MaxXExtent, MaxYExtent):
+def writeFabDrawing(fid, Place, Tools, OriginX,
+                    OriginY, MaxXExtent, MaxYExtent):
 
     # Write out all the drill hits
     writeDrillHits(fid, Place, Tools)

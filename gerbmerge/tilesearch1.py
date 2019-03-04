@@ -12,10 +12,7 @@ http://ruggedcircuits.com/gerbmerge
 import sys
 import time
 
-import config
-import tiling
-
-import gerbmerge
+from . import config, gerbmerge, tiling
 
 _StartTime = 0.0           # Start time of tiling
 _CkpointTime = 0.0         # Next time to print stats
@@ -38,7 +35,7 @@ def printTilingStats():
         area = 999999.0
         utilization = 0.0
 
-    percent = 100.0*_Permutations/_PossiblePermutations
+    percent = 100.0 * _Permutations / _PossiblePermutations
 
     # add metric support (1/1000 mm vs. 1/100,000 inch)
     if config.Config['measurementunits'] == 'inch':
@@ -116,24 +113,24 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
         # Pop off the next job and construct remaining_jobs, a sub-list
         # of Jobs with the job we've just popped off excluded.
         Xdim, Ydim, job, rjob = Jobs[job_ix]
-        remaining_jobs = Jobs[:job_ix]+Jobs[job_ix+1:]
+        remaining_jobs = Jobs[:job_ix] + Jobs[job_ix + 1:]
 
         if 0:
-            print("Level %d (%s)" % (level, job.name))
+            print("Job: {}".format(job.name))
             TSoFar.joblist()
             for J in remaining_jobs:
                 print(J[2].name, ", ", "\n")
             print("\n")
-            print('-'*75)
+            print('-' * 75)
 
         # Construct add-points for the non-rotated and rotated job.
         # As an optimization, do not construct add-points for the rotated
         # job if the job is a square (duh).
         addpoints1 = TSoFar.validAddPoints(
-            Xdim+xspacing, Ydim+yspacing)     # unrotated job
+            Xdim + xspacing, Ydim + yspacing)     # unrotated job
         if Xdim != Ydim:
             addpoints2 = TSoFar.validAddPoints(
-                Ydim+xspacing, Xdim+yspacing)   # rotated job
+                Ydim + xspacing, Xdim + yspacing)   # rotated job
         else:
             addpoints2 = []
 
@@ -144,7 +141,7 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
                 # Clone the tiling we're starting with and add the job at this
                 # add-point.
                 T = TSoFar.clone()
-                T.addJob(ix, Xdim+xspacing, Ydim+yspacing, job)
+                T.addJob(ix, Xdim + xspacing, Ydim + yspacing, job)
 
                 # Recursive call with the remaining jobs and this new tiling. The
                 # point behind the last parameter is simply so that _Permutations is
@@ -166,7 +163,7 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
                 # add-point. Remember that the job is rotated so swap X and Y
                 # dimensions.
                 T = TSoFar.clone()
-                T.addJob(ix, Ydim+xspacing, Xdim+yspacing, rjob)
+                T.addJob(ix, Ydim + xspacing, Xdim + yspacing, rjob)
 
                 # Recursive call with the remaining jobs and this new tiling.
                 _tile_search1(remaining_jobs, T,
@@ -182,7 +179,8 @@ def _tile_search1(Jobs, TSoFar, firstAddPoint, cfg=config.Config):
             printTilingStats()
 
             # Check for timeout - changed to file config
-            if (config.Config['searchtimeout'] > 0) and ((time.time() - _StartTime) > config.Config['searchtimeout']):
+            if (config.Config['searchtimeout'] > 0) and (
+                    (time.time() - _StartTime) > config.Config['searchtimeout']):
                 raise KeyboardInterrupt
 
         gerbmerge.updateGUI("Performing automatic layout...")
@@ -194,7 +192,7 @@ def factorial(N):
     if (N <= 1):
         return 1
 
-    prod = long(N)
+    prod = int(N)
     while (N > 2):
         N -= 1
         prod *= N
@@ -224,10 +222,10 @@ def tile_search1(Jobs, X, Y):
     # This is assuming all jobs are unique and each job has a rotation (i.e., is not
     # square). Practically, these assumptions make no difference because the software
     # currently doesn't optimize for cases of repeated jobs.
-    _PossiblePermutations = (2**len(Jobs))*factorial(len(Jobs))
-    #print("Possible permutations:", _PossiblePermutations)
+    _PossiblePermutations = (2**len(Jobs)) * factorial(len(Jobs))
+    # print("Possible permutations:", _PossiblePermutations)
 
-    print('='*70)
+    print('=' * 70)
     print("Starting placement using exhaustive search.")
     print("There are %ld possible permutations..." %
           _PossiblePermutations, "\n")
@@ -243,7 +241,7 @@ def tile_search1(Jobs, X, Y):
         print("don't hold your breath.")
     print("Press Ctrl-C to stop and use the best placement so far.")
     print("Estimated maximum possible utilization is %.1f%%." %
-          (tiling.maxUtilization(Jobs)*100))
+          (tiling.maxUtilization(Jobs) * 100))
 
     try:
         _tile_search1(Jobs, tiling.Tiling(X, Y), 1)
@@ -256,7 +254,7 @@ def tile_search1(Jobs, X, Y):
 
     computeTime = time.time() - _StartTime
     print("Computed %ld placements in %d seconds / %.1f placements/second" %
-          (_Placements, computeTime, _Placements/computeTime))
-    print('='*70)
+          (_Placements, computeTime, _Placements / computeTime))
+    print('=' * 70)
 
     return _TBestTiling

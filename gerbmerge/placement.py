@@ -16,7 +16,7 @@ http://ruggedcircuits.com/gerbmerge
 import sys
 import re
 
-import parselayout
+from . import parselayout
 
 
 class Placement(object):
@@ -45,8 +45,8 @@ class Placement(object):
         maxY = 0.0
 
         for job in self.jobs:
-            maxX = max(maxX, job.x+job.width_in())
-            maxY = max(maxY, job.y+job.height_in())
+            maxX = max(maxX, job.x + job.width_in())
+            maxY = max(maxY, job.y + job.height_in())
 
         return (maxX, maxY)
 
@@ -67,7 +67,7 @@ class Placement(object):
 
         try:
             fid = open(fname, 'rt')
-        except:
+        except Exception:
             print('Unable to open placement file: "%s"' % fname)
             sys.exit(1)
 
@@ -80,15 +80,19 @@ class Placement(object):
 
             match = pat.match(line)
             if not match:
-                print('Cannot interpret placement line in placement file:\n  %s' % line)
+                print(
+                    'Cannot interpret placement line in placement file:\n  %s' %
+                    line)
                 sys.exit(1)
 
             jobname, X, Y = match.groups()
             try:
                 X = float(X)
                 Y = float(Y)
-            except:
-                print('Illegal (X,Y) co-ordinates in placement file:\n  %s' % line)
+            except Exception:
+                print(
+                    'Illegal (X,Y) co-ordinates in placement file:\n  %s' %
+                    line)
                 sys.exit(1)
 
             rotated = 0

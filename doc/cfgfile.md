@@ -1,122 +1,86 @@
-<HTML>
-<HEAD>
-  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-  <TITLE>GerbMerge -- A Gerber-file merging program -- The Configuration File</TITLE>
-</HEAD>
-<BODY BGCOLOR="#ffffff" LINK="#0000c0" VLINK="#8f008f">
+[Operating Parameters](#operating-parameters)
 
-<!-- -->
+[Job Descriptions](#job-descriptions)
 
-<P><FONT SIZE="+2">GerbMerge -- The Configuration File</FONT></P>
+[Syntax Notes](#syntax-notes)
 
-<BLOCKQUOTE>
-  <P><A HREF="http://ruggedcircuits.com/gerbmerge"><FONT
-   SIZE="-1">Rugged Circuits LLC</FONT></A><FONT SIZE="-1"></FONT></P>
-</BLOCKQUOTE>
+## Introduction
 
-<P><HR ALIGN=LEFT><TABLE WIDTH="100%" BORDER="0" CELLSPACING="2"
-CELLPADDING="0">
-  <TR>
-    <TD><A HREF="index.html">Top-Level</A> | The Configuration File | <A HREF="layoutfile.html">The Layout File</A> | <A HREF="autosearch.html">Automatic Placement</A></TD>
-  </TR>
-  <TR>
-    <TD>&nbsp;</TD>
-  </TR>
-  <TR>
-    <TD>
-    <FONT SIZE="-1"><A HREF="#Parameters">Operating Parameters</A> | <A HREF="#Jobs">Job Descriptions</A> | 
-    <A HREF="#Syntax">Syntax Notes</A></TD>
-  </TR>
-</TABLE><HR ALIGN=LEFT></P>
+The configuration file tells GerbMerge things like:
 
-<H2>Introduction</H2>
+* How much space to leave between jobs in the final panel
+* Whether or not to draw cut lines or crop marks, and on which layers
+* Whether or not to generate a fabrication drawing
+* The job names and files to be panelized
+* The output file names
 
-  <P>The configuration file tells GerbMerge things like:
-  <UL>
-  <LI><P>How much space to leave between jobs in the final panel</LI>
-  <LI><P>Whether or not to draw cut lines or crop marks, and on which layers</LI>
-  <LI><P>Whether or not to generate a fabrication drawing</LI>
-  <LI><P>The job names and files to be panelized</LI>
-  <LI><P>The output file names</LI>
-  </UL>
+Note that the configuration file does not specify layout of jobs on the panel. This layout is described by the [layout file](layoutfile.md). The layout of jobs on the panel may also be constructed automatically using the [automatic placement](autosearch.md) mode of operation.
 
-  <P>Note that the configuration file does not specify layout of jobs on the
-  panel. This layout is described by the <A HREF="layoutfile.html">layout file</A>.
-  The layout of jobs on the panel may also be constructed automatically using
-  the <A HREF="autosearch.html">automatic placement</A> mode of operation.
+## Help!
+The rest of this document has a lot of information and it's easy to get overwhelmed. Users of GerbMerge complain that the configuration file is the biggest hurdle to overcome in using the program. 
 
-<P><H2>Help!</H2>
-<P>The rest of this document has a lot of information and it's easy to get overwhelmed. Users of GerbMerge
-complain that the configuration file is the biggest hurdle to overcome in using the program.
-<P>Don't panic. Start with a <A HREF="layout2.cfg">sample configuration file</A> and
-modify it for your own jobs. The comments in the sample file will guide you through the
-process.
+Don't panic. Start with a [sample configuration file](layout2.cfg) and modify it for your own jobs. The comments in the sample file will guide you through the process.
 
-<P><A NAME="Syntax"></A>
-<H2>Syntax Notes</H2>
+## Syntax Notes
+The configuration file is a plain text file that can be created with any text editor. It is parsed using Python's [`ConfigParser`](https://docs.python.org/library/configparser.html) module. See the documentation for this module for a full description of supported syntax.
 
-<P>The configuration file is a plain text file that can be created with any
-text editor. It is parsed using Python's
-<A HREF="http://docs.python.org/lib/module-ConfigParser.html"><TT>ConfigParser</TT></A> module.
-See the documentation for this module for a full description of supported syntax.
+Note that comments in this file begin with a `'#'` character. Comments must occupy an entire line and must not have any characters before the '#' character, including blanks. Comments cannot be placed at the end of a line. For example:
 
-<P>Note that comments in this file begin with a <TT>'#'</TT> character.
-Comments must occupy an entire line and must not have any characters before the
-'#' character, including blanks. Comments cannot be placed at the end of a
-line. For example:
-<PRE>
-        # This is correct...a comment occupies the entire line
-            # Incorrect...comment preceded by blanks
-        PanelWidth = 10.5   # This is INCORRECT...a comment cannot be placed at the end of a line
-</PRE>
-<P>The configuration file has a standard "INI-style" syntax comprising:
-<UL>
-<LI><I>Sections</I> delimited by section names in square brackets (e.g., <TT>[Options]</TT>)
-<LI><I>Assignments</I> of the form '<TT>Name = Value</TT>'
-</UL>
-<P>The configuration file parser supports variable substitution. You can specify a common
-pathname prefix, for example, and substitute it in subsequent assignments, like this:
-<PRE>
-    [CPUBoard]
-    Prefix = /home/user/eagle/cpuboard
+```
+# This is correct...a comment occupies the entire line
+    # Incorrect...comment preceded by blanks
+PanelWidth = 10.5   # This is INCORRECT...a comment cannot be placed at the end of a line
+```
 
-    # Note the syntax '%(prefix)s' is a variable string substitution.
-    # Even though we said 'Prefix = ...' we use LOWERCASE 'prefix' in the actual substitution!
-    BoardOutline = %(prefix)s/cpu.bor
-    Drills       = %(prefix)s/cpu.xln
-</PRE>    
+The configuration file has a standard "INI-style" syntax comprising:
 
-<HR>
-<P><B>NOTE:</B> the parser converts all names you assign to into <B>lowercase letters only</B>.
-<HR>
-<P>In general, assignments are local to the section in which they reside, i.e.,
+* _Sections_ delimited by section names in square brackets (e.g., `[Options]`)
+* _Assignments_ of the form '`Name = Value`'
+
+The configuration file parser supports variable substitution. You can specify a common pathname prefix, for example, and substitute it in subsequent assignments, like this:
+
+```
+[CPUBoard]
+Prefix = /home/user/eagle/cpuboard
+
+# Note the syntax '%(prefix)s' is a variable string substitution.
+# Even though we said 'Prefix = ...' we use LOWERCASE 'prefix' in the actual substitution!
+BoardOutline = %(prefix)s/cpu.bor
+Drills       = %(prefix)s/cpu.xln
+```
+
+---
+*NOTE:* the parser converts all names you assign to into *lowercase letters only*.
+---
+
+In general, assignments are local to the section in which they reside, i.e.,
 the names assigned to are not visible in the other sections. However, any
-assignments in the section named <TT>[DEFAULT]</TT> are visible in all
+assignments in the section named `[DEFAULT]` are visible in all
 sections. For example:
-<PRE>
-    [DEFAULT]
-    EagleDir = /home/user/eagle
 
-    [CPUBoard]
-    Prefix = %(eagledir)s/cpuboard
-    BoardOutline = %(prefix)s/cpu.bor
-    Drills       = %(prefix)s/cpu.xln
+```
+[DEFAULT]
+EagleDir = /home/user/eagle
 
-    [IOBoard]
-    Prefix = %(eagledir)s/ioboard
-    BoardOutline = %(prefix)s/io.bor
-    Drills       = %(prefix)s/io.xln
-</PRE>
-  
-  <P>Have a look at the sample configuration files <A HREF="layout1.cfg"><TT>layout1.cfg</TT></A>
-  and <A HREF="layout2.cfg"><TT>layout2.cfg</TT></A> for a quick overview of this file's syntax.
+[CPUBoard]
+Prefix = %(eagledir)s/cpuboard
+BoardOutline = %(prefix)s/cpu.bor
+Drills       = %(prefix)s/cpu.xln
 
-<P><A NAME="Parameters"></A>
-<H2>Operating Parameters</H2>
+[IOBoard]
+Prefix = %(eagledir)s/ioboard
+BoardOutline = %(prefix)s/io.bor
+Drills       = %(prefix)s/io.xln
+```  
 
-<P>The first section of the configuration file is called <TT>[Options]</TT>.
-This section specifies operating parameters for the job.
-<P>The following optional parameters are supported:
+Have a look at the sample configuration files [`layout1.cfg`](layout1.cfg) and [`layout2.cfg`](layout2.cfg) for a quick overview of this file's syntax.
+
+
+## Operating Parameters
+The first section of the configuration file is called `[Options]`. This section specifies operating parameters for the job.
+
+The following optional parameters are supported:
+
 <DL>
  <A NAME="ToolList"><DT><B>Tool List</B></DT></A>
  <DD><TT>ToolList = /home/user/eagle/toollist.drl</TT>
@@ -344,45 +308,34 @@ The <A HREF="#FiducialCopperDiameter"><TT>FiducialCopperDiameter</TT></A> and <A
 
 </DL>
 
-<P><A NAME="Jobs"></A>
-<H2>Job Descriptions</H2>
+## Job Descriptions
+Each input job is described in its own section. The job is described by providing file names for each layer. Layer names are up to you, but note the following:
 
-<P>Each input job is described in its own section. The job is described by providing file names for
-each layer. Layer names are up to you, but note the following:
-<UL>
-<LI><P>Layer names may be specified with lowercase and uppercase letters, but are converted to
-all-lowercase by GerbMerge. Note that this applies to layer names, not filenames.
-<LI><P>Each job must have at least a 'boardoutline' and 'drills' layer, specifying the Gerber
-board outline and Excellon drills layer, respectively.
-<LI><P>Each job may have an optional 'toollist' file specifying the tool list (or &quot;drill rack&quot;)
-in effect for this job only. This setting overrides the global <TT>ToolList</TT> option, described above.
-If the Excellon file for the job has embedded tool sizes, this option is ignored.
-<LI><P>All layer names other than 'boardoutline' and 'drills' must begin with an asterisk '*'
-character.
-</UL>
+* Layer names may be specified with lowercase and uppercase letters, but are converted to all-lowercase by GerbMerge. Note that this applies to layer names, not filenames.
+* Each job must have at least a 'boardoutline' and 'drills' layer, specifying the Gerber board outline and Excellon drills layer, respectively.
+* Each job may have an optional 'toollist' file specifying the tool list (or &quot;drill rack&quot;) in effect for this job only. This setting overrides the global `ToolList` option, described above. If the Excellon file for the job has embedded tool sizes, this option is ignored.
+* All layer names other than 'boardoutline' and 'drills' must begin with an asterisk '*' character.
 
-<P>Consider the following example:
-<PRE>
-    [CPUBoard]
-    BoardOutline = /home/user/eagle/cpuboard/cpu.bor
-    Drills       = /home/user/eagle/cpuboard/cpu.xln
-    ToolList     = /home/user/eagle/cpuboard/tools.drl
-    *TopLayer    = /home/user/eagle/cpuboard/cpu.cmp
-    *BottomLayer = /home/user/eagle/cpuboard/cpu.sol
-    *Silkscreen  = /home/user/eagle/cpuboard/cpu.plc
-</PRE>
-<P>Job names (in square brackets) are fairly arbitrary and need not correspond to any file names. They must,
-however, comprise only letters, digits, and the underscore character. Furthermore, job names must begin with
-a letter. Job names, unlike layer names, are case sensitive.
-<P>Each assignment statement assigns a file name to a layer name. As mentioned above,
-the layer names 'boardoutline' and 'drills' are reserved and required. The optional 'toollist' layer
-is not an actual layer but an assignment that indicates the tool list in effect for this job. All other layer
-names are up to you and must begin with an asterisk '*'.
-<P>Make good use of variable substitutions (see the sample <A HREF="layout1.cfg"><TT>layout1.cfg</TT></A>
-and <A HREF="layout2.cfg"><TT>layout2.cfg</TT></A> files) to avoid
-typing the same pathname over and over.
-<P>In addition to specifying board layers, each job description can also have job-specific
-parameter assignments:
+Consider the following example:
+
+```
+[CPUBoard]
+BoardOutline = /home/user/eagle/cpuboard/cpu.bor
+Drills       = /home/user/eagle/cpuboard/cpu.xln
+ToolList     = /home/user/eagle/cpuboard/tools.drl
+*TopLayer    = /home/user/eagle/cpuboard/cpu.cmp
+*BottomLayer = /home/user/eagle/cpuboard/cpu.sol
+*Silkscreen  = /home/user/eagle/cpuboard/cpu.plc
+```
+
+Job names (in square brackets) are fairly arbitrary and need not correspond to any file names. They must, however, comprise only letters, digits, and the underscore character. Furthermore, job names must begin with a letter. Job names, unlike layer names, are case sensitive.
+
+Each assignment statement assigns a file name to a layer name. As mentioned above, the layer names 'boardoutline' and 'drills' are reserved and required. The optional 'toollist' layer is not an actual layer but an assignment that indicates the tool list in effect for this job. All other layer names are up to you and must begin with an asterisk '*'.
+
+Make good use of variable substitutions (see the sample <A HREF="layout1.cfg"><TT>layout1.cfg</TT></A> and <A HREF="layout2.cfg"><TT>layout2.cfg</TT></A> files) to avoid typing the same pathname over and over.
+
+In addition to specifying board layers, each job description can also have job-specific parameter assignments:
+
 <DL>
  <DT><B>Repeat</B></DT>
  <DD><TT>Repeat = 3</TT>
@@ -398,44 +351,29 @@ parameter assignments:
  in which case the global <TT>ExcellonDecimals</TT> setting is applied.
 </DL>
 
-<P><A NAME="MergeOutputFiles"></A>
-<H2>Merge Output Files</H2>
+## Merge Output Files
+GerbMerge combines data from multiple jobs grouped by layer. All of the "bottom copper" layers from all jobs, for example, will be combined into a single "bottom copper" file. The names of these combined output files can be set in the `[MergeOutputFiles]` section of the configuration file.
 
-<P>GerbMerge combines data from multiple jobs grouped by layer. All of the "bottom copper"
-layers from all jobs, for example, will be combined into a single "bottom copper" file.
-The names of these combined output files can be set in the <TT>[MergeOutputFiles]</TT> section of the
-configuration file.
-<P>This section contains assignments of file names to layer names. The layer names must be the
-same as the ones specified in the <A HREF="#Jobs"><TT>[Jobs]</TT></A> section of the configuration file.
-All layer names must begin with an asterisk '<B>*</B>' except for the following four reserved layer names:
-<UL><LI><TT>BoardOutline</TT></LI>
-<LI><TT>Drills</TT></LI>
-<LI><TT>Placement</TT></LI>
-<LI><TT>ToolList</TT></LI>
-</UL>
-<P>The first two reserved layer names are actual layers, while
-<TT>Placement</TT> refers to the placement file generated by GerbMerge
-containing positions of jobs on the final panel, and <TT>ToolList</TT> refers
-to the combined tool list file generated by GerbMerge.
-<P> Any assignment made in this section that does not begin with an asterisk or is not an assignment
-to one of the above four reserved names is considered a general variable assignment for future
-string substitution.
-<P>Here is an example:
-<PRE>
-  [MergeOutputFiles]
-  Prefix = job1
-  BoardOutline = %(prefix)s.bor
-  Drills = %(prefix)s.xln
-  *topcopper = %(prefix)s.cmp
-  *bottomcopper = %(prefix)s.sol
-</PRE>
-<P>If an assignment to a layer name is missing, GerbMerge will create the file <TT>merged.layername.ger</TT> where
-'<TT>layername</TT>' is the layer name. Default values for the four reserved names are <TT>merged.boardoutline.ger</TT>
-for the <TT>BoardOutline</TT> layer, <TT>merged.drills.xln</TT> for the <TT>Drills</TT> layer, <TT>merged.placement.txt</TT> for the <TT>Placement</TT> file, and <TT>merged.toollist.drl</TT> for the <TT>ToolList</TT> combined tool list file.
+This section contains assignments of file names to layer names. The layer names must be the same as the ones specified in the [`[Jobs]`](#job-descriptions) section of the configuration file. All layer names must begin with an asterisk '<B>*</B>' except for the following four reserved layer names:
 
-<HR ALIGN=LEFT>
+* `BoardOutline`
+* `Drills`
+* `Placement`
+* `ToolList`
 
-<P><CENTER><FONT SIZE="-1">&COPY; 2003-2011, Copyright by <A HREF="http://ruggedcircuits.com">Rugged Circuits LLC</A>; All Rights Reserved. mailto: <A HREF="mailto:support@ruggedcircuits.com?subject=GerbMerge">support@ruggedcircuits.com</A></FONT></CENTER>
+The first two reserved layer names are actual layers, while `Placement` refers to the placement file generated by GerbMerge containing positions of jobs on the final panel, and `ToolList` refers to the combined tool list file generated by GerbMerge.
 
-</BODY>
-</HTML>
+Any assignment made in this section that does not begin with an asterisk or is not an assignment to one of the above four reserved names is considered a general variable assignment for future string substitution.
+
+Here is an example:
+
+```
+[MergeOutputFiles]
+Prefix = job1
+BoardOutline = %(prefix)s.bor
+Drills = %(prefix)s.xln
+*topcopper = %(prefix)s.cmp
+*bottomcopper = %(prefix)s.sol
+```
+
+If an assignment to a layer name is missing, GerbMerge will create the file `merged.layername.ger` where '`layername`' is the layer name. Default values for the four reserved names are `merged.boardoutline.ger` for the `BoardOutline` layer, `merged.drills.xln` for the `Drills` layer, `merged.placement.txt` for the `Placement` file, and `merged.toollist.drl` for the `ToolList` combined tool list file.

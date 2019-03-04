@@ -52,7 +52,8 @@ DISCLAIMER = """
 #                                               "B" = boolean
 #                                               "BI" = boolean as integer
 #
-#                                               THESE DATA TYPES ARE FIXED - CODE MUST CHANGE IF TYPES ARE ADDED/MODIFIED
+# THESE DATA TYPES ARE FIXED - CODE MUST CHANGE IF TYPES ARE
+# ADDED/MODIFIED
 DEFAULT_OPTIONS = {
     # Spacing in horizontal direction
     'xspacing': ('0.125', "DP", "XSpacing", "1 XSPACING_HELP"),

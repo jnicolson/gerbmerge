@@ -20,8 +20,7 @@ import sys
 
 from simpleparse.parser import Parser
 
-import config
-import jobs
+from . import config, jobs
 
 declaration = r'''
 file         := (commentline/nullline/rowspec)+
@@ -45,11 +44,13 @@ int := [0-9]+
 '''
 
 
-class Panel(object):                 # Meant to be subclassed as either a Row() or Col()
+class Panel(
+        object):                 # Meant to be subclassed as either a Row() or Col()
     def __init__(self):
         self.x = None
         self.y = None
-        # List (left-to-right or bottom-to-top) of JobLayout() or Row()/Col() objects
+        # List (left-to-right or bottom-to-top) of JobLayout() or Row()/Col()
+        # objects
         self.jobs = []
 
     def canonicalize(self):    # Return plain list of JobLayout objects at the roots of all trees
@@ -189,7 +190,7 @@ def findJob(jobname, rotated, Jobs=config.Jobs):
             if existingjob.lower() == fullname.lower():  # job names are case insensitive
                 job = Jobs[existingjob]
                 return jobs.JobLayout(job)
-    except:
+    except Exception:
         pass
 
     # Perhaps we just don't have a rotated job yet
@@ -198,7 +199,7 @@ def findJob(jobname, rotated, Jobs=config.Jobs):
             for existingjob in Jobs.keys():
                 if existingjob.lower() == jobname.lower():  # job names are case insensitive
                     job = Jobs[existingjob]
-        except:
+        except Exception:
             raise RuntimeError("Job name '%s' not found" % jobname)
     else:
         raise RuntimeError("Job name '%s' not found" % jobname)
@@ -297,14 +298,14 @@ def parseLayoutFile(fname):
        Each column consists of a list of either jobs or rows.
        These are recursive, so it can look like:
 
-          [ 
+          [
             Row([JobLayout(), Col([ Row([JobLayout(), JobLayout()]),
                                        JobLayout()       ]),         JobLayout() ]),   # That was row 0
             Row([JobLayout(), JobLayout()])                                            # That was row 1
           ]
 
        This is a panel with two rows. In the first row there is
-       a job, a column, and another job, from left to right. In the 
+       a job, a column, and another job, from left to right. In the
        second row there are two jobs, from left to right.
 
        The column in the first row has two jobs side by side, then

@@ -11,7 +11,7 @@ http://ruggedcircuits.com/gerbmerge
 
 import math
 
-import strokes
+from . import strokes
 
 # Define percentage of cell height and width to determine
 # intercharacter spacing
@@ -39,7 +39,8 @@ RotatedGlyphs = {}
 
 # Default arrow glyph is at 0 degrees rotation, facing left
 ArrowGlyph = [[(0, -BarLength / 2), (0, BarLength / 2)],
-              [(ArrowLength, ArrowWidth / 2), (0, 0), (ArrowLength, -ArrowWidth / 2)],
+              [(ArrowLength, ArrowWidth / 2), (0, 0),
+               (ArrowLength, -ArrowWidth / 2)],
               [(0, 0), (ArrowStemLength, 0)]
               ]
 
@@ -52,7 +53,7 @@ def rotateGlyph(glyph, degrees, glyphName):
     except KeyError:
         pass  # Not cached yet
 
-    rad = degrees/180.0*math.pi
+    rad = degrees / 180.0 * math.pi
     cosx = math.cos(rad)
     sinx = math.sin(rad)
 
@@ -79,9 +80,9 @@ def drawPolyline(fid, L, offX, offY, scale=1):
         X *= scale
         Y *= scale
         if ix == 0:
-            writeFlash(fid, X+offX, Y+offY, 2)
+            writeFlash(fid, X + offX, Y + offY, 2)
         else:
-            writeFlash(fid, X+offX, Y+offY, 1)
+            writeFlash(fid, X + offX, Y + offY, 1)
 
 
 def writeGlyph(fid, glyph, X, Y, degrees, glyphName=None):
@@ -98,7 +99,7 @@ def writeChar(fid, c, X, Y, degrees):
 
     try:
         glyph = strokes.StrokeMap[c]
-    except:
+    except Exception:
         raise RuntimeError('No glyph for character %s' % hex(ord(c)))
 
     writeGlyph(fid, glyph, X, Y, degrees, c)
@@ -117,7 +118,7 @@ def writeString(fid, s, X, Y, degrees):
             dX = -dX
             s = list(s)
             s.reverse()
-            s = string.join(s, '')
+            s = ' '.join(s)
 
     for char in s:
         writeChar(fid, char, posX, posY, degrees)
@@ -150,10 +151,10 @@ def drawDrillHit(fid, X, Y, toolNum):
 
 if __name__ == "__main__":
     import string
-    s = string.digits + string.letters + string.punctuation
-    #s = "The quick brown fox jumped over the lazy dog!"
+    s = string.digits + string.ascii_letters + string.punctuation
+    # s = "The quick brown fox jumped over the lazy dog!"
 
-    fid = file('test.ger', 'wt')
+    fid = open('test.ger', 'wt')
     fid.write("""G75*
 G70*
 %OFA0B0*%

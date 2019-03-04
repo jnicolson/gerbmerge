@@ -16,10 +16,9 @@ http://ruggedcircuits.com/gerbmerge
 
 import sys
 import re
-import string
 import copy
 
-import config
+from . import config
 
 _macro_pat = re.compile(r'^%AM([^*]+)\*$')
 
@@ -74,12 +73,12 @@ def rotatexy(x, y):
 
 def rotatexypair(L, ix):
     """Rotate list items L[ix],L[ix+1] by 90 degrees."""
-    L[ix], L[ix+1] = rotatexy(L[ix], L[ix+1])
+    L[ix], L[ix + 1] = rotatexy(L[ix], L[ix + 1])
 
 
 def swapxypair(L, ix):
     """Swap two list elements."""
-    L[ix], L[ix+1] = L[ix+1], L[ix]
+    L[ix], L[ix + 1] = L[ix + 1], L[ix]
 
 
 def rotatetheta(th):
@@ -116,7 +115,7 @@ class ApertureMacroPrimitive(object):
         # the macro primitive code is outside the range of known types.
         try:
             valids = PrimitiveParmTypes[code]
-        except:
+        except Exception:
             valids = None
 
         if valids is None:
@@ -139,13 +138,13 @@ class ApertureMacroPrimitive(object):
 
             try:
                 N = int(fields[1])
-            except:
+            except Exception:
                 raise RuntimeError(
                     'Outline macro primitive has non-integer number of points')
 
-            if len(fields) != (3+2*N):
+            if len(fields) != (3 + 2 * N):
                 raise RuntimeError(
-                    'Outline macro primitive has %d fields...expecting %d fields' % (len(fields), 3+2*N))
+                    'Outline macro primitive has %d fields...expecting %d fields' % (len(fields), 3 + 2 * N))
         else:
             if len(fields) != len(valids):
                 raise RuntimeError('Macro primitive has %d fields...expecting %d fields' % (
@@ -156,17 +155,18 @@ class ApertureMacroPrimitive(object):
         for parmix in range(len(fields)):
             try:
                 converter = valids[parmix]
-            except:
+            except Exception:
                 converter = float     # To handle variable number of points in Outline type
 
             try:
                 self.parms.append(converter(fields[parmix]))
-            except:
+            except Exception:
                 raise RuntimeError(
-                    'Aperture macro primitive parameter %d has incorrect type' % (parmix+1))
+                    'Aperture macro primitive parameter %d has incorrect type' % (parmix + 1))
 
     def setFromLine(self, line):
-        # Account for DOS line endings and get rid of line ending and '*' at the end
+        # Account for DOS line endings and get rid of line ending and '*' at
+        # the end
         line = line.replace('\x0D', '')
         line = line.rstrip()
         line = line.rstrip('*')
@@ -176,14 +176,14 @@ class ApertureMacroPrimitive(object):
         try:
             try:
                 code = int(fields[0])
-            except:
+            except Exception:
                 raise RuntimeError(
                     'Illegal aperture macro primitive code "%s"' % fields[0])
             self.setFromFields(code, fields[1:])
-        except:
-            print('='*20)
+        except Exception:
+            print('=' * 20)
             print("==> ", line)
-            print('='*20)
+            print('=' * 20)
             raise
 
     def rotate(self):
@@ -191,25 +191,28 @@ class ApertureMacroPrimitive(object):
             pass
         # Line (vector): fields (2,3) and (4,5) must be rotated, no need to
         elif self.code in (2, 20):
-                                  # rotate field 6
+            # rotate field 6
             rotatexypair(self.parms, 2)
             rotatexypair(self.parms, 4)
-        # Line (center): fields (3,4) must be rotated, and field 5 incremented by +90
+        # Line (center): fields (3,4) must be rotated, and field 5 incremented
+        # by +90
         elif self.code == 21:
             rotatexypair(self.parms, 3)
             rotatethelem(self.parms, 5)
-        # Line (lower-left): fields (3,4) must be rotated, and field 5 incremented by +90
+        # Line (lower-left): fields (3,4) must be rotated, and field 5
+        # incremented by +90
         elif self.code == 22:
             rotatexypair(self.parms, 3)
             rotatethelem(self.parms, 5)
-        # Outline: fields (2,3), (4,5), etc. must be rotated, the last field need not be incremented
+        # Outline: fields (2,3), (4,5), etc. must be rotated, the last field
+        # need not be incremented
         elif self.code == 4:
             ix = 2
             # parms[1] is the number of points
             for pts in range(self.parms[1]):
                 rotatexypair(self.parms, ix)
                 ix += 2
-            #rotatethelem(self.parms, ix)
+            # rotatethelem(self.parms, ix)
         # Polygon: fields (2,3) must be rotated, and field 5 incremented by +90
         elif self.code == 5:
             rotatexypair(self.parms, 2)
@@ -233,7 +236,7 @@ class ApertureMacroPrimitive(object):
             try:
                 if valids[parmix] is int:
                     format = ',%d'
-            except:
+            except Exception:
                 pass    # '%f' is OK for Outline extra points
 
             s += format % self.parms[parmix]
@@ -262,7 +265,7 @@ class ApertureMacro(object):
         # number of aperture macros by stripping off the leading character.
         M = copy.deepcopy(self)
         M.rotate()
-        M.name = 'R'+M.name[1:]
+        M.name = 'R' + M.name[1:]
         return M
 
     def dump(self, fid=sys.stdout):
@@ -276,7 +279,7 @@ class ApertureMacro(object):
     def hash(self):
         s = ''
         for prim in self.prim:
-            s += '  '+str(prim)+'\n'
+            s += '  ' + str(prim) + '\n'
         return s
 
     def writeDef(self, fid):
@@ -317,15 +320,14 @@ def addToApertureMacroTable(AM):
 
     # Must sort keys by integer value, not string since 99 comes before 100
     # as an integer but not a string.
-    keys = map(int, map(lambda K: K[1:], GAMT.keys()))
-    keys.sort()
+    keys = sorted(map(int, map(lambda K: K[1:], GAMT.keys())))
 
     if len(keys):
         lastCode = keys[-1]
     else:
         lastCode = 0
 
-    mcode = 'M%d' % (lastCode+1)
+    mcode = 'M%d' % (lastCode + 1)
     AM.name = mcode
     GAMT[mcode] = AM
 
@@ -345,14 +347,23 @@ if __name__ == "__main__":
 
     # A circle in the top-right quadrant, touching the axes
     M.add(ApertureMacroPrimitive(1, ('1', '0.02', '0.01', '0.01')))
-    # A line of slope -1 centered on the above circle, of thickness 5mil, length 0.05
+    # A line of slope -1 centered on the above circle, of thickness 5mil,
+    # length 0.05
     M.add(ApertureMacroPrimitive(
         2, ('1', '0.005', '0.0', '0.02', '0.02', '0.0', '0.0')))
     # A narrow vertical rectangle centered on the circle of width 2.5mil
     M.add(ApertureMacroPrimitive(
         21, ('1', '0.0025', '0.03', '0.01', '0.01', '0.0')))
     # A 45-degree line in the third quadrant, not quite touching the origin
-    M.add(ApertureMacroPrimitive(22, ('1', '0.02', '0.01', '-0.03', '-0.03', '45')))
+    M.add(
+        ApertureMacroPrimitive(
+            22,
+            ('1',
+             '0.02',
+             '0.01',
+             '-0.03',
+             '-0.03',
+             '45')))
     # A right triangle in the second quadrant
     M.add(ApertureMacroPrimitive(4, ('1', '4', '-0.03', '0.01',
                                      '-0.03', '0.03', '-0.01', '0.01', '-0.03', '0.01', '0.0')))

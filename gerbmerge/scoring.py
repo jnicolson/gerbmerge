@@ -9,9 +9,7 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 
-import config
-import util
-import makestroke
+from . import config, makestroke, util
 
 
 def addHorizontalLine(Lines, x1, x2, y, extents):
@@ -77,7 +75,7 @@ def mergeHLines(Lines):
 
     # First, make sure lines are sorted by starting X ordinate and that all lines
     # proceed to the right.
-    Lines.sort()
+    Lines = sorted(Lines)
     for line in Lines:
         assert line[0] < line[2]
 
@@ -99,7 +97,7 @@ def mergeHLines(Lines):
         else:
             # If the line to examine starts to the left of (within 0.002") the end
             # of the current line, extend the current line.
-            if line[0] <= currLine[2]+0.002:
+            if line[0] <= currLine[2] + 0.002:
                 currLine = (currLine[0], yavg, max(line[2], currLine[2]), yavg)
             else:
                 NewLines.append(currLine)
@@ -110,18 +108,14 @@ def mergeHLines(Lines):
     return NewLines
 
 
-def sortByY(A, B):
-    "Helper function to sort two lines (4-tuples) by their starting Y ordinate"
-    return cmp(A[1], B[1])
-
-
 def mergeVLines(Lines):
     """Lines is a list of 4-tuples (lines) that have nearly the same X ordinate and are to be
     optimized by combining overlapping lines."""
 
     # First, make sure lines are sorted by starting Y ordinate and that all lines
     # proceed up.
-    # TODO: Check if this is correct (used to use sortByY helper function above)
+    # TODO: Check if this is correct (used to use sortByY helper function
+    # above)
     Lines = sorted(Lines, key=lambda line: line[1])
     for line in Lines:
         assert line[1] < line[3]
@@ -144,7 +138,7 @@ def mergeVLines(Lines):
         else:
             # If the line to examine starts below (within 0.002") the end
             # of the current line, extend the current line.
-            if line[1] <= currLine[3]+0.002:
+            if line[1] <= currLine[3] + 0.002:
                 currLine = (xavg, currLine[1], xavg, max(line[3], currLine[3]))
             else:
                 NewLines.append(currLine)
@@ -192,7 +186,8 @@ def mergeLines(Lines):
         # lines with this Y ordinate.
         NewHLines[yval] = []
 
-        # Try to extend the first element of this list, which will be the leftmost.
+        # Try to extend the first element of this list, which will be the
+        # leftmost.
         xline = lines[0]
         for line in lines[1:]:
             # If this line's left edge is within 2 mil of the right edge of the line
@@ -214,7 +209,8 @@ def mergeLines(Lines):
         # lines with this X ordinate.
         NewVLines[xval] = []
 
-        # Try to extend the first element of this list, which will be the bottom-most.
+        # Try to extend the first element of this list, which will be the
+        # bottom-most.
         xline = lines[0]
         for line in lines[1:]:
             # If this line's bottom edge is within 2 mil of the top edge of the line
@@ -274,8 +270,8 @@ def writeScoring(fid, Place, OriginX, OriginY, MaxXExtent, MaxYExtent):
     # For each job, write out 4 score lines, above, to the right, below, and
     # to the left. After we collect all potential scoring lines, we worry
     # about merging, etc.
-    dx = config.Config['xspacing']/2.0
-    dy = config.Config['yspacing']/2.0
+    dx = config.Config['xspacing'] / 2.0
+    dy = config.Config['yspacing'] / 2.0
     extents = (OriginX, OriginY, MaxXExtent, MaxYExtent)
 
     Lines = []

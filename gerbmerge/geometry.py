@@ -11,37 +11,30 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 
-import math
-
-# Ensure all list elements are unique
-
 
 def uniqueify(L):
+    # Ensure all list elements are unique
     return list({}.fromkeys(L).keys())
-
-# This function rounds an (X,Y) point to integer co-ordinates
 
 
 def roundPoint(pt):
+    # This function rounds an (X,Y) point to integer co-ordinates
     return (int(round(pt[0])), int(round(pt[1])))
-
-# Returns True if the segment defined by endpoints p1 and p2 is vertical
 
 
 def isSegmentVertical(p1, p2):
+    # Returns True if the segment defined by endpoints p1 and p2 is vertical
     return p1[0] == p2[0]
-
-# Returns True if the segment defined by endpoints p1 and p2 is horizontal
 
 
 def isSegmentHorizontal(p1, p2):
+    # Returns True if the segment defined by endpoints p1 and p2 is horizontal
     return p1[1] == p2[1]
-
-# Returns slope of a non-vertical line segment
 
 
 def segmentSlope(p1, p2):
-    return float(p2[1]-p1[1])/(p2[0]-p1[0])
+    # Returns slope of a non-vertical line segment
+    return float(p2[1] - p1[1]) / (p2[0] - p1[0])
 
 # Determine if the (X,Y) 'point' is on the line segment defined by endpoints p1
 # and p2, both (X,Y) tuples. It's assumed that the point is on the line defined
@@ -53,10 +46,11 @@ def segmentSlope(p1, p2):
 def isPointOnSegment(point, p1, p2):
     if isSegmentVertical(p1, p2):
         # Treat vertical lines by comparing Y-ordinates
-        return (point[1]-p2[1])*(point[1]-p1[1]) <= 0
+        return (point[1] - p2[1]) * (point[1] - p1[1]) <= 0
     else:
-        # Treat other lines, including horizontal lines, by comparing X-ordinates
-        return (point[0]-p2[0])*(point[0]-p1[0]) <= 0
+        # Treat other lines, including horizontal lines, by comparing
+        # X-ordinates
+        return (point[0] - p2[0]) * (point[0] - p1[0]) <= 0
 
 # Returns (X,Y) point where the line segment defined by (X,Y) endpoints p1 and
 # p2 intersects the line segment defined by endpoints q1 and q2. Only a single
@@ -70,16 +64,17 @@ def segmentXsegment1pt(p1, p2, q1, q2):
     P, Q = q1
     R, S = q2
 
-    # We have to consider special cases of one or other line segments being vertical
+    # We have to consider special cases of one or other line segments being
+    # vertical
     if isSegmentVertical(p1, p2):
         if isSegmentVertical(q1, q2):
             return None
 
         x = A
-        y = segmentSlope(q1, q2)*(A-P) + Q
+        y = segmentSlope(q1, q2) * (A - P) + Q
     elif isSegmentVertical(q1, q2):
         x = P
-        y = segmentSlope(p1, p2)*(P-A) + B
+        y = segmentSlope(p1, p2) * (P - A) + B
     else:
         m1 = segmentSlope(p1, p2)
         m2 = segmentSlope(q1, q2)
@@ -87,10 +82,11 @@ def segmentXsegment1pt(p1, p2, q1, q2):
         if m1 == m2:
             return None
 
-        x = (A*m1 - B - P*m2 + Q) / (m1-m2)
-        y = m1*(x-A) + B
+        x = (A * m1 - B - P * m2 + Q) / (m1 - m2)
+        y = m1 * (x - A) + B
 
-    # Candidate point identified. Check to make sure it's on both line segments.
+    # Candidate point identified. Check to make sure it's on both line
+    # segments.
     if isPointOnSegment((x, y), p1, p2) and isPointOnSegment((x, y), q1, q2):
         return roundPoint((x, y))
     else:
@@ -169,7 +165,8 @@ def segmentXbox(pt1, pt2, llpt, urpt):
     # corner intersections, which are sometimes legal (when one segment endpoint
     # is inside the box and the other isn't, or when the segment intersects the
     # box in two places) and sometimes not (when the segment is "tangent" to
-    # the box at the corner and the corner is the signle point of intersection).
+    # the box at the corner and the corner is the signle point of
+    # intersection).
     L = []
     corners = []
 
@@ -181,7 +178,8 @@ def segmentXbox(pt1, pt2, llpt, urpt):
     # otherwise it means the segment is "tangent" to the box at that corner.
     # There is a case, however, in which a corner is a point of intersection
     # with both segment points outside the box, and that is if there are two
-    # points of intersection, i.e., the segment goes completely through the box.
+    # points of intersection, i.e., the segment goes completely through the
+    # box.
 
     def checkIntersection(corner1, corner2):
         # Check intersection with side of box
@@ -199,7 +197,8 @@ def segmentXbox(pt1, pt2, llpt, urpt):
             else:
                 # Potentially a point of intersection...we'll have to wait and
                 corners.append(pt)
-                # see if there is one more point of intersection somewhere else.
+                # see if there is one more point of intersection somewhere
+                # else.
         else:
             # Not a corner intersection, so it's valid
             if pt is not None:
@@ -225,10 +224,11 @@ def segmentXbox(pt1, pt2, llpt, urpt):
     # If the total number of intersections len(L)+len(corners) is 2, the corner
     # is valid. If there is only a single corner, it's a tangent and invalid.
     # However, if both corners are on the same side of the box, it's not valid.
-    numPts = len(L)+len(corners)
+    numPts = len(L) + len(corners)
     assert numPts <= 2
     if numPts == 2:
-        if len(corners) == 2 and (isSegmentHorizontal(corners[0], corners[1]) or isSegmentVertical(corners[0], corners[1])):
+        if len(corners) == 2 and (isSegmentHorizontal(
+                corners[0], corners[1]) or isSegmentVertical(corners[0], corners[1])):
             return []
         else:
             L += corners
@@ -257,7 +257,8 @@ def areExtentsOverlapping(E1, E2, allowLines=False):
         else:
             return True
     else:
-        if (minU >= maxX) or (maxU <= minX) or (minV >= maxY) or (maxV <= minY):
+        if (minU >= maxX) or (maxU <= minX) or (
+                minV >= maxY) or (maxV <= minY):
             return False
         else:
             return True
@@ -294,13 +295,13 @@ def isRect1InRect2(E1, E2):
 # Return width of rectangle, which may be 0 if bottom-left and upper-right X
 # positions are the same. The rectangle is a 4-tuple (minx,miny,maxx,maxy).
 def rectWidth(rect):
-    return abs(rect[2]-rect[0])
+    return abs(rect[2] - rect[0])
 
 
 # Return height of rectangle, which may be 0 if bottom-left and upper-right Y
 # positions are the same. The rectangle is a 4-tuple (minx,miny,maxx,maxy).
 def rectHeight(rect):
-    return abs(rect[3]-rect[1])
+    return abs(rect[3] - rect[1])
 
 
 # Return center (X,Y) co-ordinates of rectangle.
@@ -309,13 +310,13 @@ def rectCenter(rect):
     dy = rectHeight(rect)
 
     if dx & 1:    # Odd width: center is (left+right)/2 + 1/2
-        X = (rect[0] + rect[2] + 1)/2
+        X = (rect[0] + rect[2] + 1) / 2
     else:         # Even width: center is (left+right)/2
-        X = (rect[0] + rect[2])/2
+        X = (rect[0] + rect[2]) / 2
 
     if dy & 1:
-        Y = (rect[1] + rect[3] + 1)/2
+        Y = (rect[1] + rect[3] + 1) / 2
     else:
-        Y = (rect[1] + rect[3])/2
+        Y = (rect[1] + rect[3]) / 2
 
     return (X, Y)

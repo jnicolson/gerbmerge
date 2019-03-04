@@ -13,11 +13,8 @@ http://ruggedcircuits.com/gerbmerge
 
 import sys
 import re
-import string
 
-import config
-import amacro
-import util
+from . import amacro, config, util
 
 # Recognized apertures and re pattern that matches its definition Thermals and
 # annuli are generated using macros (see the eagle.def file) but only on inner
@@ -25,34 +22,21 @@ import util
 # specially as the Eagle macro uses a replaceable macro parameter ($1) and
 # GerbMerge doesn't handle these yet...only fixed macros (no parameters) are
 # currently supported.
-Apertures = (
-    ('Rectangle', re.compile(
-        r'^%AD(D\d+)R,([^X]+)X([^*]+)\*%$'), '%%AD%sR,%.5fX%.5f*%%\n'),
-    ('Circle',    re.compile(
-        r'^%AD(D\d+)C,([^*]+)\*%$'),         '%%AD%sC,%.5f*%%\n'),
-    ('Oval',      re.compile(
-        r'^%AD(D\d+)O,([^X]+)X([^*]+)\*%$'), '%%AD%sO,%.5fX%.5f*%%\n'),
+Apertures = {
+    'Rectangle': (re.compile(r'^%AD(D\d+)R,([^X]+)X([^*]+)\*%$'), r'%%AD%sR,%.5fX%.5f*%%\n'),
+    'Circle': (re.compile(r'^%AD(D\d+)C,([^*]+)\*%$'), r'%%AD%sC,%.5f*%%\n'),
+    'Oval': (re.compile(r'^%AD(D\d+)O,([^X]+)X([^*]+)\*%$'), r'%%AD%sO,%.5fX%.5f*%%\n'),
     # Specific to Eagle
-    ('Octagon',   re.compile(
-        r'^%AD(D\d+)OC8,([^*]+)\*%$'),       '%%AD%sOC8,%.5f*%%\n'),
-    ('Macro',     re.compile(
-        r'^%AD(D\d+)([^*]+)\*%$'),           '%%AD%s%s*%%\n')
-)
-
-# This loop defines names in this module like 'Rectangle',
-# which are element 0 of the Apertures list above. So code
-# will be like:
-#       import aptable
-#       A = aptable.Aperture(aptable.Rectangle, ......)
-
-for ap in Apertures:
-    globals()[ap[0]] = ap
+    'Octagon': (re.compile(r'^%AD(D\d+)OC8,([^*]+)\*%$'), r'%%AD%sOC8,%.5f*%%\n'),
+    'Macro': (re.compile(r'^%AD(D\d+)([^*]+)\*%$'), r'%%AD%s%s*%%\n')
+}
 
 
 class Aperture(object):
     def __init__(self, aptype, code, dimx, dimy=None):
         assert aptype in Apertures
-        self.apname, self.pat, self.format = aptype
+        self.apname = aptype
+        self.pat, self.format = Apertures[aptype]
         self.code = code
         self.dimx = dimx      # Macro name for Macro apertures
         self.dimy = dimy      # None for Macro apertures
@@ -69,21 +53,22 @@ class Aperture(object):
         dx = util.in2gerb(self.dimx)
         dy = util.in2gerb(self.dimy)
 
-        # Odd-sized: X extents are (dx+1)/2 on the left and (dx-1)/2 on the right
+        # Odd-sized: X extents are (dx+1)/2 on the left and (dx-1)/2 on the
+        # right
         if dx & 1:
-            xm = int((dx+1)/2)
-            xp = xm-1
+            xm = int((dx + 1) / 2)
+            xp = xm - 1
         else:         # Even-sized: X extents are X-dx/2 and X+dx/2
-            xm = xp = int(dx/2)
+            xm = xp = int(dx / 2)
 
         # Odd-sized: Y extents are (dy+1)/2 below and (dy-1)/2 above
         if dy & 1:
-            ym = int((dy+1)/2)
-            yp = ym-1
+            ym = int((dy + 1) / 2)
+            yp = ym - 1
         else:         # Even-sized: Y extents are Y-dy/2 and Y+dy/2
-            ym = yp = int(dy/2)
+            ym = yp = int(dy / 2)
 
-        return (X-xm, Y-ym, X+xp, Y+yp)
+        return (X - xm, Y - ym, X + xp, Y + yp)
 
     def getAdjusted(self, minimum):
         """
@@ -93,18 +78,18 @@ class Aperture(object):
         dimx = dimy = None
 
         # Check for X and Y dimensions less than minimum
-        if (self.dimx != None) and (self.dimx < minimum):
+        if (self.dimx is not None) and (self.dimx < minimum):
             dimx = minimum
-        if (self.dimy != None) and (self.dimx < minimum):
+        if (self.dimy is not None) and (self.dimx < minimum):
             dimy = minimum
 
         # Return new aperture if needed
-        if (dimx != None) or (dimy != None):
-            if dimx == None:
+        if (dimx is not None) or (dimy is not None):
+            if dimx is None:
                 dimx = self.dimx
-            if dimy == None:
+            if dimy is None:
                 dimy = self.dimy
-            return Aperture((self.apname, self.pat, self.format), self.code, dimx, dimy)
+            return Aperture(self.apname, self.code, dimx, dimy)
         else:
             return False  # no new aperture needs to be created
 
@@ -130,9 +115,9 @@ class Aperture(object):
             self.dimy = t
 
     def rotated(self, RevGAMT):
-        # deepcopy doesn't work on re patterns for some reason so we copy ourselves manually
-        APR = Aperture((self.apname, self.pat, self.format),
-                       self.code, self.dimx, self.dimy)
+        # deepcopy doesn't work on re patterns for some reason so we copy
+        # ourselves manually
+        APR = Aperture(self.apname, self.code, self.dimx, self.dimy)
         APR.rotate(RevGAMT)
         return APR
 
@@ -172,17 +157,17 @@ class Aperture(object):
 
 
 def parseAperture(s, knownMacroNames):
-    for ap in Apertures:
-        match = ap[1].match(s)
+    for key in Apertures:
+        match = Apertures[key][0].match(s)
         if match:
             dimy = None
-            if ap[0] in ('Circle', 'Octagon', 'Macro'):
+            if key in ('Circle', 'Octagon', 'Macro'):
                 code, dimx = match.groups()
             else:
                 code, dimx, dimy = match.groups()
 
-            if ap[0] in ('Macro',):
-                if knownMacroNames.has_key(dimx):
+            if key in ('Macro',):
+                if dimx in knownMacroNames:
                     # dimx is now GLOBAL, permanent macro name (e.g., 'M2')
                     dimx = knownMacroNames[dimx]
                 else:
@@ -193,10 +178,10 @@ def parseAperture(s, knownMacroNames):
                     dimx = float(dimx)
                     if dimy:
                         dimy = float(dimy)
-                except:
+                except Exception:
                     raise RuntimeError("Illegal floating point aperture size")
 
-            return Aperture(ap, code, dimx, dimy)
+            return Aperture(key, code, dimx, dimy)
 
     return None
 
@@ -233,7 +218,7 @@ def constructApertureTable(fileList):
 
     AT = {}               # Aperture Table for this file
     for fname in fileList:
-        #print('Reading apertures from %s ...' % fname)
+        # print('Reading apertures from %s ...' % fname)
 
         knownMacroNames = {}
 
@@ -251,7 +236,8 @@ def constructApertureTable(fileList):
             if line[:7] == '%AMOC8*':
                 continue
 
-            # parseApertureMacro() sucks up all macro lines up to terminating '%'
+            # parseApertureMacro() sucks up all macro lines up to terminating
+            # '%'
             AM = amacro.parseApertureMacro(line, fid)
             if AM:
                 # Has this macro definition already been defined (perhaps by another name
@@ -259,11 +245,13 @@ def constructApertureTable(fileList):
                 try:
                     # If this macro has already been encountered anywhere in any job,
                     # RevGAMT will map the macro hash to the global macro name. Then,
-                    # make the local association knownMacroNames[localMacroName] = globalMacroName.
+                    # make the local association
+                    # knownMacroNames[localMacroName] = globalMacroName.
                     knownMacroNames[AM.name] = RevGAMT[AM.hash()]
                 except KeyError:
                     # No, so define the global macro and do the translation. Note that
-                    # addToApertureMacroTable() MODIFIES AM.name to the new M-name.
+                    # addToApertureMacroTable() MODIFIES AM.name to the new
+                    # M-name.
                     localMacroName = AM.name
                     AM = amacro.addToApertureMacroTable(AM)
                     knownMacroNames[localMacroName] = AM.name
@@ -287,8 +275,7 @@ def constructApertureTable(fileList):
         code += 1
 
     if 0:
-        keylist = config.GAT.keys()
-        keylist.sort()
+        keylist = sorted(config.GAT.keys())
         print('Apertures')
         print('=========')
         for key in keylist:
@@ -301,8 +288,7 @@ def findHighestApertureCode(keys):
 
     # Must sort keys by integer value, not string since 99 comes before 100
     # as an integer but not a string.
-    keys = [int(K[1:]) for K in keys]
-    keys.sort()
+    keys = sorted([int(K[1:]) for K in keys])
 
     return keys[-1]
 
@@ -311,7 +297,7 @@ def addToApertureTable(AP):
     GAT = config.GAT
 
     lastCode = findHighestApertureCode(GAT.keys())
-    code = 'D%d' % (lastCode+1)
+    code = 'D%d' % (lastCode + 1)
     GAT[code] = AP
     AP.code = code
 
@@ -344,8 +330,7 @@ def findOrAddAperture(AP):
 if __name__ == "__main__":
     constructApertureTable(sys.argv[1:])
 
-    keylist = config.GAMT.keys()
-    keylist.sort()
+    keylist = sorted(config.GAMT.keys())
     print('Aperture Macros')
     print('===============')
     for key in keylist:
