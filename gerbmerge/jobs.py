@@ -13,6 +13,7 @@ http://ruggedcircuits.com/gerbmerge
 """
 
 import builtins
+import copy
 
 from . import (aptable, config, makestroke, util)
 from .gerber import GerberParser
@@ -470,7 +471,7 @@ class JobLayout(object):
         total = 0
         for tool in tools:
             try:
-                total += len(self.job.xcommands[tool])
+                total += len(self.job.drills.xcommands[tool])
             except Exception:
                 pass
 
@@ -507,7 +508,7 @@ def rotateJob(job, degrees=90, firstpass=True):
     RevGAMT = config.buildRevDict(GAMT)  # RevGAMT[hash] = aperturemacroname
 
     # Keep list of tool diameters and default tool list
-    J.drills = job.drills
+    J.drills = copy.deepcopy(job.drills)
     # J.xdiam = job.xdiam
     # J.ToolList = job.ToolList
     J.Repeat = job.Repeat

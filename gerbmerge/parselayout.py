@@ -45,8 +45,7 @@ int := [0-9]+
 '''
 
 
-class Panel(
-        object):                 # Meant to be subclassed as either a Row() or Col()
+class Panel(object):  # Meant to be subclassed as either a Row() or Col()
     def __init__(self):
         self.x = None
         self.y = None
@@ -190,8 +189,6 @@ def findJob(jobname, rotated, Jobs=config.Jobs):
         for existingjob in Jobs.keys():
             if existingjob.lower() == fullname.lower():  # job names are case insensitive
                 job = Jobs[existingjob]
-                # TODO: Cleanup line below
-                print(" a {}".format(job.drills))
                 return jobs.JobLayout(job)
     except Exception:
         pass
