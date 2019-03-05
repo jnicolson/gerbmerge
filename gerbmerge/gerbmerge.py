@@ -155,10 +155,16 @@ def writeGerberFooter(fid):
 
 def writeExcellonHeader(fid):
     if config.Config['measurementunits'] != 'inch':  # metric - mm
-        fid.write(
-            """M48
+        fid.write("""M48
 METRIC,0000.00
 """)
+    else:
+        fid.write("""M48
+INCH
+""")
+
+
+def writeExcellonEndHeader(fid):
     fid.write('%\n')
 
 
@@ -166,8 +172,12 @@ def writeExcellonFooter(fid):
     fid.write('M30\n')
 
 
-def writeExcellonTool(fid, tool, size):
+def writeExcellonToolHeader(fid, tool, size):
     fid.write('%sC%f\n' % (tool, size))
+
+
+def writeExcellonTool(fid, tool):
+    fid.write('%s\n' % tool)
 
 
 def writeFiducials(fid, drawcode, OriginX, OriginY, MaxXExtent, MaxYExtent):
@@ -738,6 +748,16 @@ def merge(args, gui=None):
     fid = open(fullname, 'wt')
 
     writeExcellonHeader(fid)
+    for tool in Tools:
+        try:
+            size = config.GlobalToolMap[tool]
+        except Exception:
+            raise RuntimeError(
+                "INTERNAL ERROR: Tool code %s not found in global tool map" % tool)
+
+        writeExcellonToolHeader(fid, tool, size)
+    writeExcellonEndHeader(fid)
+
 
     # Ensure each one of our tools is represented in the tool list specified
     # by the user.
@@ -748,7 +768,7 @@ def merge(args, gui=None):
             raise RuntimeError(
                 "INTERNAL ERROR: Tool code %s not found in global tool map" % tool)
 
-        writeExcellonTool(fid, tool, size)
+        writeExcellonTool(fid, tool)
 
         # for row in Layout:
         #  row.writeExcellon(fid, size)
