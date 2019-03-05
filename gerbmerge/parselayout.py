@@ -16,6 +16,7 @@ Version 3.  See http://www.fsf.org for details of the license.
 Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
+import copy
 import sys
 
 from simpleparse.parser import Parser
@@ -44,8 +45,7 @@ int := [0-9]+
 '''
 
 
-class Panel(
-        object):                 # Meant to be subclassed as either a Row() or Col()
+class Panel(object):  # Meant to be subclassed as either a Row() or Col()
     def __init__(self):
         self.x = None
         self.y = None

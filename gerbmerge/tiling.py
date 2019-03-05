@@ -18,6 +18,7 @@ Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
 
+import copy
 import sys
 import math
 
@@ -83,7 +84,10 @@ class Tiling(object):
             self.xmax - config.Config['xspacing'],
             self.ymax - config.Config['yspacing'])
         T.points = self.points[:]
-        T.jobs = self.jobs[:]
+
+        # TODO: revert the stuff below
+        #T.jobs = self.jobs[:]
+        T.jobs = copy.deepcopy(self.jobs)
         return T
 
     def dump(self, fid=sys.stdout):

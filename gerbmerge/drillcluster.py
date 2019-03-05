@@ -111,7 +111,7 @@ def remap(jobs, globalToolMap, debug=None):
         debug_print(str(job.xcommands))
         new_tools = {}
         new_commands = {}
-        for tool, diam in job.xdiam.items():
+        for tool, diam in job.drills.xdiam.items():
 
             # debug_print("\n  Current tool: " + tool + " (" + str_d(diam) + ")")
 
@@ -130,18 +130,18 @@ def remap(jobs, globalToolMap, debug=None):
             if best_tool in new_commands:
                 # debug_print( "Current commands: " + str( new_commands[best_tool] ) )
                 temp = new_commands[best_tool]
-                temp.extend(job.xcommands[tool])
+                temp.extend(job.drills.xcommands[tool])
                 new_commands[best_tool] = temp
                 # debug_print( "All commands: " + str( new_commands[best_tool] ) )
             else:
-                new_commands[best_tool] = job.xcommands[tool]
+                new_commands[best_tool] = job.drills.xcommands[tool]
 
         debug_print("\n  New job tools:")
         debug_print(str(new_tools))
         debug_print("\n  New commands:")
         debug_print(str(new_commands))
-        job.xdiam = new_tools
-        job.xcommands = new_commands
+        job.drills.xdiam = new_tools
+        job.drills.xcommands = new_commands
 
 
 def debug_print(text, status=False, newLine=True):
