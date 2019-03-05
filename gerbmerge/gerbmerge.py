@@ -25,7 +25,6 @@ http://ruggedcircuits.com/gerbmerge
 """
 
 import sys
-import getopt
 
 from . import (aptable, config, drillcluster, fabdrawing, jobs, parselayout,
                placement, schwartz, scoring, strokes, tilesearch1, tilesearch2,
@@ -310,6 +309,7 @@ def tile_jobs(Jobs):
         Ydim = job.height_in()
         # NOTE: This will only try 90 degree rotations though 180 & 270 are
         # available
+
         rjob = jobs.rotateJob(job, 90)
 
         for count in range(job.Repeat):
@@ -357,7 +357,7 @@ def merge(args, gui=None):
     if args.place_file:
         config.AutoSearchType = FROM_FILE
         config.PlacementFile = args.place_file
-    
+
     if args.no_trim_gerber:
         config.TrimGerber = 0
 
@@ -403,6 +403,7 @@ def merge(args, gui=None):
             print('  Size: %5.3fmm x %5.3fmm' %
                   (job.width_in(), job.height_in()))
         print("\n")
+
 
     # Trim drill locations and flash data to board extents
     if config.TrimExcellon:
@@ -524,6 +525,7 @@ def merge(args, gui=None):
         # Determine which apertures and macros are truly needed
         apUsedDict = {}
         apmUsedDict = {}
+
         for job in Place.jobs:
             apd, apmd = job.aperturesAndMacros(layername)
             apUsedDict.update(apd)
@@ -554,13 +556,13 @@ def merge(args, gui=None):
                         job = joblayout.job  # access job inside job layout
                         temp = []
                         if job.hasLayer(layername):
-                            for x in job.commands[layername]:
+                            for x in job.gerbers[layername].commands:
                                 if x == ap:
                                     # replace old aperture with new one
                                     temp.append(new_code)
                                 else:
                                     temp.append(x)  # keep old command
-                            job.commands[layername] = temp
+                            job.gerbers[layername].commands = temp
 
         if config.Config['cutlinelayers'] and (
                 layername in config.Config['cutlinelayers']):
@@ -679,8 +681,9 @@ def merge(args, gui=None):
     # of tools.
     if 0:
         Tools = {}
+
         for job in config.Jobs.values():
-            for key in job.xcommands.keys():
+            for key in job.drills.xcommands.keys():
                 Tools[key] = 1
 
         Tools = sorted(Tools.keys())
@@ -689,7 +692,8 @@ def merge(args, gui=None):
 
         # First construct global mapping of diameters to tool numbers
         for job in config.Jobs.values():
-            for tool, diam in job.xdiam.items():
+
+            for tool, diam in job.drills.xdiam.items():
                 if diam in config.GlobalToolRMap:
                     continue
 
@@ -793,12 +797,10 @@ def merge(args, gui=None):
     print('-' * 50)
     # add metric support (1/1000 mm vs. 1/100,000 inch)
     if config.Config['measurementunits'] == 'inch':
-        print('     Job Size : %f" x %f"' %
-              (MaxXExtent - OriginX, MaxYExtent - OriginY))
+        print('     Job Size : %f" x %f"' % (MaxXExtent - OriginX, MaxYExtent - OriginY))
         print('     Job Area : %.2f sq. in.' % totalarea)
     else:
-        print('     Job Size : %.2fmm x %.2fmm' %
-              (MaxXExtent - OriginX, MaxYExtent - OriginY))
+        print('     Job Size : %.2fmm x %.2fmm' % (MaxXExtent - OriginX, MaxYExtent - OriginY))
         print('     Job Area : %.0f mm2' % totalarea)
 
     print('   Area Usage : %.1f%%' % (jobarea / totalarea * 100))

@@ -246,7 +246,7 @@ def tile_search1(Jobs, X, Y):
     try:
         _tile_search1(Jobs, tiling.Tiling(X, Y), 1)
         printTilingStats()
-        print
+        print("")
     except KeyboardInterrupt:
         printTilingStats()
         print("\n")

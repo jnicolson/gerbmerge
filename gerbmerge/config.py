@@ -254,12 +254,9 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
 
             elif opt in ('fabricationdrawing', 'outlinelayer'):
                 print('*' * 73)
-                print(
-                    '\nThe FabricationDrawing and OutlineLayer configuration options have been')
-                print(
-                    'renamed as of GerbMerge version 1.0. Please consult the documentation for')
-                print(
-                    'a description of the new options, then modify your configuration file.\n')
+                print('\nThe FabricationDrawing and OutlineLayer configuration options have been')
+                print('renamed as of GerbMerge version 1.0. Please consult the documentation for')
+                print('a description of the new options, then modify your configuration file.\n')
                 print('*' * 73)
                 sys.exit(1)
             else:
@@ -397,6 +394,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
         # the user wrote them, and we may get Gerber files before we get a tool
         # list! Same thing goes for ExcellonDecimals. We need to know what this is
         # before parsing any Excellon files.
+        excellon_decimals = Config['excellondecimals']
         for layername in cp.options(jobname):
             fname = cp.get(jobname, layername)
 
@@ -404,7 +402,7 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
                 J.ToolList = parseToolList(fname)
             elif layername == 'excellondecimals':
                 try:
-                    J.ExcellonDecimals = int(fname)
+                    excellon_decimals = int(fname)
                 except Exception:
                     raise RuntimeError(
                         "Excellon decimals '%s' in config file is not a valid integer" % fname)
@@ -423,11 +421,11 @@ def parseConfigFile(fname, Config=Config, Jobs=Jobs):
             elif layername[0] == '*':
                 J.parseGerber(fname, layername, updateExtents=0)
             elif layername == 'drills':
-                J.parseExcellon(fname)
+                J.parseExcellon(fname, excellon_decimals)
 
         # Emit warnings if some layers are missing
         ll = LayerList.copy()
-        for layername in J.apxlat.keys():
+        for layername in J.gerbers.keys():
             assert layername in ll
             del ll[layername]
 

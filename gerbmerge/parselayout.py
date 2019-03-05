@@ -16,6 +16,7 @@ Version 3.  See http://www.fsf.org for details of the license.
 Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
+import copy
 import sys
 
 from simpleparse.parser import Parser
@@ -189,6 +190,8 @@ def findJob(jobname, rotated, Jobs=config.Jobs):
         for existingjob in Jobs.keys():
             if existingjob.lower() == fullname.lower():  # job names are case insensitive
                 job = Jobs[existingjob]
+                # TODO: Cleanup line below
+                print(" a {}".format(job.drills))
                 return jobs.JobLayout(job)
     except Exception:
         pass
