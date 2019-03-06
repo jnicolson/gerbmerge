@@ -16,7 +16,7 @@ format_pat = re.compile(r'%FS(L|T)?(A|I)(N\d+)?(X\d\d)(Y\d\d)\*%')  # Format sta
 layerpol_pat = re.compile(r'^%LP[CD]\*%')  # Layer polarity (D=dark, C=clear)
 
 # Gerber X2
-attr_pat = re.compile(r'^\%TF\.(.*?),(.*)\*\%$')
+attr_pat = re.compile(r'\%TF\.(.*?),(.*)\*\%')
 
 # Circular interpolation drawing commands (from Protel)
 cdrawXY_pat = re.compile(r'X([+-]?\d+)Y([+-]?\d+)I([+-]?\d+)J([+-]?\d+)D0?([123])\*')
@@ -87,6 +87,8 @@ class GerberParser(object):
         # header of the merged file. Once again, the list of apertures refers to
         # GLOBAL aperture codes in the GAT, not ones local to this layer.
         self.apertures = []
+
+        self.attributes = []
 
         self.filename = ""
         self.update_extents = 0
@@ -178,6 +180,11 @@ class GerberParser(object):
             match = layerpol_pat.match(line)
             if match:
                 self.commands.append(line)
+                continue
+
+            match = attr_pat.match(line)
+            if match:
+                self.attributes.append({"name": match.group(1), "value": match.group(2)})
                 continue
 
             # See if this is an aperture definition, and if so, map it.
