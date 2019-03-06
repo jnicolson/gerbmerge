@@ -472,11 +472,12 @@ class JobLayout(object):
                 total += len(self.job.drills.xcommands[tool])
             except Exception:
                 pass
+        return total
+
     @property
     def width(self):
         return self.job.width
 
-        return total
     @property
     def height(self):
         return self.job.height
