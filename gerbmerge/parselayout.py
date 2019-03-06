@@ -67,7 +67,7 @@ class Panel(object):  # Meant to be subclassed as either a Row() or Col()
         "Return width in inches"
         width = 0.0
         for job in self.jobs:
-            width += job.width_in() + config.Config['xspacing']
+            width += job.width + config.Config['xspacing']
         width -= config.Config['xspacing']
         return width
 
@@ -75,14 +75,14 @@ class Panel(object):  # Meant to be subclassed as either a Row() or Col()
         "Return maximum width in inches of any one subpanel"
         width = 0.0
         for job in self.jobs:
-            width = max(width, job.width_in())
+            width = max(width, job.width)
         return width
 
     def addheights(self):
         "Return height in inches"
         height = 0.0
         for job in self.jobs:
-            height += job.height_in() + config.Config['yspacing']
+            height += job.height + config.Config['yspacing']
         height -= config.Config['yspacing']
         return height
 
@@ -90,7 +90,7 @@ class Panel(object):  # Meant to be subclassed as either a Row() or Col()
         "Return maximum height in inches of any one subpanel"
         height = 0.0
         for job in self.jobs:
-            height = max(height, job.height_in())
+            height = max(height, job.height)
         return height
 
     def writeGerber(self, fid, layername):
@@ -129,10 +129,12 @@ class Row(Panel):
         Panel.__init__(self)
         self.LR = 1   # Horizontal arrangement
 
-    def width_in(self):
+    @property
+    def width(self):
         return self.addwidths()
 
-    def height_in(self):
+    @property
+    def height(self):
         return self.maxheights()
 
     def setPosition(self, x, y):   # In inches
@@ -140,7 +142,7 @@ class Row(Panel):
         self.y = y
         for job in self.jobs:
             job.setPosition(x, y)
-            x += job.width_in() + config.Config['xspacing']
+            x += job.width + config.Config['xspacing']
 
 
 class Col(Panel):
@@ -148,10 +150,12 @@ class Col(Panel):
         Panel.__init__(self)
         self.LR = 0   # Vertical arrangement
 
-    def width_in(self):
+    @property
+    def width(self):
         return self.maxwidths()
 
-    def height_in(self):
+    @property
+    def height(self):
         return self.addheights()
 
     def setPosition(self, x, y):   # In inches
@@ -159,7 +163,7 @@ class Col(Panel):
         self.y = y
         for job in self.jobs:
             job.setPosition(x, y)
-            y += job.height_in() + config.Config['yspacing']
+            y += job.height + config.Config['yspacing']
 
 
 def canonicalizePanel(panel):

@@ -86,16 +86,20 @@ class Job(object):
         self.drills = None
         self.gerbers = {}
 
-    def width_in(self):
+    @property
+    def width(self):
         # add metric support (1/1000 mm vs. 1/100,000 inch)
+        # TODO: config
         if config.Config['measurementunits'] == 'inch':
             "Return width in INCHES"
             return float(self.maxx - self.minx) * 0.00001
         else:
             return float(self.maxx - self.minx) * 0.001
 
-    def height_in(self):
+    @property
+    def height(self):
         # add metric support (1/1000 mm vs. 1/100,000 inch)
+        # TODO: config
         if config.Config['measurementunits'] == 'inch':
             "Return height in INCHES"
             return float(self.maxy - self.miny) * 0.00001
@@ -103,10 +107,10 @@ class Job(object):
             return float(self.maxy - self.miny) * 0.001
 
     def jobarea(self):
-        return self.width_in() * self.height_in()
+        return self.width * self.height
 
     def maxdimension(self):
-        return max(self.width_in(), self.height_in())
+        return max(self.width, self.height)
 
     def mincoordinates(self):
         "Return minimum X and Y coordinate"
@@ -278,15 +282,15 @@ class JobLayout(object):
             y = self.y - radius
 
             left = notEdge(self.x, X1)
-            right = notEdge(self.x + self.width_in(), X2)
+            right = notEdge(self.x + self.width, X2)
             bot = notEdge(self.y, Y1)
-            top = notEdge(self.y + self.height_in(), Y2)
+            top = notEdge(self.y + self.height, Y2)
 
             BL = ((x), (y))
-            TL = ((x), (y + self.height_in() + 2 * radius))
-            TR = ((x + self.width_in() + 2 * radius),
-                  (y + self.height_in() + 2 * radius))
-            BR = ((x + self.width_in() + 2 * radius), (y))
+            TL = ((x), (y + self.height + 2 * radius))
+            TR = ((x + self.width + 2 * radius),
+                  (y + self.height + 2 * radius))
+            BR = ((x + self.width + 2 * radius), (y))
 
             if not left:
                 BL = (BL[0] + 2 * radius, BL[1])
@@ -340,12 +344,6 @@ class JobLayout(object):
         self.x = x
         self.y = y
 
-    def width_in(self):
-        return self.job.width_in()
-
-    def height_in(self):
-        return self.job.height_in()
-
     def drillhits(self, diameter):
         tools = self.job.findTools(diameter)
         total = 0
@@ -354,8 +352,15 @@ class JobLayout(object):
                 total += len(self.job.drills.xcommands[tool])
             except Exception:
                 pass
-
         return total
+
+    @property
+    def width(self):
+        return self.job.width
+
+    @property
+    def height(self):
+        return self.job.height
 
     def jobarea(self):
         return self.job.jobarea()
