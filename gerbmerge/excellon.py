@@ -260,7 +260,7 @@ class ExcellonParser(object):
                     # add metric support (1/1000 mm vs. 1/100,000 inch)
                     # TODO - verify metric scaling is correct???
                     makestroke.drawDrillHit(fid, 10 * x + DX, 10 * y + DY, toolNum)
-        
+
     def write(self, fid, diameter, Xoff, Yoff):
         "Write out the data such that the lower-left corner of this job is at the given (X,Y) position, in inches"
 

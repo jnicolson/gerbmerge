@@ -77,13 +77,11 @@ def cluster(drills, tolerance, debug=None):
         new_size = (min(c) + max(c)) / 2.0
         new_drills[new_size] = new_drill
 
-        debug_print(str_d(c) + " will be represented by " +
-                    new_drill + " (" + str_d(new_size) + ")")
+        debug_print(str_d(c) + " will be represented by " + new_drill + " (" + str_d(new_size) + ")")
 
     debug_print("\n  " + str(len(new_drills)) + " Clustered Drills:")
     debug_print(drillsToString(new_drills))
-    debug_print("Drill count reduced from " + str(len(drills))
-                + " to " + str(len(new_drills)), True)
+    debug_print("Drill count reduced from " + str(len(drills)) + " to " + str(len(new_drills)), True)
 
     return new_drills
 

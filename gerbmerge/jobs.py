@@ -15,7 +15,7 @@ http://ruggedcircuits.com/gerbmerge
 import builtins
 import copy
 
-from . import (aptable, config, makestroke, util)
+from . import (aptable, config, util)
 from .gerber import GerberParser
 
 # Parsing Gerber/Excellon files is currently very brittle. A more robust
@@ -187,7 +187,7 @@ class Job(object):
 
         if layername not in self.gerbers:
             return {}, {}
-            
+
         else:
             apertures = self.gerbers[layername].apertures
 
@@ -344,16 +344,6 @@ class JobLayout(object):
         self.x = x
         self.y = y
 
-    def drillhits(self, diameter):
-        tools = self.job.findTools(diameter)
-        total = 0
-        for tool in tools:
-            try:
-                total += len(self.job.drills.xcommands[tool])
-            except Exception:
-                pass
-        return total
-
     @property
     def width(self):
         return self.job.width
@@ -383,8 +373,6 @@ def rotateJob(job, degrees=90, firstpass=True):
             J = Job(job.name + '*rotated90')
     else:
         J = Job(job.name)
-
-
 
     # Keep the origin (lower-left) in the same place
     J.maxx = job.minx + job.maxy - job.miny

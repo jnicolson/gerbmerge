@@ -414,7 +414,6 @@ def merge(args, gui=None):
                   (job.width, job.height))
         print("\n")
 
-
     # Trim drill locations and flash data to board extents
     if config.TrimExcellon:
         updateGUI("Trimming Excellon data...")
@@ -761,7 +760,6 @@ def merge(args, gui=None):
 
         writeExcellonToolHeader(fid, tool, size)
     writeExcellonEndHeader(fid)
-
 
     # Ensure each one of our tools is represented in the tool list specified
     # by the user.

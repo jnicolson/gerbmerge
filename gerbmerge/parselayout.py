@@ -16,7 +16,6 @@ Version 3.  See http://www.fsf.org for details of the license.
 Rugged Circuits LLC
 http://ruggedcircuits.com/gerbmerge
 """
-import copy
 import sys
 
 from simpleparse.parser import Parser
