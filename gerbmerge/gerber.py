@@ -4,31 +4,24 @@ import re
 from . import amacro, aptable, config, geometry, util
 
 # Patterns for Gerber RS274X file interpretation
-apdef_pat = re.compile(r'^%AD(D\d+)([^*$]+)\*%$')     # Aperture definition
-# Aperture macro definition
-apmdef_pat = re.compile(r'^%AM([^*$]+)\*$')
-# Comment (GerbTool comment omits the 0)
-comment_pat = re.compile(r'G0?4[^*]*\*')
-tool_pat = re.compile(r'(D\d+)\*')                   # Aperture selection
-gcode_pat = re.compile(r'G(\d{1,2})\*?')              # G-codes
-drawXY_pat = re.compile(
-    r'X([+-]?\d+)Y([+-]?\d+)D0?([123])\*')  # Drawing command
-# Drawing command, Y is implied
-drawX_pat = re.compile(r'X([+-]?\d+)D0?([123])\*')
-# Drawing command, X is implied
-drawY_pat = re.compile(r'Y([+-]?\d+)D0?([123])\*')
-format_pat = re.compile(
-    r'%FS(L|T)?(A|I)(N\d+)?(X\d\d)(Y\d\d)\*%')  # Format statement
-# Layer polarity (D=dark, C=clear)
-layerpol_pat = re.compile(r'^%LP[CD]\*%')
+apdef_pat = re.compile(r'^%AD(D\d+)([^*$]+)\*%$')  # Aperture definition
+apmdef_pat = re.compile(r'^%AM([^*$]+)\*$')  # Aperture macro definition
+comment_pat = re.compile(r'G0?4[^*]*\*')  # Comment (GerbTool comment omits the 0)
+tool_pat = re.compile(r'(D\d+)\*')  # Aperture selection
+gcode_pat = re.compile(r'G(\d{1,2})\*?')  # G-codes
+drawXY_pat = re.compile(r'X([+-]?\d+)Y([+-]?\d+)D0?([123])\*')  # Drawing command
+drawX_pat = re.compile(r'X([+-]?\d+)D0?([123])\*')  # Drawing command, Y is implied
+drawY_pat = re.compile(r'Y([+-]?\d+)D0?([123])\*')  # Drawing command, X is implied
+format_pat = re.compile(r'%FS(L|T)?(A|I)(N\d+)?(X\d\d)(Y\d\d)\*%')  # Format statement
+layerpol_pat = re.compile(r'^%LP[CD]\*%')  # Layer polarity (D=dark, C=clear)
+
+# Gerber X2
+attr_pat = re.compile(r'^\%TF\.(.*?),(.*)\*\%$')
 
 # Circular interpolation drawing commands (from Protel)
-cdrawXY_pat = re.compile(
-    r'X([+-]?\d+)Y([+-]?\d+)I([+-]?\d+)J([+-]?\d+)D0?([123])\*')
-cdrawX_pat = re.compile(
-    r'X([+-]?\d+)I([+-]?\d+)J([+-]?\d+)D0?([123])\*')  # Y is implied
-cdrawY_pat = re.compile(
-    r'Y([+-]?\d+)I([+-]?\d+)J([+-]?\d+)D0?([123])\*')  # X is implied
+cdrawXY_pat = re.compile(r'X([+-]?\d+)Y([+-]?\d+)I([+-]?\d+)J([+-]?\d+)D0?([123])\*')
+cdrawX_pat = re.compile(r'X([+-]?\d+)I([+-]?\d+)J([+-]?\d+)D0?([123])\*')  # Y is implied
+cdrawY_pat = re.compile(r'Y([+-]?\d+)I([+-]?\d+)J([+-]?\d+)D0?([123])\*')  # X is implied
 
 IgnoreList = ( \
     # These are for Eagle, and RS274X files in general
@@ -510,7 +503,7 @@ class GerberParser(object):
         newcmds = []
         lastInBorders = True
         # (minx,miny,exposure off)
-        lastx, lasty, lastd = self.minx, self.miny, 2
+        lastx, lasty = self.minx, self.miny
         bordersRect = (self.minx, self.miny, self.maxx, self.maxy)
         lastAperture = None
 
@@ -570,11 +563,11 @@ class GerberParser(object):
                                 # We arbitrarily remove all flashes that lead to rectangles
                                 # with a width or length less than 1 mil (10 Gerber units). - sdd s.b. 0.1mil???
                                 # Should we make this configurable?
-# add metric support (1/1000 mm vs. 1/100,000 inch)
-#                if config.Config['measurementunits'] == 'inch':
-#                  minFlash = 10;
-#                else
-#                  minFlash =
+                                # add metric support (1/1000 mm vs. 1/100,000 inch)
+                                #                if config.Config['measurementunits'] == 'inch':
+                                #                  minFlash = 10;
+                                #                else
+                                #                  minFlash =
                                 # sdd - change for metric case at some point
                                 if min(newRectWidth, newRectHeight) >= 10:
                                     # Construct an Aperture that is a Rectangle
@@ -688,7 +681,6 @@ class GerberParser(object):
                                 newcmds.append((pt1[0], pt1[1], 1))
                                 # Go to destination point, exposure off
                                 newcmds.append((x, y, 2))
-                                d = 2                                 # Make next 'lastd' represent exposure off
 
                         else:                 # Case A, two points of intersection
                             pt1 = pointsL[0]
@@ -700,9 +692,8 @@ class GerberParser(object):
                             newcmds.append((pt2[0], pt2[1], 1))
                             # Go to destination point, exposure off
                             newcmds.append((x, y, 2))
-                            d = 2                                 # Make next 'lastd' represent exposure off
 
-                lastx, lasty, lastd = x, y, d
+                lastx, lasty = x, y
                 lastInBorders = newInBorders
             else:
                 # It's a string indicating an aperture change, G-code, or RS-274X
@@ -721,3 +712,46 @@ class GerberParser(object):
                 self.apxlat.keys())
             localCode = 'D%d' % (lastCode + 1)
             self.apxlat[localCode] = AP.code
+
+    def write(self, fid, Xoff, Yoff):
+        "Write out the data such that the lower-left corner of this job is at the given (X,Y) position, in inches"
+
+        # add metric support (1/1000 mm vs. 1/100,000 inch)
+        # TODO: config
+        if config.Config['measurementunits'] == 'inch':
+            # First convert given inches to 2.5 co-ordinates
+            X = int(round(Xoff / 0.00001))
+            Y = int(round(Yoff / 0.00001))
+        else:
+            # First convert given mm to 5.3 co-ordinates
+            X = int(round(Xoff / 0.001))
+            Y = int(round(Yoff / 0.001))
+
+        # Now calculate displacement for each position so that we end up at
+        # specified origin
+        DX = X - self.minx
+        DY = Y - self.miny
+
+        # Rock and roll. First, write out a dummy flash using code D02
+        # (exposure off). This prevents an unintentional draw from the end
+        # of one job to the beginning of the next when a layer is repeated
+        # due to panelizing.
+        fid.write('X%07dY%07dD02*\n' % (X, Y))
+        for cmd in self.commands:
+            if isinstance(cmd, tuple):
+                if len(cmd) == 3:
+                    x, y, d = cmd
+                    fid.write('X%07dY%07dD%02d*\n' % (x + DX, y + DY, d))
+                else:
+                    x, y, I, J, d, s = cmd
+                    fid.write('X%07dY%07dI%07dJ%07dD%02d*\n' %
+                              (x + DX, y + DY, I, J, d))  # I,J are relative
+            else:
+                # It's an aperture change, G-code, or RS274-X command that begins with '%'. If
+                # it's an aperture code, the aperture has already been translated
+                # to the global aperture table during the parse phase.
+                if cmd[0] == '%':
+                    # The command already has a * in it (e.g., "%LPD*%")
+                    fid.write('%s\n' % cmd)
+                else:
+                    fid.write('%s*\n' % cmd)
