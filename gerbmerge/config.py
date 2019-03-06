@@ -128,26 +128,12 @@ MinimumFeatureDimension = {}
 
 
 def buildRevDict(D):
-    RevD = {}
-    for key, val in D.items():
-        RevD[val.hash()] = key
-    return RevD
+    return {val.hash(): key for key, val in D.items()}
 
 
 def parseStringList(L):
     """Parse something like '*toplayer, *bottomlayer' into a list of names
        without quotes, spaces, etc."""
-
-    if 0:
-        if L[0] == "'":
-            if L[-1] != "'":
-                raise RuntimeError("Illegal configuration string '%s'" % L)
-            L = L[1:-1]
-
-        elif L[0] == '"':
-            if L[-1] != '"':
-                raise RuntimeError("Illegal configuration string '%s'" % L)
-            L = L[1:-1]
 
     # This pattern matches quotes at the beginning and end...quotes must match
     quotepat = re.compile(r'^([' "'" '"' r']?)([^\1]*)\1$')
@@ -159,13 +145,14 @@ def parseStringList(L):
 
     return delimitpat.split(L)
 
-# Parse an Excellon tool list file of the form
-#
-#   T01 0.035in
-#   T02 0.042in
-
 
 def parseToolList(fname):
+    """Parse an Excellon tool file."""
+    """
+        File of form
+        T01 0.035in
+        T02 0.042in
+    """
     TL = {}
 
     try:
@@ -450,12 +437,3 @@ if __name__ == "__main__":
     cp = parseConfigFile(sys.argv[1])
     print(Config)
     sys.exit(0)
-
-    if 0:
-        for key, val in cp.defaults().items():
-            print('%s: %s' % (key, val))
-
-        for section in cp.sections():
-            print('[%s]' % section)
-            for opt in cp.options(section):
-                print('  %s=%s' % (opt, cp.get(section, opt)))

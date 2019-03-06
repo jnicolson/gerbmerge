@@ -45,38 +45,6 @@ config.PlacementFile = None
 GUI = None
 
 
-def usage():
-    print("""
-Usage: gerbmerge [Options] configfile [layoutfile]
-
-Options:
-    -h, --help          -- This help summary
-    -v, --version       -- Program version and contact information
-    -s, --skipdisclaimer -- Skip disclaimer dialog
-    --random-search     -- Automatic placement using random search (default)
-    --full-search       -- Automatic placement using exhaustive search
-    --place-file=fn     -- Read placement from file
-    --rs-fsjobs=N       -- When using random search, exhaustively search N jobs
-                           for each random placement (default: N=2)
-    --search-timeout=T  -- When using random search, search for T seconds for best
-                           random placement (default: T=0, search until stopped)
-    --no-trim-gerber    -- Do not attempt to trim Gerber data to extents of board
-    --no-trim-excellon  -- Do not attempt to trim Excellon data to extents of board
-    --octagons=fmt      -- Generate octagons in two different styles depending on
-                           the value of 'fmt':
-
-                              fmt is 'rotate' :  0.0 rotation
-                              fmt is 'normal' : 22.5 rotation (default)
-
-If a layout file is not specified, automatic placement is performed. If the
-placement is read from a file, then no automatic placement is performed and
-the layout file (if any) is ignored.
-
-NOTE: The dimensions of each job are determined solely by the maximum extent of
-the board outline layer for each job.
-""")
-    sys.exit(1)
-
 # changed these two writeGerberHeader files to take metric units (mm) into
 # account:
 
