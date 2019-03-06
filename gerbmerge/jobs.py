@@ -299,6 +299,7 @@ class Job(object):
     def aperturesAndMacros(self, layername):
         """Return dictionaries whose keys are all necessary aperture names and macro names for this layer."""
 
+        # TODO: config
         GAT = config.GAT
 
         if layername not in self.gerbers:
@@ -391,6 +392,7 @@ class JobLayout(object):
             self.writeGerber(fid, outline_layer)
 
         else:
+            # TODO: config
             radius = config.GAT[drawing_code].dimx / 2.0
 
             # Start at lower-left, proceed clockwise
@@ -483,6 +485,7 @@ class JobLayout(object):
 
 def rotateJob(job, degrees=90, firstpass=True):
     """Create a new job from an existing one, rotating by specified degrees in 90 degree passes"""
+    # TODO: config
     GAT = config.GAT
     GAMT = config.GAMT
     # print("rotating job:", job.name, degrees, firstpass)
@@ -504,6 +507,7 @@ def rotateJob(job, degrees=90, firstpass=True):
     J.minx = job.minx
     J.miny = job.miny
 
+    # TODO: config
     RevGAT = config.buildRevDict(GAT)   # RevGAT[hash] = aperturename
     RevGAMT = config.buildRevDict(GAMT)  # RevGAMT[hash] = aperturemacroname
 

@@ -316,6 +316,7 @@ def parseApertureMacro(s, fid):
 
 
 def addToApertureMacroTable(AM):
+    # TODO: config
     GAMT = config.GAMT
 
     # Must sort keys by integer value, not string since 99 comes before 100

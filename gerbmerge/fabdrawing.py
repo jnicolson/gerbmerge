@@ -20,6 +20,7 @@ def writeDrillHits(fid, Place, Tools):
         toolNumber += 1
 
         try:
+            # TODO: config
             size = config.GlobalToolMap[tool]
         except Exception:
             raise RuntimeError(
@@ -61,6 +62,7 @@ def writeDrillLegend(fid, Tools, OriginY, MaxXExtent):
     toolNumber = -1
     for tool in Tools:
         toolNumber += 1
+        # TODO: config
         L.append((config.GlobalToolMap[tool], toolNumber))
 
     # Now sort the list from smallest to largest
@@ -158,6 +160,7 @@ def writeDimensionArrow(fid, OriginX, OriginY, MaxXExtent, MaxYExtent):
 
 
 def writeUserText(fid, X, Y):
+    # TODO: config
     fname = config.Config['fabricationdrawingtext']
     if not fname:
         return

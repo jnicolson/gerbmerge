@@ -100,6 +100,7 @@ class Aperture(object):
             # self.dimx to the new name. Recall that GAMT maps name to macro
             # (e.g., GAMT['M9'] = ApertureMacro(...)) while RevGAMT maps hash to
             # macro name (e.g., RevGAMT[hash] = 'M9')
+            # TODO: config
             AMR = config.GAMT[self.dimx].rotated()
             hash = AMR.hash()
             try:
@@ -210,6 +211,7 @@ def constructApertureTable(fileList):
     # numbers. For aperture macros, we construct their final version
     # (i.e., 'M1', 'M2', etc.) right away, as they are parsed. Thus,
     # we translate from 'THX10N' or whatever to 'M2' right away.
+    # TODO: config
     GAT = config.GAT      # Global Aperture Table
     GAT.clear()
     GAMT = config.GAMT    # Global Aperture Macro Table
@@ -275,6 +277,7 @@ def constructApertureTable(fileList):
         code += 1
 
     if 0:
+        # TODO: config
         keylist = sorted(config.GAT.keys())
         print('Apertures')
         print('=========')
@@ -294,6 +297,7 @@ def findHighestApertureCode(keys):
 
 
 def addToApertureTable(AP):
+    # TODO: config
     GAT = config.GAT
 
     lastCode = findHighestApertureCode(GAT.keys())
@@ -308,6 +312,7 @@ def findInApertureTable(AP):
     """Return 'D10', for example in response to query for an object
        of type Aperture()"""
     hash = AP.hash()
+    # TODO: config
     for key, val in config.GAT.items():
         if hash == val.hash():
             return key
@@ -329,7 +334,7 @@ def findOrAddAperture(AP):
 
 if __name__ == "__main__":
     constructApertureTable(sys.argv[1:])
-
+    # TODO: config
     keylist = sorted(config.GAMT.keys())
     print('Aperture Macros')
     print('===============')

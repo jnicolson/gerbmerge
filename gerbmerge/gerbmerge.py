@@ -37,6 +37,7 @@ VERSION_MINOR = '9b'
 RANDOM_SEARCH = 1
 EXHAUSTIVE_SEARCH = 2
 FROM_FILE = 3
+# TODO: config
 config.AutoSearchType = RANDOM_SEARCH
 config.RandomSearchExhaustiveJobs = 2
 config.PlacementFile = None
