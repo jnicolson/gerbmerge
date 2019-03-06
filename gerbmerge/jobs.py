@@ -121,52 +121,6 @@ class Job(object):
     def hasLayer(self, layername):
         return layername in self.gerbers
 
-    def writeGerber(self, fid, layername, Xoff, Yoff):
-        "Write out the data such that the lower-left corner of this job is at the given (X,Y) position, in inches"
-
-        # Maybe we don't have this layer
-        if not self.hasLayer(layername):
-            return
-
-        # add metric support (1/1000 mm vs. 1/100,000 inch)
-        if config.Config['measurementunits'] == 'inch':
-            # First convert given inches to 2.5 co-ordinates
-            X = int(round(Xoff / 0.00001))
-            Y = int(round(Yoff / 0.00001))
-        else:
-            # First convert given mm to 5.3 co-ordinates
-            X = int(round(Xoff / 0.001))
-            Y = int(round(Yoff / 0.001))
-
-        # Now calculate displacement for each position so that we end up at
-        # specified origin
-        DX = X - self.minx
-        DY = Y - self.miny
-
-        # Rock and roll. First, write out a dummy flash using code D02
-        # (exposure off). This prevents an unintentional draw from the end
-        # of one job to the beginning of the next when a layer is repeated
-        # due to panelizing.
-        fid.write('X%07dY%07dD02*\n' % (X, Y))
-        for cmd in self.gerbers[layername].commands:
-            if isinstance(cmd, tuple):
-                if len(cmd) == 3:
-                    x, y, d = cmd
-                    fid.write('X%07dY%07dD%02d*\n' % (x + DX, y + DY, d))
-                else:
-                    x, y, I, J, d, s = cmd
-                    fid.write('X%07dY%07dI%07dJ%07dD%02d*\n' %
-                              (x + DX, y + DY, I, J, d))  # I,J are relative
-            else:
-                # It's an aperture change, G-code, or RS274-X command that begins with '%'. If
-                # it's an aperture code, the aperture has already been translated
-                # to the global aperture table during the parse phase.
-                if cmd[0] == '%':
-                    # The command already has a * in it (e.g., "%LPD*%")
-                    fid.write('%s\n' % cmd)
-                else:
-                    fid.write('%s*\n' % cmd)
-
     def findTools(self, diameter):
         "Find the tools, if any, with the given diameter in inches. There may be more than one!"
         L = []
@@ -347,7 +301,7 @@ class JobLayout(object):
 
     def writeGerber(self, fid, layername):
         assert self.x is not None
-        self.job.writeGerber(fid, layername, self.x, self.y)
+        self.job.gerbers[layername].write(fid, self.x, self.y)
 
     def aperturesAndMacros(self, layername):
         return self.job.aperturesAndMacros(layername)
