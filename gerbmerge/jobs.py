@@ -143,24 +143,16 @@ class Job(object):
         self.maxy += y_shift
 
         # Shift all commands
-        for layer, command in self.commands.items():
-
-            # Loop through each command in each layer
-            for index in range(len(command)):
-                c = command[index]
-
+        for layer in self.gerbers:
+            for index, command in enumerate(self.gerbers[layer].commands):
                 # Shift X and Y coordinate of command
-                if isinstance(
-                        c, tuple):  # ensure that command is of type tuple
-                    command_list = list(c)  # convert tuple to list
-                    if isinstance(command_list[0], int) \
-                            and isinstance(command_list[1], int):  # ensure that first two elemenst are integers
+                if isinstance(command, tuple):  # ensure that command is of type tuple
+                    command_list = list(command)  # convert tuple to list
+                    if isinstance(command_list[0], int) and isinstance(command_list[1], int):  # ensure that first two elemenst are integers
                         command_list[0] += x_shift
                         command_list[1] += y_shift
                     # convert list back to tuple
-                    command[index] = tuple(command_list)
-
-            self.commands[layer] = command  # set modified command
+                    self.gerbers[layer].commands[index] = tuple(command_list)
 
         # Shift all excellon commands
         for tool, command in self.drills.xcommands.items():
@@ -231,7 +223,8 @@ class JobLayout(object):
 
     def writeGerber(self, fid, layername):
         assert self.x is not None
-        self.job.gerbers[layername].write(fid, self.x, self.y)
+        if layername in self.job.gerbers:
+            self.job.gerbers[layername].write(fid, self.x, self.y)
 
     def aperturesAndMacros(self, layername):
         return self.job.aperturesAndMacros(layername)
@@ -374,7 +367,9 @@ def rotateJob(job, degrees=90, firstpass=True):
     else:
         J = Job(job.name)
 
-    # Keep the origin (lower-left) in the same place
+    # Keep the origin (lower-left) in the same place.
+    # The new maxx and maxy are due to a 90 degree
+    # rotation (adding the extents along the other axis)
     J.maxx = job.minx + job.maxy - job.miny
     J.maxy = job.miny + job.maxx - job.minx
     J.minx = job.minx
@@ -393,11 +388,11 @@ def rotateJob(job, degrees=90, firstpass=True):
     # those apertures which have an orientation: rectangles, ovals, and macros.
 
     ToolChangeReplace = {}
-    for layername in job.gerbers.keys():
+    for layername in job.gerbers:
         J.gerbers[layername] = GerberParser()
         J.gerbers[layername].apxlat = {}
 
-        for ap in job.gerbers[layername].apxlat.keys():
+        for ap in job.gerbers[layername].apxlat:
             code = job.gerbers[layername].apxlat[ap]
             A = GAT[code]
 
@@ -438,7 +433,7 @@ def rotateJob(job, degrees=90, firstpass=True):
     # replace them with the new aperture code if we have
     # a rotation.
     offset = job.maxy - job.miny
-    for layername in job.gerbers.keys():
+    for layername in job.gerbers:
         J.gerbers[layername].commands = []
         J.gerbers[layername].apertures = []
 
@@ -524,4 +519,8 @@ def rotateJob(job, degrees=90, firstpass=True):
         return rotateJob(J, degrees, False)
     else:
         # print("rotated:", J.name)
+        # The Next line is important - now that each gerber layer 
+        # is an object and the extents are on the Job,
+        # this propagates the extents down
+        J.updateExtents((J.minx, J.miny, J.maxx, J.maxy))
         return J
