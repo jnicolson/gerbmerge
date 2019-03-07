@@ -315,8 +315,8 @@ def tile_jobs(Jobs):
     sortJobs.reverse()
 
     for job in sortJobs:
-        Xdim = job.width_in()
-        Ydim = job.height_in()
+        Xdim = job.width
+        Ydim = job.height
         # NOTE: This will only try 90 degree rotations though 180 & 270 are
         # available
 
@@ -408,12 +408,11 @@ def merge(args, gui=None):
               (job.minx, job.miny, job.maxx, job.maxy))
         # add metric support (1/1000 mm vs. 1/100,000 inch)
         if config.Config['measurementunits'] == 'inch':
-            print('  Size: %f" x %f"' % (job.width_in(), job.height_in()))
+            print('  Size: %f" x %f"' % (job.width, job.height))
         else:
             print('  Size: %5.3fmm x %5.3fmm' %
-                  (job.width_in(), job.height_in()))
+                  (job.width, job.height))
         print("\n")
-
 
     # Trim drill locations and flash data to board extents
     if config.TrimExcellon:
@@ -450,7 +449,7 @@ def merge(args, gui=None):
 
         for row in Layout:
             row.setPosition(X, Y)
-            Y += row.height_in() + config.Config['yspacing']
+            Y += row.height + config.Config['yspacing']
 
         # Construct a canonical placement from the layout
         Place.addFromLayout(Layout)
@@ -761,7 +760,6 @@ def merge(args, gui=None):
 
         writeExcellonToolHeader(fid, tool, size)
     writeExcellonEndHeader(fid)
-
 
     # Ensure each one of our tools is represented in the tool list specified
     # by the user.
