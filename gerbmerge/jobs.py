@@ -15,7 +15,7 @@ http://ruggedcircuits.com/gerbmerge
 import builtins
 import copy
 
-from . import (aptable, config, makestroke, util)
+from . import (aptable, config, util)
 from .gerber import GerberParser
 
 # Parsing Gerber/Excellon files is currently very brittle. A more robust
@@ -86,16 +86,20 @@ class Job(object):
         self.drills = None
         self.gerbers = {}
 
-    def width_in(self):
+    @property
+    def width(self):
         # add metric support (1/1000 mm vs. 1/100,000 inch)
+        # TODO: config
         if config.Config['measurementunits'] == 'inch':
             "Return width in INCHES"
             return float(self.maxx - self.minx) * 0.00001
         else:
             return float(self.maxx - self.minx) * 0.001
 
-    def height_in(self):
+    @property
+    def height(self):
         # add metric support (1/1000 mm vs. 1/100,000 inch)
+        # TODO: config
         if config.Config['measurementunits'] == 'inch':
             "Return height in INCHES"
             return float(self.maxy - self.miny) * 0.00001
@@ -103,10 +107,10 @@ class Job(object):
             return float(self.maxy - self.miny) * 0.001
 
     def jobarea(self):
-        return self.width_in() * self.height_in()
+        return self.width * self.height
 
     def maxdimension(self):
-        return max(self.width_in(), self.height_in())
+        return max(self.width, self.height)
 
     def mincoordinates(self):
         "Return minimum X and Y coordinate"
@@ -121,52 +125,6 @@ class Job(object):
     def hasLayer(self, layername):
         return layername in self.gerbers
 
-    def writeGerber(self, fid, layername, Xoff, Yoff):
-        "Write out the data such that the lower-left corner of this job is at the given (X,Y) position, in inches"
-
-        # Maybe we don't have this layer
-        if not self.hasLayer(layername):
-            return
-
-        # add metric support (1/1000 mm vs. 1/100,000 inch)
-        if config.Config['measurementunits'] == 'inch':
-            # First convert given inches to 2.5 co-ordinates
-            X = int(round(Xoff / 0.00001))
-            Y = int(round(Yoff / 0.00001))
-        else:
-            # First convert given mm to 5.3 co-ordinates
-            X = int(round(Xoff / 0.001))
-            Y = int(round(Yoff / 0.001))
-
-        # Now calculate displacement for each position so that we end up at
-        # specified origin
-        DX = X - self.minx
-        DY = Y - self.miny
-
-        # Rock and roll. First, write out a dummy flash using code D02
-        # (exposure off). This prevents an unintentional draw from the end
-        # of one job to the beginning of the next when a layer is repeated
-        # due to panelizing.
-        fid.write('X%07dY%07dD02*\n' % (X, Y))
-        for cmd in self.gerbers[layername].commands:
-            if isinstance(cmd, tuple):
-                if len(cmd) == 3:
-                    x, y, d = cmd
-                    fid.write('X%07dY%07dD%02d*\n' % (x + DX, y + DY, d))
-                else:
-                    x, y, I, J, d, s = cmd
-                    fid.write('X%07dY%07dI%07dJ%07dD%02d*\n' %
-                              (x + DX, y + DY, I, J, d))  # I,J are relative
-            else:
-                # It's an aperture change, G-code, or RS274-X command that begins with '%'. If
-                # it's an aperture code, the aperture has already been translated
-                # to the global aperture table during the parse phase.
-                if cmd[0] == '%':
-                    # The command already has a * in it (e.g., "%LPD*%")
-                    fid.write('%s\n' % cmd)
-                else:
-                    fid.write('%s*\n' % cmd)
-
     def findTools(self, diameter):
         "Find the tools, if any, with the given diameter in inches. There may be more than one!"
         L = []
@@ -174,47 +132,6 @@ class Job(object):
             if diam == diameter:
                 L.append(tool)
         return L
-
-    def writeExcellon(self, fid, diameter, Xoff, Yoff):
-        "Write out the data such that the lower-left corner of this job is at the given (X,Y) position, in inches"
-
-        # First convert given inches to 2.4 co-ordinates. Note that Gerber is 2.5 (as of GerbMerge 1.2)
-        # and our internal Excellon representation is 2.4 as of GerbMerge
-        # version 0.91. We use X,Y to calculate DX,DY in 2.4 units (i.e., with a
-        # resolution of 0.0001".
-        # add metric support (1/1000 mm vs. 1/100,000 inch)
-        if config.Config['measurementunits'] == 'inch':
-            # First work in 2.5 format to match Gerber
-            X = int(round(Xoff / 0.00001))
-            Y = int(round(Yoff / 0.00001))
-        else:
-            # First work in 5.3 format to match Gerber
-            X = int(round(Xoff / 0.001))
-            Y = int(round(Yoff / 0.001))
-
-        # Now calculate displacement for each position so that we end up at
-        # specified origin
-        DX = X - self.minx
-        DY = Y - self.miny
-
-        # Now round down to 2.4 format
-        # this scaling seems to work for either unit system
-        DX = int(round(DX / 10.0))
-        DY = int(round(DY / 10.0))
-
-        ltools = self.findTools(diameter)
-
-        if config.Config['excellonleadingzeros']:
-            fmtstr = 'X%06dY%06d\n'
-        else:
-            fmtstr = 'X%dY%d\n'
-
-        # Boogie
-        for ltool in ltools:
-            if ltool in self.drills.xcommands:
-                for cmd in self.drills.xcommands[ltool]:
-                    x, y = cmd
-                    fid.write(fmtstr % (x + DX, y + DY))
 
     def fixcoordinates(self, x_shift, y_shift):
         "Add x_shift and y_shift to all coordinates in the job"
@@ -263,39 +180,6 @@ class Job(object):
 
             self.drills.xcommands[tool] = command  # set modified command
 
-    def writeDrillHits(self, fid, diameter, toolNum, Xoff, Yoff):
-        """Write a drill hit pattern. diameter is tool diameter in inches, while toolNum is
-        an integer index into strokes.DrillStrokeList"""
-
-        # add metric support (1/1000 mm vs. 1/100,000 inch)
-        if config.Config['measurementunits'] == 'inch':
-            # First convert given inches to 2.5 co-ordinates
-            X = int(round(Xoff / 0.00001))
-            Y = int(round(Yoff / 0.00001))
-        else:
-            # First convert given inches to 5.3 co-ordinates
-            X = int(round(Xoff / 0.001))
-            Y = int(round(Yoff / 0.001))
-
-        # Now calculate displacement for each position so that we end up at
-        # specified origin
-        DX = X - self.minx
-        DY = Y - self.miny
-
-        # Do NOT round down to 2.4 format. These drill hits are in Gerber 2.5 format, not
-        # Excellon plunge commands.
-
-        ltools = self.findTools(diameter)
-
-        for ltool in ltools:
-            if ltool in self.drills.xcommands:
-                for cmd in self.drills.xcommands[ltool]:
-                    x, y = cmd
-                    # add metric support (1/1000 mm vs. 1/100,000 inch)
-# TODO - verify metric scaling is correct???
-                    makestroke.drawDrillHit(
-                        fid, 10 * x + DX, 10 * y + DY, toolNum)
-
     def aperturesAndMacros(self, layername):
         """Return dictionaries whose keys are all necessary aperture names and macro names for this layer."""
 
@@ -303,7 +187,7 @@ class Job(object):
 
         if layername not in self.gerbers:
             return {}, {}
-            
+
         else:
             apertures = self.gerbers[layername].apertures
 
@@ -347,18 +231,18 @@ class JobLayout(object):
 
     def writeGerber(self, fid, layername):
         assert self.x is not None
-        self.job.writeGerber(fid, layername, self.x, self.y)
+        self.job.gerbers[layername].write(fid, self.x, self.y)
 
     def aperturesAndMacros(self, layername):
         return self.job.aperturesAndMacros(layername)
 
     def writeExcellon(self, fid, diameter):
         assert self.x is not None
-        self.job.writeExcellon(fid, diameter, self.x, self.y)
+        self.job.drills.write(fid, diameter, self.x, self.y)
 
     def writeDrillHits(self, fid, diameter, toolNum):
         assert self.x is not None
-        self.job.writeDrillHits(fid, diameter, toolNum, self.x, self.y)
+        self.job.drills.writeDrillHits(fid, diameter, toolNum, self.x, self.y)
 
     def writeCutLines(self, fid, drawing_code, X1, Y1, X2, Y2):
         """Draw a board outline using the given aperture code"""
@@ -398,15 +282,15 @@ class JobLayout(object):
             y = self.y - radius
 
             left = notEdge(self.x, X1)
-            right = notEdge(self.x + self.width_in(), X2)
+            right = notEdge(self.x + self.width, X2)
             bot = notEdge(self.y, Y1)
-            top = notEdge(self.y + self.height_in(), Y2)
+            top = notEdge(self.y + self.height, Y2)
 
             BL = ((x), (y))
-            TL = ((x), (y + self.height_in() + 2 * radius))
-            TR = ((x + self.width_in() + 2 * radius),
-                  (y + self.height_in() + 2 * radius))
-            BR = ((x + self.width_in() + 2 * radius), (y))
+            TL = ((x), (y + self.height + 2 * radius))
+            TR = ((x + self.width + 2 * radius),
+                  (y + self.height + 2 * radius))
+            BR = ((x + self.width + 2 * radius), (y))
 
             if not left:
                 BL = (BL[0] + 2 * radius, BL[1])
@@ -460,25 +344,19 @@ class JobLayout(object):
         self.x = x
         self.y = y
 
-    def width_in(self):
-        return self.job.width_in()
+    @property
+    def width(self):
+        return self.job.width
 
-    def height_in(self):
-        return self.job.height_in()
-
-    def drillhits(self, diameter):
-        tools = self.job.findTools(diameter)
-        total = 0
-        for tool in tools:
-            try:
-                total += len(self.job.drills.xcommands[tool])
-            except Exception:
-                pass
-
-        return total
+    @property
+    def height(self):
+        return self.job.height
 
     def jobarea(self):
         return self.job.jobarea()
+
+    def drillhits(self, diameter):
+        return self.job.drills.drillhits(diameter)
 
 
 def rotateJob(job, degrees=90, firstpass=True):
@@ -495,8 +373,6 @@ def rotateJob(job, degrees=90, firstpass=True):
             J = Job(job.name + '*rotated90')
     else:
         J = Job(job.name)
-
-
 
     # Keep the origin (lower-left) in the same place
     J.maxx = job.minx + job.maxy - job.miny

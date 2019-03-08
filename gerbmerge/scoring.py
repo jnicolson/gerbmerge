@@ -278,8 +278,8 @@ def writeScoring(fid, Place, OriginX, OriginY, MaxXExtent, MaxYExtent):
     for layout in Place.jobs:
         x = layout.x - dx
         y = layout.y - dy
-        X = layout.x + layout.width_in() + dx
-        Y = layout.y + layout.height_in() + dy
+        X = layout.x + layout.width + dx
+        Y = layout.y + layout.height + dy
 
         # Just so we don't get 3.75000000004 and 3.75000000009, we round to
         # 2.5 limits.

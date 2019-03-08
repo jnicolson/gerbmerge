@@ -45,8 +45,8 @@ class Placement(object):
         maxY = 0.0
 
         for job in self.jobs:
-            maxX = max(maxX, job.x + job.width_in())
-            maxY = max(maxY, job.y + job.height_in())
+            maxX = max(maxX, job.x + job.width)
+            maxY = max(maxY, job.y + job.height)
 
         return (maxX, maxY)
 

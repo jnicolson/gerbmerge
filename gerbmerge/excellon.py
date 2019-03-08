@@ -1,6 +1,6 @@
 import re
 
-from . import config
+from . import config, makestroke
 
 # Patterns for Excellon interpretation
 xtool_pat = re.compile(r'^(T\d+)$')           # Tool selection
@@ -224,3 +224,91 @@ class ExcellonParser(object):
             else:
                 del self.xcommands[toolname]
                 del self.xdiam[toolname]
+
+    def findTools(self, diameter):
+        "Find the tools, if any, with the given diameter in inches. There may be more than one!"
+        return [tool for tool, diam in self.xdiam.items() if diam == diameter]
+
+    def writeDrillHits(self, fid, diameter, toolNum, Xoff, Yoff):
+        """Write a drill hit pattern. diameter is tool diameter in inches, while toolNum is
+        an integer index into strokes.DrillStrokeList"""
+
+        # add metric support (1/1000 mm vs. 1/100,000 inch)
+        if config.Config['measurementunits'] == 'inch':
+            # First convert given inches to 2.5 co-ordinates
+            X = int(round(Xoff / 0.00001))
+            Y = int(round(Yoff / 0.00001))
+        else:
+            # First convert given inches to 5.3 co-ordinates
+            X = int(round(Xoff / 0.001))
+            Y = int(round(Yoff / 0.001))
+
+        # Now calculate displacement for each position so that we end up at
+        # specified origin
+        DX = X - self.minx
+        DY = Y - self.miny
+
+        # Do NOT round down to 2.4 format. These drill hits are in Gerber 2.5 format, not
+        # Excellon plunge commands.
+
+        ltools = self.findTools(diameter)
+
+        for ltool in ltools:
+            if ltool in self.xcommands:
+                for cmd in self.xcommands[ltool]:
+                    x, y = cmd
+                    # add metric support (1/1000 mm vs. 1/100,000 inch)
+                    # TODO - verify metric scaling is correct???
+                    makestroke.drawDrillHit(fid, 10 * x + DX, 10 * y + DY, toolNum)
+
+    def write(self, fid, diameter, Xoff, Yoff):
+        "Write out the data such that the lower-left corner of this job is at the given (X,Y) position, in inches"
+
+        # First convert given inches to 2.4 co-ordinates. Note that Gerber is 2.5 (as of GerbMerge 1.2)
+        # and our internal Excellon representation is 2.4 as of GerbMerge
+        # version 0.91. We use X,Y to calculate DX,DY in 2.4 units (i.e., with a
+        # resolution of 0.0001".
+        # add metric support (1/1000 mm vs. 1/100,000 inch)
+        if config.Config['measurementunits'] == 'inch':
+            # First work in 2.5 format to match Gerber
+            X = int(round(Xoff / 0.00001))
+            Y = int(round(Yoff / 0.00001))
+        else:
+            # First work in 5.3 format to match Gerber
+            X = int(round(Xoff / 0.001))
+            Y = int(round(Yoff / 0.001))
+
+        # Now calculate displacement for each position so that we end up at
+        # specified origin
+        DX = X - self.minx
+        DY = Y - self.miny
+
+        # Now round down to 2.4 format
+        # this scaling seems to work for either unit system
+        DX = int(round(DX / 10.0))
+        DY = int(round(DY / 10.0))
+
+        ltools = self.findTools(diameter)
+
+        if config.Config['excellonleadingzeros']:
+            fmtstr = 'X%06dY%06d\n'
+        else:
+            fmtstr = 'X%dY%d\n'
+
+        # Boogie
+        for ltool in ltools:
+            if ltool in self.xcommands:
+                for cmd in self.xcommands[ltool]:
+                    x, y = cmd
+                    fid.write(fmtstr % (x + DX, y + DY))
+
+    def drillhits(self, diameter):
+        tools = self.findTools(diameter)
+        total = 0
+        for tool in tools:
+            try:
+                total += len(self.xcommands[tool])
+            except Exception:
+                pass
+
+        return total

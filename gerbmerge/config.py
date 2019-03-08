@@ -29,9 +29,9 @@ Config = {
     'yspacing': 0,                    # Spacing in vertical direction - ditto
     'panelwidth': '12.6',             # X-Dimension maximum panel size (Olimex)
     'panelheight': '7.8',             # Y-Dimension maximum panel size (Olimex)
-    'cropmarklayers': None,           # e.g., *toplayer,*bottomlayer
+    'cropmarklayers': [],           # e.g., *toplayer,*bottomlayer
     'cropmarkwidth': 0,  # '0.01',          # Width (inches) of crop lines
-    'cutlinelayers': None,            # as for cropmarklayers
+    'cutlinelayers': [],            # as for cropmarklayers
     'cutlinewidth': 0,  # '0.01',           # Width (inches) of cut lines
     'minimumfeaturesize': 0,          # Minimum dimension for selected layers
     'toollist': None,                 # Name of file containing default tool list
@@ -142,7 +142,6 @@ def parseStringList(L):
     match = quotepat.match(L)
     if match:
         L = match.group(2)
-
     return delimitpat.split(L)
 
 

@@ -95,7 +95,7 @@ class Tiling(object):
         T.points = self.points[:]
 
         # TODO: revert the stuff below
-        #T.jobs = self.jobs[:]
+        # T.jobs = self.jobs[:]
         T.jobs = copy.deepcopy(self.jobs)
         return T
 
@@ -362,7 +362,7 @@ mirrored-L corner __  |      |
             minY = min(minY, bl[1])
             maxY = max(maxY, tr[1])
 
-        return ((minX, minY), (maxX - config.Config['xspacing'], 
+        return ((minX, minY), (maxX - config.Config['xspacing'],
                 maxY - config.Config['yspacing']))
 
     def area(self):
