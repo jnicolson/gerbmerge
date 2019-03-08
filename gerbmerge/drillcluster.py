@@ -106,9 +106,9 @@ def remap(jobs, globalToolMap, debug=None):
         job = job.job  # access job inside job layout
         debug_print("\n  Job name: " + job.name)
         debug_print("\n  Original job tools:")
-        debug_print(str(job.xdiam))
+        debug_print(str(job.drills.xdiam))
         debug_print("\n  Original commands:")
-        debug_print(str(job.xcommands))
+        debug_print(str(job.drills.xcommands))
         new_tools = {}
         new_commands = {}
         for tool, diam in job.drills.xdiam.items():
