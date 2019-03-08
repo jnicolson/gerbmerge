@@ -4,19 +4,31 @@ from . import config, makestroke
 
 # Patterns for Excellon interpretation
 xtool_pat = re.compile(r'^(T\d+)$')           # Tool selection
-xydraw_pat = re.compile(r'^X([+-]?\d+)Y([+-]?\d+)$')    # Plunge command
+# xydraw_pat = re.compile(r'^X([+-]?\d+)Y([+-]?\d+)$')    # Plunge command
+xydraw_pat = re.compile(r'^X(?P<x>[+-]?\d+\.\d+)Y(?P<y>[+-]?\d+\.\d+)$')
 # Plunge command, repeat last Y value
 xdraw_pat = re.compile(r'^X([+-]?\d+)$')
 # Plunge command, repeat last X value
 ydraw_pat = re.compile(r'^Y([+-]?\d+)$')
+
 # Tool+diameter definition with optional
-xtdef_pat = re.compile(r'^(T\d+)(?:F\d+)?(?:S\d+)?C([0-9.]+)$')
 # feed/speed (for Protel)
+xtdef_pat = re.compile(r'^(T\d+)(?:F\d+)?(?:S\d+)?C([0-9.]+)$')
+
 # Tool+diameter definition with optional
-xtdef2_pat = re.compile(r'^(T\d+)C([0-9.]+)(?:F\d+)?(?:S\d+)?$')
 # feed/speed at the end (for OrCAD)
+xtdef2_pat = re.compile(r'^(T\d+)C([0-9.]+)(?:F\d+)?(?:S\d+)?$')
+
 # Leading/trailing zeros INCLUDED
 xzsup_pat = re.compile(r'^INCH,([LT])Z$')
+
+# Format header
+format_pat = re.compile(r'^FMAT,(\d)$')
+
+# Mode header
+position_mode_pat = re.compile(r'^G9[01]$')
+
+tool_mode_pat = re.compile(r'G0[0-5]')
 
 XIgnoreList = (
     re.compile(r'^%$'),
@@ -35,6 +47,8 @@ class ExcellonParser(object):
         self.xcommands = {}
         self.minx = self.miny = 9999999
         self.maxx = self.maxy = -9999999
+        # TODO: Replace with enum
+        self.mode = 'Absolute'
 
     def __str__(self):
         return ("xdiam: {}, ToolList: {}".format(self.xdiam, self.ToolList))
@@ -76,6 +90,25 @@ class ExcellonParser(object):
         for line in fid:
             # Get rid of CR characters
             line = line.replace('\x0D', '')
+
+            match = format_pat.match(line)
+            if match:
+                if match.group(1) == 1:
+                    raise RuntimeError("Drill file uses format 1 commands.  These are not supported at this time")
+                continue
+            
+            match = position_mode_pat.match(line)
+            if match:
+                if line == 'G90':
+                    self.mode = 'Absolute'
+                elif line == 'G91':
+                    self.mode = 'Incremental'
+                continue
+
+            match = tool_mode_pat.match(line)
+            if match:
+                # TODO: do something with the tool mode
+                continue
 
             # add support for DipTrace
             if line[:6] == 'METRIC':
