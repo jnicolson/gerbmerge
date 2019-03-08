@@ -392,6 +392,11 @@ def rotateJob(job, degrees=90, firstpass=True):
         J.gerbers[layername] = GerberParser()
         J.gerbers[layername].apxlat = {}
 
+        J.gerbers[layername].x_div = job.gerbers[layername].x_div
+        J.gerbers[layername].y_div = job.gerbers[layername].y_div
+        J.gerbers[layername].x_fmt = job.gerbers[layername].x_fmt
+        J.gerbers[layername].y_fmt = job.gerbers[layername].y_fmt
+
         for ap in job.gerbers[layername].apxlat:
             code = job.gerbers[layername].apxlat[ap]
             A = GAT[code]

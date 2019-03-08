@@ -304,8 +304,12 @@ def rectHeight(rect):
     return abs(rect[3] - rect[1])
 
 
-# Return center (X,Y) co-ordinates of rectangle.
 def rectCenter(rect):
+    return (rectWidth(rect) / 2, rectHeight(rect) / 2)
+
+
+# Return center (X,Y) co-ordinates of rectangle.
+def rectCenter2(rect):
     dx = rectWidth(rect)
     dy = rectHeight(rect)
 

@@ -12,8 +12,11 @@ gcode_pat = re.compile(r'G(\d{1,2})\*?')  # G-codes
 drawXY_pat = re.compile(r'X([+-]?\d+)Y([+-]?\d+)D0?([123])\*')  # Drawing command
 drawX_pat = re.compile(r'X([+-]?\d+)D0?([123])\*')  # Drawing command, Y is implied
 drawY_pat = re.compile(r'Y([+-]?\d+)D0?([123])\*')  # Drawing command, X is implied
-format_pat = re.compile(r'%FS(L|T)?(A|I)(N\d+)?(X\d\d)(Y\d\d)\*%')  # Format statement
+format_pat = re.compile(r'%FS(?P<zeros>L|T|D)?(?P<coord_mode>A|I)(N\d+)?X(?P<x>[0-6][0-6])Y(?P<y>[0-6][0-6])\*%')  # Format statement
 layerpol_pat = re.compile(r'^%LP[CD]\*%')  # Layer polarity (D=dark, C=clear)
+
+units_pat = re.compile(r'^%MO(?P<units>IN|MM)\*%')
+
 
 # Gerber X2
 attr_pat = re.compile(r'\%TF\.(.*?),(.*)\*\%')
@@ -40,7 +43,6 @@ IgnoreList = ( \
     re.compile(r'\*'),            # Empty statement
     re.compile(r'^%IN.*\*%'),
     re.compile(r'^%ICAS\*%'),      # Not in RS274X spec.
-    re.compile(r'^%MOIN\*%'),
     re.compile(r'^%ASAXBY\*%'),
     re.compile(r'^%AD\*%'),        # GerbTool empty aperture definition
     re.compile(r'^%LN.*\*%')       # Layer name
@@ -78,7 +80,7 @@ class GerberParser(object):
         #        else the tuple is unsigned.
         #
         # This variable is, as for apxlat, a dictionary keyed by layer name.
-        self.commands = {}
+        self.commands = []
 
         # This list stores all GLOBAL apertures actually needed by this
         # layer, i.e., apertures specified prior to draw commands.  Each entry
@@ -125,17 +127,12 @@ class GerberParser(object):
         fid = open(self.filename, 'rt')
         currtool = None
 
-        self.apxlat = {}
-        self.apmxlat = {}
-        self.commands = []
-        self.apertures = []
-
         # These divisors are used to scale (X,Y) co-ordinates. We store
         # everything as integers in hundred-thousandths of an inch (i.e., M.5
         # format). If we get something in M.4 format, we must multiply by
         # 10. If we get something in M.6 format we must divide by 10, etc.
-        x_div = 1.0
-        y_div = 1.0
+        self.x_div = 1.0
+        self.y_div = 1.0
 
         # Drawing commands can be repeated with X or Y omitted if they are
         # the same as before. These variables store the last X/Y value as
@@ -182,6 +179,13 @@ class GerberParser(object):
                 self.commands.append(line)
                 continue
 
+            match = units_pat.match(line)
+            if match:
+                self.units = match.group('units')
+                if self.units == 'MM' and config.Config['measurementunits'] == 'inch':
+                    raise RuntimeError("Units in gerber {} doesn't match config".format(self.filename))
+                continue
+
             match = attr_pat.match(line)
             if match:
                 self.attributes.append({"name": match.group(1), "value": match.group(2)})
@@ -216,17 +220,6 @@ class GerberParser(object):
             # is not yet supported in GerbMerge.
             if line[:7] == '%AMOC8*':
                 continue
-
-            # DipTrace specific fixes, but could be emitted by any CAD program. They are Standard Gerber RS-274X
-            # a hack to fix lack of recognition for metric direction from
-            # DipTrace - %MOMM*%
-            if (line[:7] == '%MOMM*%'):
-                if (config.Config['measurementunits'] == 'inch'):
-                    raise RuntimeError(
-                        "File %s units do match config file" % self.filename)
-                else:
-                    # print("ignoring metric directive: " + line)
-                    continue  # ignore it so func doesn't choke on it
 
             if line[:3] == '%SF':  # scale factor - we will ignore it
                 print('Scale factor parameter ignored: ' + line)
@@ -268,46 +261,19 @@ class GerberParser(object):
                 # Used to be format_pat.search
                 match = format_pat.match(sub_line)
                 if match:
+                    if match.group('zeros') != "L":
+                        raise RuntimeError("RS274X only allows Leading Zero mode")
+                    
+                    if match.group('coord_mode') != "A":
+                        raise RuntimeError("RS274X only allows Absolute Coordinates")
+
+                    self.x_fmt = match.group('x')
+                    self.y_fmt = match.group('y')
+                    
+                    self.x_div = 10.0**(-int(match.group('x')[1]))
+                    self.y_div = 10.0**(-int(match.group('y')[1]))
+
                     sub_line = sub_line[match.end():]
-                    for item in match.groups():
-                        if item is None:
-                            continue   # Optional group didn't match
-
-                        if item[0] in "LA":   # omit leading zeroes and absolute co-ordinates
-                            continue
-
-                        if item[0] == 'T':      # omit trailing zeroes
-                            raise RuntimeError(
-                                "Trailing zeroes not supported in RS274X files")
-                        if item[0] == 'I':      # incremental co-ordinates
-                            raise RuntimeError(
-                                "Incremental co-ordinates not supported in RS274X files")
-
-                        if item[0] == 'N':      # Maximum digits for N* commands...ignore it
-                            continue
-
-                        # allow for metric - scale to 1/1000 mm
-                        if config.Config['measurementunits'] == 'inch':
-                            # M.N specification for X-axis.
-                            if item[0] == 'X':
-                                fracpart = int(item[2])
-                                x_div = 10.0**(5 - fracpart)
-                            # M.N specification for Y-axis.
-                            if item[0] == 'Y':
-                                fracpart = int(item[2])
-                                y_div = 10.0**(5 - fracpart)
-                        else:
-                            # M.N specification for X-axis.
-                            if item[0] == 'X':
-                                fracpart = int(item[2])
-                                x_div = 10.0**(3 - fracpart)
-                                # print("x_div= %5.3f." % x_div)
-                            # M.N specification for Y-axis.
-                            if item[0] == 'Y':
-                                fracpart = int(item[2])
-                                y_div = 10.0**(3 - fracpart)
-                                # print("y_div= %5.3f." % y_div)
-
                     continue
 
                 # Parse and interpret G-codes
@@ -458,11 +424,11 @@ class GerberParser(object):
                             self.miny = min(self.miny, 0)
                             self.maxy = max(self.maxy, 0)
 
-                    x = int(round(x * x_div))
-                    y = int(round(y * y_div))
+                    x = round(x * self.x_div, int(self.x_fmt[1]))
+                    y = round(y * self.y_div, int(self.y_fmt[1]))
                     if I is not None:
-                        I = int(round(I * x_div))
-                        J = int(round(J * y_div))
+                        I = round(I * self.x_div, int(self.x_fmt[1]))
+                        J = round(J * self.y_div, int(self.y_fmt[1]))
                         self.commands.append(
                             (x, y, I, J, d, circ_signed))
                     else:
@@ -723,16 +689,8 @@ class GerberParser(object):
     def write(self, fid, Xoff, Yoff):
         "Write out the data such that the lower-left corner of this job is at the given (X,Y) position, in inches"
 
-        # add metric support (1/1000 mm vs. 1/100,000 inch)
-        # TODO: config
-        if config.Config['measurementunits'] == 'inch':
-            # First convert given inches to 2.5 co-ordinates
-            X = int(round(Xoff / 0.00001))
-            Y = int(round(Yoff / 0.00001))
-        else:
-            # First convert given mm to 5.3 co-ordinates
-            X = int(round(Xoff / 0.001))
-            Y = int(round(Yoff / 0.001))
+        X = int(round(Xoff / self.x_div))
+        Y = int(round(Yoff / self.y_div))
 
         # Now calculate displacement for each position so that we end up at
         # specified origin
