@@ -78,7 +78,7 @@ class GerberParser(object):
         #        else the tuple is unsigned.
         #
         # This variable is, as for apxlat, a dictionary keyed by layer name.
-        self.commands = {}
+        self.commands = []
 
         # This list stores all GLOBAL apertures actually needed by this
         # layer, i.e., apertures specified prior to draw commands.  Each entry
@@ -122,11 +122,6 @@ class GerberParser(object):
 
         fid = open(self.filename, 'rt')
         currtool = None
-
-        self.apxlat = {}
-        self.apmxlat = {}
-        self.commands = []
-        self.apertures = []
 
         # These divisors are used to scale (X,Y) co-ordinates. We store
         # everything as integers in hundred-thousandths of an inch (i.e., M.5

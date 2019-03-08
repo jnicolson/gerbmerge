@@ -52,11 +52,7 @@ GUI = None
 def writeGerberHeader22degrees(fid):
     if config.Config['measurementunits'] == 'inch':
         fid.write(
-            """G75*
-G70*
-%OFA0B0*%
-%FSLAX25Y25*%
-%IPPOS*%
+            """%FSLAX25Y25*%
 %LPD*%
 %AMOC8*
 5,1,8,0,0,1.08239X$1,22.5*
@@ -64,12 +60,8 @@ G70*
 """)
     else:    # assume mm - also remove eagleware hack for %AMOC8
         fid.write(
-            """G75*
-G71*
+            """%FSLAX53Y53*%
 %MOMM*%
-%OFA0B0*%
-%FSLAX53Y53*%
-%IPPOS*%
 %LPD*%
 """)
 
@@ -77,11 +69,7 @@ G71*
 def writeGerberHeader0degrees(fid):
     if config.Config['measurementunits'] == 'inch':
         fid.write(
-            """G75*
-G70*
-%OFA0B0*%
-%FSLAX25Y25*%
-%IPPOS*%
+            """%FSLAX25Y25*%
 %LPD*%
 %AMOC8*
 5,1,8,0,0,1.08239X$1,0.0*
@@ -89,12 +77,8 @@ G70*
 """)
     else:    # assume mm - also remove eagleware hack for %AMOC8
         fid.write(
-            """G75*
-G71*
+            """%FSLAX53Y53*%
 %MOMM*%
-%OFA0B0*%
-%FSLAX53Y53*%
-%IPPOS*%
 %LPD*%
 """)
 
