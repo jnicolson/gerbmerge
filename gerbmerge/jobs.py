@@ -56,32 +56,8 @@ class Job(object):
         self.maxx = self.maxy = -9999999
         self.minx = self.miny = 9999999
 
-        # Excellon commands are grouped by tool number in a dictionary.
-        # This is to help sorting all jobs and writing out all plunge
-        # commands for a single tool.
-        #
-        # The key to this dictionary is the full tool name, e.g., T03
-        # as a string. Each command is an (X,Y) integer tuple.
-        self.xcommands = {}
-
-        # This is a dictionary mapping LOCAL tool names (e.g., T03) to diameters
-        # in inches for THIS JOB. This dictionary will be initially empty
-        # for old-style Excellon files with no embedded tool sizes. The
-        # main program will construct this dictionary from the global tool
-        # table in this case, once all jobs have been read in.
-        self.xdiam = {}
-
-        # This is a mapping from tool name to diameter for THIS JOB
-        self.ToolList = None
-
         # How many times to replicate this job if using auto-placement
         self.Repeat = 1
-
-        # How many decimal digits of precision there are in the Excellon file.
-        # A value greater than 0 overrides the global ExcellonDecimals setting
-        # for this file, allowing jobs with different Excellon decimal settings
-        # to be combined.
-        self.ExcellonDecimals = 0     # 0 means global value prevails
 
         self.drills = None
         self.gerbers = {}
@@ -89,7 +65,7 @@ class Job(object):
     @property
     def width(self):
         # add metric support (1/1000 mm vs. 1/100,000 inch)
-        # TODO: config
+        # TODO: config, hard coded format
         if config.Config['measurementunits'] == 'inch':
             "Return width in INCHES"
             return float(self.maxx - self.minx) * 0.00001
@@ -99,7 +75,7 @@ class Job(object):
     @property
     def height(self):
         # add metric support (1/1000 mm vs. 1/100,000 inch)
-        # TODO: config
+        # TODO: config, hard coded format
         if config.Config['measurementunits'] == 'inch':
             "Return height in INCHES"
             return float(self.maxy - self.miny) * 0.00001
@@ -301,6 +277,7 @@ class JobLayout(object):
                 BL = (BL[0], BL[1] + 2 * radius)
                 BR = (BR[0], BR[1] + 2 * radius)
 
+            # TODO: Fix hard coded units
             BL = (util.in2gerb(BL[0]), util.in2gerb(BL[1]))
             TL = (util.in2gerb(TL[0]), util.in2gerb(TL[1]))
             TR = (util.in2gerb(TR[0]), util.in2gerb(TR[1]))

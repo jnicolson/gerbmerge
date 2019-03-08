@@ -241,6 +241,8 @@ Thanks to Matt Kavalauskas for identifying Eagle's annulus and thermal macros an
 
 Thanks to Bohdan Zograf for the [Belorussian translation](http://webhostingrating.com/libs/gerbmerge-be) of this documentation.
 
+Copyright &copy; 2019 Jarl Nicolson.  All Rights Reserved
+
 Copyright &copy; 2013 [ProvideYourOwn.com](http://provideyourown.com). All Rights Reserved.
 
 Portions (version 1.8 & prior): Copyright &copy; 2003-2011, Copyright by [Rugged Circuits LLC](http://ruggedcircuits.com); All Rights Reserved. mailto: [support@ruggedcircuits.com](mailto:support@ruggedcircuits.com?subject=GerbMerge)
