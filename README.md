@@ -1,6 +1,9 @@
 # GerbMerge -- A Gerber-file merging program
 
 ## What's New
+In Release 1.x
+* Python 3
+* Split up parsing
 
 In release 1.9
 * Added metric support
